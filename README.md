@@ -234,7 +234,7 @@ Nút **Tự tìm quái** cạnh Shop thuốc bật/tắt tự di chuyển đến
 
 ## Nhân vật luyện cấp mô phỏng
 
-Nút **Menu bot** bên phải **Tự tìm quái** mở menu riêng: **+1 bot**, **−1 bot**, hoặc **Tắt toàn bộ**. Mỗi lần bấm thêm/bớt đúng một nhân vật, tối đa 12 nhân vật; sau khi tắt toàn bộ, bấm +1 để bật một nhân vật. Màu tên giống người chơi. Tên ngẫu nhiên, không có nhãn trên map. Các nhân vật này được mô phỏng tại trình duyệt, không phải tài khoản online và không tham gia chat/bảng xếp hạng.
+Nút **Menu bot** bên phải **Tự tìm quái** mở menu riêng: **+1 bot**, **−1 bot**, hoặc **Tắt toàn bộ**. Mỗi lần bấm thêm/bớt đúng một nhân vật, tối đa 30 nhân vật; sau khi tắt toàn bộ, bấm +1 để bật một nhân vật. Màu tên giống người chơi. Tên ngẫu nhiên, không có nhãn trên map. Các nhân vật này được mô phỏng tại trình duyệt, không phải tài khoản online và không tham gia chat/bảng xếp hạng.
 
 Nhân vật mới có cấp gần cấp map. Trang bị, yêu cầu mặc đồ và võ công lấy từ dữ liệu game, giới hạn theo cấp và môn phái; lên cấp bằng EXP khi hạ quái. Khi quay về map thấp, cấp chiến đấu và đồ/chiêu được giới hạn theo map. Quái chỉ do nhân vật mô phỏng hạ không cấp EXP/đồ cho người chơi; người chơi cùng đánh vẫn nhận thưởng. Bot chỉ hoạt động ở bãi train, không tham gia Luyện công sinh tồn, Tống Kim, tháp hay công thành. Danh sách/cấp/EXP và mật độ được lưu cùng nhân vật.
 

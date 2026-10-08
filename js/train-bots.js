@@ -1,5 +1,5 @@
 "use strict";
-const TRAIN_BOT_MAX = 12;
+const TRAIN_BOT_MAX = 30;
 const TRAIN_BOTS = { actors: new Map(), map: '' };
 const BOT_NAMES = ['Lệnh Hồ Xung','Đông Phương Bại','Độc Cô Cầu Bại','Dương Quá','Tiểu Long Nữ','Quách Tĩnh','Hoàng Dung','Trương Vô Kỵ','Triệu Mẫn','Chu Chỉ Nhược','Kiều Phong','Đoàn Dự','Hư Trúc','Vương Ngữ Yên','Nhậm Doanh Doanh','Vi Tiểu Bảo','Lục Tiểu Phụng','Hoa Mãn Lâu','Sở Lưu Hương','Lý Tầm Hoan','A Phi','Tây Môn Xuy Tuyết','Ăn Mì Đánh Quái','Đại Hiệp Hết Tiền','Kiếm Sĩ Mất Dép','Bún Bò Đại Hiệp','Lão Hạc Cầm Kiếm','Cày Thuê Trả Nợ','Bang Chủ Ngủ Gật','Thánh Né Deadline','Độc Cô Ăn Vạ','Hết Mana Rồi','Một Đấm Ăn Cơm','Đang Đợi Lương','Sư Phụ Mất Wifi','Kiếm Khách Ăn Hành','Tiểu Nhị Bán Bún','Chưởng Môn Sợ Vợ','Đại Ca Bán Cá','Cô Nương Ăn Lẩu'];
 const BOT_FIRST = ['Thiên','Phong','Long','Hàn','Ngọc','Bạch','Vân','Lâm','Kiếm','Tiểu','Mộc','Tử'];
