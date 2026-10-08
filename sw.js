@@ -1,7 +1,7 @@
 // Mang truoc, cache du phong: luon lay ban moi khi co mang, choi offline khi mat mang
 // QA-021: truoc day ten cache co dinh 'jxidle-v1' va khong precache -> co the phuc vu HTML cu tro toi JS moi.
-const C = 'jxidle-v32';   // v25: tai khoan va dong bo cloud, khoi phuc storage an toan
-const CORE = ['./index.html', './style.css', './ui/jx2.css?v=28', './js/action-collapse.js?v=2', './js/jxshell.js?v=24', './js/ui.js?v=24', './manifest.json', './js/core.js', './js/main.js', './js/render.js?v=32', './js/combat.js?v=32', './js/survival.js?v=32', './js/train-bots.js?v=32', './js/bot-party.js?v=28', './js/modes.js?v=27', './js/quick.js?v=27', './js/cloud-storage.js?v=1', './js/cloud-account.js?v=3', './ui/cloud-account.css?v=1', './js/online.js?v=25', './ref.js', './data.js', './world.js'];
+const C = 'jxidle-v33';   // v25: tai khoan va dong bo cloud, khoi phuc storage an toan
+const CORE = ['./index.html', './style.css', './ui/jx2.css?v=33', './js/action-collapse.js?v=2', './js/jxshell.js?v=24', './js/ui.js?v=33', './manifest.json', './ui/kim-nguyen-bao.svg', './js/save.js?v=33', './js/rewards.js?v=33', './js/core.js', './js/main.js', './js/render.js?v=32', './js/combat.js?v=32', './js/survival.js?v=33', './js/train-bots.js?v=32', './js/bot-party.js?v=28', './js/modes.js?v=27', './js/quick.js?v=27', './js/cloud-storage.js?v=1', './js/cloud-account.js?v=3', './ui/cloud-account.css?v=1', './js/online.js?v=25', './ref.js', './data.js', './world.js'];
 self.addEventListener('install', e => e.waitUntil(
   caches.open(C).then(c => c.addAll(CORE)).catch(() => caches.open(C))
     .then(() => self.skipWaiting())

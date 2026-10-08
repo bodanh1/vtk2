@@ -754,3 +754,5 @@ body:not(.jxthumb).actionsCollapsed #jxStat{top:calc(100px + var(--safe-t,0px))}
 body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(169px + var(--safe-t,0px))!important}
 
 .partyHudTitle{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.partyHudToggle{touch-action:none}
+
+.hknb{color:#ffd700}.hknb img{width:20px;height:14px;image-rendering:auto}
