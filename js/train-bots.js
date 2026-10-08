@@ -16,6 +16,22 @@ function botConfig() {
     b.xp = Math.max(0, Number.isFinite(+b.xp) ? +b.xp : 0);
     b.kills = Math.max(0, Math.floor(+b.kills || 0));
   }
+  const zone=zoneOf(Math.min(S.stage,STAGES));
+  if(cfg.zone!==zone.id){
+    const changed=cfg.zone!==undefined,count=cfg.list.length;
+    cfg.zone=zone.id;
+    if(changed){
+      cfg.list=[];
+      TRAIN_BOTS.actors.clear();TRAIN_BOTS.map='';TRAIN_BOTS.nextSpawnAt=0;
+      R.enemies=R.enemies.filter(e=>!e.botWild);
+      const hadParty=S.botParty&&S.botParty.members&&S.botParty.members.length;
+      if(S.botParty){S.botParty.members=[];S.botParty.leader='player';S.botParty.lootTurn=0;S.botParty.history=[]}
+      if(typeof BOT_PARTY!=='undefined'){BOT_PARTY.invite=null;BOT_PARTY.nextInvite=Date.now()+30000}
+      for(let i=0;i<count;i++)addTrainBot();
+      const hud=document.getElementById('partyHud');if(hud)hud.classList.add('hidden');
+      if(hadParty)toast('Đã sang map mới: tổ đội cũ giải tán. Hãy tìm đội mới.');
+    }
+  }
   return cfg;
 }
 function addTrainBot() {
@@ -23,7 +39,7 @@ function addTrainBot() {
   if (cfg.list.length >= TRAIN_BOT_MAX) return false;
   const name=botRandomName(cfg.list);
   const fac = Object.keys(FAC)[irnd(0,Object.keys(FAC).length-1)];
-  cfg.list.push({id:crypto.randomUUID(),name,fac,sex:irnd(0,1),lvl:clamp(stageLevel(S.stage)+irnd(-2,2),1,MAX_LEVEL),xp:0,kills:0});
+  cfg.list.push({id:crypto.randomUUID(),name,fac,sex:irnd(0,1),lvl:clamp(irnd(zoneOf(Math.min(S.stage,STAGES)).lo,zoneOf(Math.min(S.stage,STAGES)).hi),1,MAX_LEVEL),xp:0,kills:0});
   return true;
 }
 const botsAvailable = () => S && S.fac && botConfig().on && !R.town && !R.tk && !R.tower && !S.siege && !SV.on;
@@ -46,7 +62,7 @@ function botsTick(dt) {
       b={data,x,y,homeX,homeY,patrol:null,patrolT:0,targetId:null,spawnT:0,skillIndex:0,dir:0,face:1,act:'st',actT:0,cd:rnd(0,.8),hp:100,maxhp:100,deadT:0};
       TRAIN_BOTS.actors.set(data.id,b);
     }
-    const effectiveLevel=Math.min(data.lvl,Math.max(1,stageLevel(S.stage)+2));
+    const zone=zoneOf(Math.min(S.stage,STAGES)),effectiveLevel=clamp(data.lvl,Math.max(1,zone.lo),Math.min(MAX_LEVEL,zone.hi));
     const profileKey=S.mode+':'+effectiveLevel;
     if(b.profileKey!==profileKey){b.profile=botProfile(data,effectiveLevel);b.profileKey=profileKey;b.maxhp=b.profile.P.life;b.hp=b.maxhp;b.mana=b.profile.P.mana}
     const oldX=b.x,oldY=b.y;
