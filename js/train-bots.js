@@ -202,7 +202,7 @@ function botSkillHit(b,a,e){
   if(a.stun&&!(e.stunImm>0)&&Math.random()*100<a.stun){e.stun=e.cls==='boss'?.5:.8;e.stunImm=e.cls==='boss'?STUN_IMM_BOSS:e.cls==='elite'?STUN_IMM_ELITE:0}
   b.hp=Math.min(b.maxhp,b.hp+total*(P.leech||0)/100);b.mana=Math.min(P.mana,b.mana+total*(P.manaLeech||0)/100);
   if(e.hp<=0)e.botFinisher=b.data.id;
-  if(onScreen(e.x,e.y,160))addText(e.x,e.y-e.r-6,fmt(total),crit?'#ffe14a':skillFxColor(a),crit?16:12);
+  if(onScreen(e.x,e.y,160))addText(e.x,e.y-e.r-6,fmt(total),'#ff0000',crit?16:12,'Arial');
 }
 function nearestTrainBot(e){
   if(!botsAvailable())return null;
