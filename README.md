@@ -187,7 +187,7 @@ Bản chạy cục bộ (start_game.bat) vẫn gọi được máy chủ online,
 
 ### Triển khai máy chủ (dành cho người quản trị)
 
-Máy chủ là Cloudflare Worker `jx-idle-final` (cấu hình trong `wrangler.jsonc`, mã trong `worker/`), phục vụ cả game lẫn API `/api/*`, dữ liệu lưu trong D1.
+Máy chủ là Cloudflare Worker `game` (cấu hình trong `wrangler.jsonc`, mã trong `worker/`), phục vụ cả game lẫn API `/api/*`, dữ liệu lưu trong D1.
 
 1. `npm install`, rồi `npx wrangler deploy`. D1 `jx-idle-final-db` đã khai báo kèm `database_id` trong `wrangler.jsonc`.
 2. Bảng dữ liệu được Worker tự tạo ở request đầu tiên. Không cần chạy migration riêng.
@@ -228,4 +228,4 @@ ZIP gồm tệp cần để chạy trò chơi offline, dữ liệu nhân vật, 
 
 Nút 💬 ở góc dưới bên trái, ngay trên thanh vật phẩm, bật/tắt khung chat. Mọi map và chế độ dùng chung kênh; không cần đăng ký tài khoản PvP. Mã ngắn sau tên giúp phân biệt người chơi trùng tên. Tin nhắn tối đa 300 ký tự, cập nhật khoảng 4 giây khi mở chat và được giữ 7 ngày. Đóng chat hoặc ẩn tab sẽ dừng tải tin.
 
-Máy chủ chat chung là `https://vltk3ae.vltk.workers.dev`. Các bản game khác phải tích hợp `js/global-chat.js` và dùng cùng máy chủ để tham gia. Có thể đặt `window.JX_CHAT_API` để chọn máy chủ chat khác (hoặc `window.JX_API` khi thử cục bộ). Bảng D1 được tự tạo sau deploy, không cần thao tác thủ công. Kiểm thử dùng Node.js 22.13+ (SQLite tích hợp).
+Máy chủ chat chung là `https://game.vltk.workers.dev`. Các bản game khác phải tích hợp `js/global-chat.js` và dùng cùng máy chủ để tham gia. Có thể đặt `window.JX_CHAT_API` để chọn máy chủ chat khác (hoặc `window.JX_API` khi thử cục bộ). Bảng D1 được tự tạo sau deploy, không cần thao tác thủ công. Kiểm thử dùng Node.js 22.13+ (SQLite tích hợp).

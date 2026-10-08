@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "jx-idle-final",
+  "name": "game",
   "main": "worker/src/index.js",
   // Đóng gói mã game cho máy chủ (worker/gen/game.js) trước mỗi lần dev/deploy.
   "build": { "command": "node worker/build-game.mjs", "watch_dir": "worker/src" },
