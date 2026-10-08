@@ -756,3 +756,5 @@ body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(169px + var(--safe-t,
 .partyHudTitle{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.partyHudToggle{touch-action:none}
 
 .hknb{color:#ffd700}.hknb img{width:20px;height:14px;image-rendering:auto}
+
+.invWallet>div{display:flex;align-items:center;gap:5px;min-height:20px}

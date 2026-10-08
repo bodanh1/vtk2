@@ -94,3 +94,8 @@ html.jxo #jxDim{background:transparent;pointer-events:none}                     
 /* Give the companion skill list enough space for Vietnamese names and controls. */
 html.jxo #panel[data-jxk=skill] .jxx{width:360px;max-width:calc(100vw - var(--jxl) - var(--jxw) - 16px)}
 html.jxo #panel[data-jxk=inv] .jxx{width:360px;max-width:calc(var(--jxl) - 16px)}
+
+/* Kim Nguyên Bảo nằm dưới ngân lượng; các nút rao bán chưa dùng nằm ở hàng cuối. */
+.jxf-item .jxKnbIcon{left:25px;top:374px;width:20px;height:14px;background:url(../kim-nguyen-bao.svg) center/contain no-repeat}
+.jxf-item [data-c=GoldCoin]{left:53px;top:373px;width:139px;height:16px;line-height:16px;color:#ffd700}
+.jxf-item [data-c=MakeAdvBtn],.jxf-item [data-c=MarkPriceBtn],.jxf-item [data-c=MakeStallBtn]{top:426px}
