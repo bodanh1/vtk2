@@ -50,9 +50,9 @@ test("điểm tiềm năng và kỹ năng vượt mức bị gắn cờ", () => 
 });
 
 test("cấp vượt ngưỡng giờ chơi bị gắn cờ, đủ giờ thì không", () => {
-  const s = makeChar(120);
-  assert.ok(codes(validateChar(s, 600)).includes("level_time"));
-  assert.ok(!codes(validateChar(s, minSecForLevel(120) + 1)).includes("level_time"));
+  const s = makeChar(180);
+  assert.ok(codes(validateChar(s, Math.max(0,minSecForLevel(180)-1))).includes("level_time"));
+  assert.ok(!codes(validateChar(s, minSecForLevel(180) + 1)).includes("level_time"));
   assert.ok(levelCapForTime(0) >= 1);
 });
 
