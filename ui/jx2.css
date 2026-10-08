@@ -715,3 +715,8 @@ body.jxland .acts{max-width:276px}
 .acts .rnd[data-r=hunt] i,.acts .rnd[data-r=hunt].on i{background-image:url(v3/q_hunt.svg);background-position:center;background-size:100% 100%}
 .acts .rnd[data-r=hunt].on i{filter:brightness(1.3) drop-shadow(0 0 2px #e9bd4a)}
 body.jxland .acts{max-width:320px}
+
+body.jxland .acts{max-width:364px}
+
+.botlist{display:grid;gap:6px;margin-top:8px}.botrow{padding:8px;border:1px solid #9e895b66;background:#102017aa}.botrow b,.botrow small{display:block}.botrow small{color:#b9cebb;line-height:1.5;white-space:normal}
+@media(max-width:359px){.acts,body.jxthumb .acts{max-width:calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 8px);flex-wrap:wrap}}
