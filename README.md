@@ -239,3 +239,7 @@ Nút **Menu bot** bên phải **Tự tìm quái** mở menu riêng: Trung bình 
 Nhân vật mới có cấp gần cấp map. Trang bị, yêu cầu mặc đồ và võ công lấy từ dữ liệu game, giới hạn theo cấp và môn phái; lên cấp bằng EXP khi hạ quái. Khi quay về map thấp, cấp chiến đấu và đồ/chiêu được giới hạn theo map. Quái chỉ do nhân vật mô phỏng hạ không cấp EXP/đồ cho người chơi; người chơi cùng đánh vẫn nhận thưởng. Bot chỉ hoạt động ở bãi train, không tham gia Luyện công sinh tồn, Tống Kim, tháp hay công thành. Danh sách/cấp/EXP và mật độ được lưu cùng nhân vật.
 
 Nhân vật luyện cấp được rải vào các khu vực riêng trên toàn map, tuần tra trong khu vực và ưu tiên quái chưa có nhân vật mô phỏng khác nhắm tới. Khi hết quái, tiếp tục tuần tra; hồi sinh tại khu vực riêng thay vì tụ quanh người chơi.
+
+Tên nhân vật mô phỏng lấy từ danh sách kiếm hiệp và tên hài vui, không có số phía sau; tên cũ có số được tự đổi. Môn phái ngẫu nhiên. Bot dùng kỹ năng thật đã học theo cấp, luân phiên tối đa 4 chiêu, tiêu hao/hồi mana và hiệu ứng gốc của game. Quái có thể nhắm và đánh bot, bot chết sẽ hồi sinh ở khu vực riêng. Quái bổ sung quanh các khu tuần tra giúp nhân vật ở xa tiếp tục luyện cấp; quái này không tính vào tiến độ vượt ải.
+
+Trang bị là vật phẩm thật, được vẽ bằng hệ thống nhân vật của game. Bậc đồ và yêu cầu mặc bị giới hạn theo cấp chiến đấu; cấp dưới 20 mặc đồ thường, từ cấp 20/50/90 tăng chất lượng, tuân theo trần đồ của từng chế độ. Áo, mũ, giày và vũ khí được nâng theo cấp, kiểm tra yêu cầu chỉ số/giới tính/môn phái.
