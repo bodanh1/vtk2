@@ -1,6 +1,6 @@
 "use strict";
 const TRAIN_BOT_MAX = 30;
-const TRAIN_BOTS = { actors: new Map(), map: '' };
+const TRAIN_BOTS = { actors: new Map(), map: '', nextSpawnAt:0 };
 const BOT_NAMES = ['Lệnh Hồ Xung','Đông Phương Bại','Độc Cô Cầu Bại','Dương Quá','Tiểu Long Nữ','Quách Tĩnh','Hoàng Dung','Trương Vô Kỵ','Triệu Mẫn','Chu Chỉ Nhược','Kiều Phong','Đoàn Dự','Hư Trúc','Vương Ngữ Yên','Nhậm Doanh Doanh','Vi Tiểu Bảo','Lục Tiểu Phụng','Hoa Mãn Lâu','Sở Lưu Hương','Lý Tầm Hoan','A Phi','Tây Môn Xuy Tuyết','Ăn Mì Đánh Quái','Đại Hiệp Hết Tiền','Kiếm Sĩ Mất Dép','Bún Bò Đại Hiệp','Lão Hạc Cầm Kiếm','Cày Thuê Trả Nợ','Bang Chủ Ngủ Gật','Thánh Né Deadline','Độc Cô Ăn Vạ','Hết Mana Rồi','Một Đấm Ăn Cơm','Đang Đợi Lương','Sư Phụ Mất Wifi','Kiếm Khách Ăn Hành','Tiểu Nhị Bán Bún','Chưởng Môn Sợ Vợ','Đại Ca Bán Cá','Cô Nương Ăn Lẩu'];
 const BOT_FIRST = ['Thiên','Phong','Long','Hàn','Ngọc','Bạch','Vân','Lâm','Kiếm','Tiểu','Mộc','Tử'];
 const BOT_LAST = ['Vũ','Ảnh','Phong','Tâm','Sơn','Hổ','Nguyệt','Long','Minh','Hà','Trúc','Yến'];
@@ -33,13 +33,16 @@ function botsTick(dt) {
   const cfg = botConfig(), map = saveKey()+':'+S.stage;
   if (TRAIN_BOTS.map !== map) { TRAIN_BOTS.actors.clear();R.enemies=R.enemies.filter(e=>!e.botWild); TRAIN_BOTS.map=map }
   for (const id of TRAIN_BOTS.actors.keys()) if (!cfg.list.some(b=>b.id===id)) TRAIN_BOTS.actors.delete(id);
+  R.enemies=R.enemies.filter(e=>!e.botWild||cfg.list.some(b=>b.id===e.botWild));
   const claimed = new Set();
   for (const [index,data] of cfg.list.entries()) {
     let b = TRAIN_BOTS.actors.get(data.id);
     if (!b) {
-      const cols=Math.ceil(Math.sqrt(cfg.list.length)),rows=Math.ceil(cfg.list.length/cols);
-      const [homeX,homeY]=obsSnap(...inWorld(WORLD.w*(.12+.76*((index%cols)+.5)/cols),WORLD.h*(.12+.76*(Math.floor(index/cols)+.5)/rows)));
-      const [x,y] = obsSnap(...inWorld(homeX+rnd(-60,60),homeY+rnd(-60,60)));
+      const now=performance.now();
+      if(now<TRAIN_BOTS.nextSpawnAt)continue;
+      TRAIN_BOTS.nextSpawnAt=now+40;
+      const [homeX,homeY]=botHomePoint(index);
+      const [x,y]=[homeX,homeY];
       b={data,x,y,homeX,homeY,patrol:null,patrolT:0,targetId:null,spawnT:0,skillIndex:0,dir:0,face:1,act:'st',actT:0,cd:rnd(0,.8),hp:100,maxhp:100,deadT:0};
       TRAIN_BOTS.actors.set(data.id,b);
     }
@@ -76,7 +79,7 @@ function botsTick(dt) {
           b.skillIndex++;
           const center=attack.around?b:target,splash=attack.around?attack.rad+40:110;
           const victims=[target,...alive().filter(e=>e!==target&&Math.hypot(e.x-center.x,e.y-center.y)<(attack.targets>1?splash:0)).slice(0,attack.targets-1)];
-          for(const victim of victims){botSkillHit(b,attack,victim);skillFx(b,victim,attack)}
+          for(const victim of victims){botSkillHit(b,attack,victim);if(onScreen(b.x,b.y,160)||onScreen(victim.x,victim.y,160))skillFx(b,victim,attack)}
           b.cd=1/Math.max(.2,attack.rate);b.act=heroAttackAction(attack)||'at';b.actT=0;
           const length=typeof dollActLen==='function'?dollActLen(b.profile.state,b.act):0;
           b.actK=length>0?Math.min(3,Math.max(1,length/(.9/attack.rate))):1;
@@ -103,8 +106,9 @@ function botGainKill(b,e) {
 }
 function drawTrainBot(b,dt) {
   const c=CX,hw=W.hero[b.data.fac];
-  c.fillStyle='#0007';c.beginPath();c.ellipse(b.x,b.y,16,6,0,0,7);c.fill();
   b.animKey=hw&&hw.anim;stepAct(b,dt,b.deadT>0?'die':b.moving?'run':'st');
+  if(!onScreen(b.x,b.y,160))return;
+  c.fillStyle='#0007';c.beginPath();c.ellipse(b.x,b.y,16,6,0,0,7);c.fill();
   const dollHeight=typeof drawDoll==='function'?drawDoll(c,b.x,b.y,b.act||'st',b.dir||0,b.actT||0,HERO_DOLL_SCALE,b.deadT>0?.4:1,b.profile&&b.profile.state):0;
   const h=dollHeight||hw&&drawAnim(hw.anim,b.act||'st',b.dir||0,b.actT||0,b.x,b.y,HERO_SCALE,b.deadT>0?.4:1);
   if(!h&&hw)drawSprite(img(hw.img),hw.sz,b.x,b.y,.9,b.face<0);
@@ -114,7 +118,7 @@ function setBotPopulation(count) {
   count=clamp(Math.floor(count),0,TRAIN_BOT_MAX);
   const cfg=botConfig();
   if(count===0){cfg.on=false;TRAIN_BOTS.actors.clear()}
-  else {while(cfg.list.length<count)addTrainBot();cfg.list=cfg.list.slice(0,count);cfg.on=true;TRAIN_BOTS.actors.clear()}
+  else {while(cfg.list.length<count)addTrainBot();cfg.list=cfg.list.slice(0,count);cfg.on=true;for(const id of TRAIN_BOTS.actors.keys())if(!cfg.list.some(b=>b.id===id))TRAIN_BOTS.actors.delete(id)}
   save();trainBotsModal();
 }
 function trainBotsModal() {
@@ -176,7 +180,7 @@ function botSkillHit(b,a,e){
   if(a.stun&&!(e.stunImm>0)&&Math.random()*100<a.stun){e.stun=e.cls==='boss'?.5:.8;e.stunImm=e.cls==='boss'?STUN_IMM_BOSS:e.cls==='elite'?STUN_IMM_ELITE:0}
   b.hp=Math.min(b.maxhp,b.hp+total*(P.leech||0)/100);b.mana=Math.min(P.mana,b.mana+total*(P.manaLeech||0)/100);
   if(e.hp<=0)e.botFinisher=b.data.id;
-  addText(e.x,e.y-e.r-6,fmt(total),crit?'#ffe14a':skillFxColor(a),crit?16:12);
+  if(onScreen(e.x,e.y,160))addText(e.x,e.y-e.r-6,fmt(total),crit?'#ffe14a':skillFxColor(a),crit?16:12);
 }
 function nearestTrainBot(e){
   if(!botsAvailable())return null;
@@ -190,11 +194,24 @@ function botEnemyHit(e,b,ultimate=false){
   if(P.block&&Math.random()*100<P.block)return;
   let damage=applyPart(ultimate?P.life*.3:e.dmg*rnd(.8,1.2),'phys',e.series,P.series,P.res,PLAYER_RES_MAX,10);
   damage=Math.max(1,damage*(1-(P.absorb||0))-(P.flatDR||0));
-  b.hp-=damage;addText(b.x,b.y-36,'-'+fmt(damage),'#ff6a5a',12);
+  b.hp-=damage;if(onScreen(b.x,b.y,160))addText(b.x,b.y-36,'-'+fmt(damage),'#ff6a5a',12);
   if(b.hp<=0){b.hp=0;b.deadT=5;b.act='die';b.actT=0;b.targetId=null}
 }
 function botKillCredit(e){
   if(!e.botFinisher)return;
   const data=botConfig().list.find(b=>b.id===e.botFinisher);
   if(data)botGainKill(data,e);
+}
+
+function botHomePoint(index){
+  const cols=6,rows=5,cell=(index*17)%TRAIN_BOT_MAX;
+  let best=null,bestDistance=-1;
+  for(let attempt=0;attempt<20;attempt++){
+    const [x,y]=attempt===0?inWorld(WORLD.w*(.12+.76*((cell%cols)+.5)/cols),WORLD.h*(.12+.76*(Math.floor(cell/cols)+.5)/rows)):inWorld(rnd(WORLD.w*.1,WORLD.w*.9),rnd(WORLD.h*.1,WORLD.h*.9));
+    let distance=Math.hypot(x-H.x,y-H.y);
+    for(const other of TRAIN_BOTS.actors.values())distance=Math.min(distance,Math.hypot(x-other.homeX,y-other.homeY));
+    if(distance>bestDistance){best=[x,y];bestDistance=distance}
+    if(distance>=150)return [x,y];
+  }
+  return best;
 }

@@ -243,3 +243,5 @@ Nhân vật luyện cấp được rải vào các khu vực riêng trên toàn 
 Tên nhân vật mô phỏng lấy từ danh sách kiếm hiệp và tên hài vui, không có số phía sau; tên cũ có số được tự đổi. Môn phái ngẫu nhiên. Bot dùng kỹ năng thật đã học theo cấp, luân phiên tối đa 4 chiêu, tiêu hao/hồi mana và hiệu ứng gốc của game. Quái có thể nhắm và đánh bot, bot chết sẽ hồi sinh ở khu vực riêng. Quái bổ sung quanh các khu tuần tra giúp nhân vật ở xa tiếp tục luyện cấp; quái này không tính vào tiến độ vượt ải.
 
 Trang bị là vật phẩm thật, được vẽ bằng hệ thống nhân vật của game. Bậc đồ và yêu cầu mặc bị giới hạn theo cấp chiến đấu; cấp dưới 20 mặc đồ thường, từ cấp 20/50/90 tăng chất lượng, tuân theo trần đồ của từng chế độ. Áo, mũ, giày và vũ khí được nâng theo cấp, kiểm tra yêu cầu chỉ số/giới tính/môn phái.
+
+Bot xuất hiện trực tiếp tại vị trí riêng rải khắp map và hồi sinh trong khu vực riêng. Tạo bot được giãn theo thời gian để tránh tải trang bị đồng loạt; tăng/giảm số lượng giữ nguyên các bot còn lại. Bot ở ngoài màn hình tiếp tục mô phỏng nhưng không tải/vẽ trang phục và hiệu ứng kỹ năng ở xa.
