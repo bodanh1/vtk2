@@ -10,6 +10,7 @@
 <title>Võ Lâm Idle</title>
 <link rel="stylesheet" href="fonts/font.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ui/global-chat.css">
 <link rel="stylesheet" href="ui/jx2.css">
 <link rel="stylesheet" href="ui/jx/jx_layout.css">
 <link rel="stylesheet" href="ui/jx/jx_win.css">
@@ -70,6 +71,13 @@
       </div>
     </div>
     <div id="svBar" class="hidden"></div>
+    <button id="globalChatToggle" type="button" aria-label="Bật hoặc tắt chat chung" aria-expanded="false" aria-controls="globalChat">💬</button>
+    <section id="globalChat" class="hidden" aria-label="Chat chung toàn bộ map và chế độ">
+      <header><b>Chat chung</b><button id="globalChatClose" type="button" aria-label="Đóng chat">×</button></header>
+      <div id="globalChatMessages" role="log" aria-live="polite" aria-relevant="additions"></div>
+      <small id="globalChatStatus" role="status">Mọi map · mọi chế độ</small>
+      <form id="globalChatForm"><input id="globalChatInput" maxlength="300" autocomplete="off" placeholder="Nhập tin nhắn…" aria-label="Tin nhắn chat"><button type="submit">Gửi</button></form>
+    </section>
     <div id="townBar" class="hidden"><b id="townName"></b><button class="btn sm" id="bShop">Cửa hàng</button><button class="btn sm" id="bStashT">Kho chung</button><button class="btn sm" id="bSellTown">Bán đồ lọc</button><button class="btn sm on" id="bBack">Trở lại ải</button></div>
   </section>
 
@@ -152,5 +160,6 @@
 <script defer src="js/uihub.js"></script>
 <script defer src="js/feedback.js"></script>
 <script defer src="js/jxorig.js"></script>
+<script defer src="js/global-chat.js"></script>
 </body>
 </html>

@@ -1,0 +1,12 @@
+#globalChatToggle{position:absolute;left:calc(var(--safe-l,0px) + 10px);bottom:calc(var(--chat-bar-over,34px) + 4px);z-index:12;width:44px;height:44px;border:1px solid #c9aa61;border-radius:4px;background:#122519e8;color:#f5dfaa;font-size:23px;cursor:pointer}
+#globalChatToggle[aria-expanded=true]{background:#5a4525}
+#globalChat{position:absolute;left:calc(var(--safe-l,0px) + 6px);bottom:calc(var(--chat-bar-over,34px) + 52px);z-index:12;box-sizing:border-box;width:min(480px,calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 12px));height:min(330px,calc(100% - var(--chat-bar-over,34px) - 115px));min-height:100px;display:flex;flex-direction:column;border:1px solid #c9aa61;border-radius:4px;background:rgba(8,19,13,.87);color:#f5dfaa;font:13px/1.4 var(--font);box-shadow:0 2px 10px #0008;pointer-events:auto}
+#globalChat.hidden{display:none}
+#globalChat header{display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid #c9aa6166}
+#globalChat button{border:1px solid #c9aa6188;border-radius:3px;background:#31422b;color:#f5dfaa;cursor:pointer;min-height:36px;padding:0 10px}
+#globalChatMessages{flex:1;min-height:0;overflow-y:auto;padding:6px 10px;overscroll-behavior:contain;touch-action:pan-y;user-select:text}
+#globalChatMessages p{margin:0 0 6px;overflow-wrap:anywhere;white-space:pre-wrap}
+#globalChatMessages b{color:#e3c775}#globalChatMessages time{color:#a8b6a7;font-size:11px;margin-right:5px}
+#globalChatStatus{padding:2px 10px;color:#b9c6b6}
+#globalChatForm{display:flex;gap:5px;padding:6px;border-top:1px solid #c9aa6166}
+#globalChatInput{flex:1;min-width:0;background:#07140b;color:#fff;border:1px solid #8b8058;padding:6px;font-size:16px}
