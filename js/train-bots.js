@@ -34,7 +34,7 @@ function botsTick(dt) {
   if (TRAIN_BOTS.map !== map) { TRAIN_BOTS.actors.clear();R.enemies=R.enemies.filter(e=>!e.botWild); TRAIN_BOTS.map=map }
   for (const id of TRAIN_BOTS.actors.keys()) if (!cfg.list.some(b=>b.id===id)) TRAIN_BOTS.actors.delete(id);
   R.enemies=R.enemies.filter(e=>!e.botWild||cfg.list.some(b=>b.id===e.botWild));
-  const claimed = new Set();
+  const claimed = new Set(),partyIds=typeof botPartyConfig==='function'?new Set(botPartyConfig().members):new Set();
   for (const [index,data] of cfg.list.entries()) {
     let b = TRAIN_BOTS.actors.get(data.id);
     if (!b) {
@@ -62,7 +62,9 @@ function botsTick(dt) {
       }
     }
     if (b.deadT>0) { b.deadT-=dt; b.act='die'; if(b.deadT<=0){b.hp=b.maxhp;[b.x,b.y]=obsSnap(...inWorld(b.homeX+rnd(-80,80),b.homeY+rnd(-80,80)));b.act='st'} continue }
-    const enemies=alive().filter(e=>!claimed.has(e.id)&&Math.hypot(e.x-b.homeX,e.y-b.homeY)<650);
+    const grouped=partyIds.has(data.id);
+    const anchor=grouped?H:{x:b.homeX,y:b.homeY};
+    const enemies=alive().filter(e=>(grouped||!claimed.has(e.id))&&Math.hypot(e.x-anchor.x,e.y-anchor.y)<650&&(!grouped||Math.hypot(e.x-b.x,e.y-b.y)<900));
     b.patrolT-=dt;
     const target=enemies.reduce((best,e)=>!best||Math.hypot(e.x-b.x,e.y-b.y)<Math.hypot(best.x-b.x,best.y-b.y)?e:best,null);
     b.targetId=target?target.id:null;
@@ -86,6 +88,10 @@ function botsTick(dt) {
 
         }
       }
+    } else if(grouped){
+      b.hp=Math.min(b.maxhp,b.hp+b.profile.P.regen*dt);
+      const angle=index*Math.PI*.65,[x,y]=inWorld(H.x+Math.cos(angle)*90,H.y+Math.sin(angle)*90);
+      if(Math.hypot(b.x-x,b.y-y)>35)obsSteer(b,x,y,150*b.profile.P.speed*dt);
     } else {
       b.hp=Math.min(b.maxhp,b.hp+b.profile.P.regen*dt);
       if(!b.patrol||b.patrolT<=0||Math.hypot(b.patrol.x-b.x,b.patrol.y-b.y)<25){
@@ -198,7 +204,7 @@ function botEnemyHit(e,b,ultimate=false){
   if(b.hp<=0){b.hp=0;b.deadT=5;b.act='die';b.actT=0;b.targetId=null}
 }
 function botKillCredit(e){
-  if(!e.botFinisher)return;
+  if(!e.botFinisher||typeof partyRecipients==="function"&&partyRecipients(e).length)return;
   const data=botConfig().list.find(b=>b.id===e.botFinisher);
   if(data)botGainKill(data,e);
 }

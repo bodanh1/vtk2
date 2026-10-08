@@ -719,3 +719,9 @@ body.jxland .acts{max-width:320px}
 body.jxland .acts{max-width:364px}
 
 @media(max-width:359px){.acts,body.jxthumb .acts{max-width:calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 8px);flex-wrap:wrap}}
+
+.acts .rnd[data-r=party] i,.acts .rnd[data-r=party]:hover i,.acts .rnd[data-r=party].on i{background-image:url(v3/q_party.svg);background-position:center;background-size:100% 100%}
+#jxActs{max-width:calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 8px);flex-wrap:wrap}
+body.jxthumb #jxActs{flex-wrap:wrap}body.jxland #jxActs{max-width:min(408px,calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 8px))}
+.partyrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;margin:4px 0;background:#102017aa;border:1px solid #9e895b66}.partyrow span{min-width:0;flex:1}.partyrow b,.partyrow small{display:block}.partyrow small{color:#b9cebb;line-height:1.5}
+@media(min-width:360px) and (max-width:430px){#jxActs .rnd,#jxActs .rnd span{width:min(44px,calc((100vw - var(--safe-l,0px) - var(--safe-r,0px) - 8px)/9))}}

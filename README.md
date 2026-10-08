@@ -245,3 +245,9 @@ Tên nhân vật mô phỏng lấy từ danh sách kiếm hiệp và tên hài v
 Trang bị là vật phẩm thật, được vẽ bằng hệ thống nhân vật của game. Bậc đồ và yêu cầu mặc bị giới hạn theo cấp chiến đấu; cấp dưới 20 mặc đồ thường, từ cấp 20/50/90 tăng chất lượng, tuân theo trần đồ của từng chế độ. Áo, mũ, giày và vũ khí được nâng theo cấp, kiểm tra yêu cầu chỉ số/giới tính/môn phái.
 
 Bot xuất hiện trực tiếp tại vị trí riêng rải khắp map và hồi sinh trong khu vực riêng. Tạo bot được giãn theo thời gian để tránh tải trang bị đồng loạt; tăng/giảm số lượng giữ nguyên các bot còn lại. Bot ở ngoài màn hình tiếp tục mô phỏng nhưng không tải/vẽ trang phục và hiệu ứng kỹ năng ở xa.
+
+## Tổ đội với nhân vật luyện cấp
+
+Nút **Tổ đội** cạnh **Menu bot** hiện các nhân vật mô phỏng đang ở gần để mời, lời mời nhận được và thành viên hiện tại. Tối đa 6 thành viên gồm bạn và 5 bot. Bot có thể chủ động mời; bạn chọn Chấp nhận/Từ chối trong menu, hoặc tắt lời mời. Đồng đội tự chạy tới hỗ trợ; có thể cho từng người rời nhóm hoặc rời tổ đội.
+
+EXP và ngân lượng chia đều cho thành viên còn sống trong phạm vi 800 đơn vị quanh quái bị hạ, với hệ số EXP riêng của từng nhân vật. Trang bị và vật liệu rơi được phân theo lượt; phần của bạn rơi trên map/kho vật liệu, phần của bot lưu trong túi/kho riêng. Menu ghi lịch sử chia đồ gần đây. Bot chết hoặc ở xa không nhận phần thưởng. Tổ đội chỉ hoạt động ở bãi train; tắt bot sẽ bỏ các thành viên bot khỏi nhóm. Tổ đội và túi đồ bot được lưu cùng nhân vật trong trình duyệt.
