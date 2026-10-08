@@ -14,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "jx-idle-final-db",
-      "database_id": "65f253d1-733b-4ab3-b1b5-7ffad08972af",
+      "database_id": "64ae867a-ceee-4709-a23c-489120dbfea9",
       "migrations_dir": "migrations"
     }
   ],
