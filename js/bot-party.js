@@ -110,19 +110,22 @@ function partyNameColor(id='player'){
   const members=botPartyConfig().members;
   return (id==='player'?members.length>0:members.includes(id))?PARTY_NAME_COLOR:NAME_COL.hero;
 }
+let partyHudCollapsed=false;
+try{partyHudCollapsed=localStorage.getItem('jxidle_party_hud_collapsed')==='1'}catch(e){}
 function updatePartyHud(){
   const hud=document.getElementById('partyHud');if(!hud||typeof S==='undefined'||!S)return;
   const p=botPartyConfig();hud.classList.toggle('hidden',!p.members.length);
   if(!p.members.length)return;
+  hud.classList.toggle('partyHudCollapsed',partyHudCollapsed);
   const cfg=botConfig(),rows=[{id:'player',name:S.name||'Bạn',lvl:S.lvl,hp:R.life,max:R.P&&R.P.life,dead:R.life<=0}];
   for(const id of p.members){
     const data=cfg.list.find(b=>b.id===id),actor=TRAIN_BOTS.actors.get(id);
     rows.push({id,name:data.name,lvl:actor&&actor.profile?actor.profile.state.lvl:data.lvl,hp:actor&&actor.hp,max:actor&&actor.maxhp,dead:actor&&actor.deadT>0,away:!actor});
   }
-  const html=`<button type="button" class="partyHudTitle">Tổ đội · ${rows.length}/${BOT_PARTY_MAX}</button><div class="partyHudMembers">${rows.map(m=>{
+  const html=`<button type="button" class="partyHudToggle" aria-label="${partyHudCollapsed?'Mở danh sách tổ đội':'Ẩn danh sách tổ đội'}" aria-expanded="${!partyHudCollapsed}" aria-controls="partyHudMembers">${partyHudCollapsed?'›':'‹'}</button><button type="button" class="partyHudTitle">Tổ đội · ${rows.length}/${BOT_PARTY_MAX}</button><div class="partyHudMembers" id="partyHudMembers">${rows.map(m=>{
     const health=m.max?clamp(m.hp/m.max,0,1)*100:0;
     return `<div class="partyHudMember"><div><b title="${esc(m.name)}">${m.id===p.leader?'★ ':''}${esc(m.name)}${m.id==='player'?' (Bạn)':''}</b><small>${m.lvl}</small></div><div class="partyHudLife"><i style="width:${health}%"></i></div>${m.dead?'<em>Đang hồi sinh</em>':m.away?'<em>Ở xa</em>':''}</div>`;
   }).join('')}</div>`;
-  if(hud.innerHTML!==html){const list=hud.querySelector('.partyHudMembers'),scroll=list?list.scrollTop:0;hud.innerHTML=html;hud.querySelector('.partyHudMembers').scrollTop=scroll;hud.querySelector('button').onclick=botPartyModal;}
+  if(hud.innerHTML!==html){const list=hud.querySelector('.partyHudMembers'),scroll=list?list.scrollTop:0;hud.innerHTML=html;hud.querySelector('.partyHudMembers').scrollTop=scroll;hud.querySelector('.partyHudTitle').onclick=botPartyModal;hud.querySelector('.partyHudToggle').onclick=()=>{partyHudCollapsed=!partyHudCollapsed;try{localStorage.setItem('jxidle_party_hud_collapsed',partyHudCollapsed?'1':'0')}catch(e){}updatePartyHud()};}
 }
 setInterval(updatePartyHud,500);

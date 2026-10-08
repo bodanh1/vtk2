@@ -253,3 +253,5 @@ Nút **Tổ đội** cạnh **Menu bot** hiện các nhân vật mô phỏng đa
 EXP và ngân lượng chia đều cho thành viên còn sống trong phạm vi 800 đơn vị quanh quái bị hạ, với hệ số EXP riêng của từng nhân vật. Trang bị và vật liệu rơi được phân theo lượt; phần của bạn rơi trên map/kho vật liệu, phần của bot lưu trong túi/kho riêng. Menu ghi lịch sử chia đồ gần đây. Bot chết hoặc ở xa không nhận phần thưởng. Tổ đội chỉ hoạt động ở bãi train; tắt bot sẽ bỏ các thành viên bot khỏi nhóm. Tổ đội và túi đồ bot được lưu cùng nhân vật trong trình duyệt.
 
 Danh sách thành viên tổ đội hiện ở mép trái chiến trường, gồm cả nhân vật của bạn, cấp độ và thanh máu. Bấm tiêu đề danh sách để mở menu tổ đội. Tên trên map của bạn và đồng đội chuyển sang màu xanh khi chung đội, trở lại màu thường khi rời đội.
+
+Các nút hoạt động xuống hàng từ Tự tìm quái để tránh bản đồ nhỏ trên điện thoại. Mũi tên lên/xuống thu gọn/mở rộng toàn bộ nút hoạt động; mũi tên trái/phải trên danh sách tổ đội ẩn/hiện riêng danh sách. Hai trạng thái được nhớ trong trình duyệt.
