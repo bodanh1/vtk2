@@ -32,11 +32,14 @@ function botsTick(dt) {
   const cfg = botConfig(), map = saveKey()+':'+S.stage;
   if (TRAIN_BOTS.map !== map) { TRAIN_BOTS.actors.clear(); TRAIN_BOTS.map=map }
   for (const id of TRAIN_BOTS.actors.keys()) if (!cfg.list.some(b=>b.id===id)) TRAIN_BOTS.actors.delete(id);
-  for (const data of cfg.list) {
+  const claimed = new Set();
+  for (const [index,data] of cfg.list.entries()) {
     let b = TRAIN_BOTS.actors.get(data.id);
     if (!b) {
-      const [x,y] = obsSnap(...inWorld(H.x+rnd(-100,100),H.y+rnd(-100,100)));
-      b={data,x,y,dir:0,face:1,act:'st',actT:0,cd:rnd(0,.8),hp:100,maxhp:100,deadT:0};
+      const cols=Math.ceil(Math.sqrt(cfg.list.length)),rows=Math.ceil(cfg.list.length/cols);
+      const [homeX,homeY]=obsSnap(...inWorld(WORLD.w*(.12+.76*((index%cols)+.5)/cols),WORLD.h*(.12+.76*(Math.floor(index/cols)+.5)/rows)));
+      const [x,y] = obsSnap(...inWorld(homeX+rnd(-60,60),homeY+rnd(-60,60)));
+      b={data,x,y,homeX,homeY,patrol:null,patrolT:0,targetId:null,dir:0,face:1,act:'st',actT:0,cd:rnd(0,.8),hp:100,maxhp:100,deadT:0};
       TRAIN_BOTS.actors.set(data.id,b);
     }
     const effectiveLevel=Math.min(data.lvl,Math.max(1,stageLevel(S.stage)+2));
@@ -44,10 +47,13 @@ function botsTick(dt) {
     if(b.profileKey!==profileKey){b.profile=botProfile(data,effectiveLevel);b.profileKey=profileKey;b.maxhp=b.profile.P.life;b.hp=b.maxhp}
     const oldX=b.x,oldY=b.y;
     b.cd=Math.max(0,b.cd-dt);
-    if (b.deadT>0) { b.deadT-=dt; b.act='die'; if(b.deadT<=0){b.hp=b.maxhp;[b.x,b.y]=obsSnap(...inWorld(H.x+rnd(-80,80),H.y+rnd(-80,80)));b.act='st'} continue }
-    const enemies=alive();
+    if (b.deadT>0) { b.deadT-=dt; b.act='die'; if(b.deadT<=0){b.hp=b.maxhp;[b.x,b.y]=obsSnap(...inWorld(b.homeX+rnd(-80,80),b.homeY+rnd(-80,80)));b.act='st'} continue }
+    const enemies=alive().filter(e=>!claimed.has(e.id)&&Math.hypot(e.x-b.homeX,e.y-b.homeY)<650);
+    b.patrolT-=dt;
     const target=enemies.reduce((best,e)=>!best||Math.hypot(e.x-b.x,e.y-b.y)<Math.hypot(best.x-b.x,best.y-b.y)?e:best,null);
+    b.targetId=target?target.id:null;
     if (target) {
+      claimed.add(target.id);
       const distance=Math.hypot(target.x-b.x,target.y-b.y);
       b.dir=dirOf(target.x-b.x,target.y-b.y);b.face=target.x>=b.x?1:-1;
       if(distance>b.profile.attack.rad+target.r) obsSteer(b,target.x,target.y,150*b.profile.P.speed*dt);
@@ -66,7 +72,12 @@ function botsTick(dt) {
       }
     } else {
       b.hp=Math.min(b.maxhp,b.hp+b.profile.P.regen*dt);
-      if(Math.hypot(H.x-b.x,H.y-b.y)>180) obsSteer(b,H.x,H.y,120*dt);
+      if(!b.patrol||b.patrolT<=0||Math.hypot(b.patrol.x-b.x,b.patrol.y-b.y)<25){
+        const angle=rnd(0,Math.PI*2),radius=rnd(100,320);
+        const [x,y]=obsSnap(...inWorld(b.homeX+Math.cos(angle)*radius,b.homeY+Math.sin(angle)*radius));
+        b.patrol={x,y};b.patrolT=rnd(4,8);
+      }
+      obsSteer(b,b.patrol.x,b.patrol.y,120*b.profile.P.speed*dt);
     }
     b.moving=Math.hypot(b.x-oldX,b.y-oldY)>.01;
     if(b.moving)b.dir=dirOf(b.x-oldX,b.y-oldY);
