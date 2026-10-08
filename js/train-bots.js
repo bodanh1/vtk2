@@ -119,10 +119,10 @@ function setBotPopulation(count) {
 }
 function trainBotsModal() {
   const cfg=botConfig(),count=cfg.on?cfg.list.length:0;
-  modal(`<h3>Nhân vật luyện cấp <small>${cfg.on?cfg.list.length+' đang hoạt động':'Đã tắt'}</small></h3>
+  modal(`<h3>Nhân vật luyện cấp <small>${count} đang hoạt động</small></h3>
     <p class="desc">Nhân vật tự cày cùng map, mặc đồ và dùng chiêu theo cấp. Khi lên cấp, trang bị và võ công phát triển dần. Chỉ hoạt động ở bãi train.</p>
     <div class="btnrow"><button class="btn" id="botsAdd" ${count>=TRAIN_BOT_MAX?'disabled':''}>+1 bot</button><button class="btn" id="botsReduce" ${count===0?'disabled':''}>−1 bot</button><button class="btn ${!cfg.on?'on':''}" id="botsOff" ${count===0?'disabled':''}>Tắt toàn bộ</button></div>
-    <div class="botlist">${(cfg.on?cfg.list:[]).map(b=>`<div class="botrow"><b>${esc(b.name)}</b><small>${esc(FAC[b.fac].n)} · Cấp ${Math.min(b.lvl,Math.max(1,stageLevel(S.stage)+2))} · ${fmt(b.kills)} quái</small><small>${botEquipmentSummary(b)}</small></div>`).join('')||'<p class="desc">Bấm +1 bot để thêm nhân vật có tên ngẫu nhiên.</p>'}</div>`,()=>{
+    <p class="desc">Số bot đang hoạt động: <b>${count}</b> / ${TRAIN_BOT_MAX}</p>`,()=>{
       $('#botsAdd').onclick=()=>setBotPopulation(count+1);
       $('#botsReduce').onclick=()=>setBotPopulation(count-1);
       $('#botsOff').onclick=()=>setBotPopulation(0);
@@ -147,12 +147,6 @@ function botProfile(data,lvl) {
     if(attacks.length){state.main=attacks[0];state.mainLock=true}
     const P=calc();return {state,P,attack:P.main};
   } finally {S=player}
-}
-
-function botEquipmentSummary(data){
-  const level=Math.min(data.lvl,Math.max(1,stageLevel(S.stage)+2));
-  const profile=botProfile(data,level);
-  return esc((profile.state.eq.weapon?profile.state.eq.weapon.n:'Tay không')+' · '+(SK[profile.attack.id]?SK[profile.attack.id].n:'Đánh thường'));
 }
 
 function botRandomName(list){
