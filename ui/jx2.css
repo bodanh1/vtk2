@@ -758,3 +758,10 @@ body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(169px + var(--safe-t,
 .hknb{color:#ffd700}.hknb img{width:20px;height:14px;image-rendering:auto}
 
 .invWallet>div{display:flex;align-items:center;gap:5px;min-height:20px}
+
+#jxTreasure{position:absolute;z-index:4;width:64px;height:38px;border:1px solid #ac8c37;border-radius:5px;background:#18261ded;color:#ffe58b;font:700 11px Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;padding:2px;pointer-events:auto}
+#jxTreasure img{width:22px;height:16px}#jxTreasure:active{filter:brightness(1.3)}
+html.jxo #bb:not(.touchbar) #jxTreasure{width:64px;height:48px;border:0;background:transparent}
+html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
+#bb.touchbar #jxTreasure{width:44px;height:44px;flex-direction:column;font-size:10px;gap:2px}
+.treasureProduct{display:flex;align-items:center;gap:12px}.treasureProduct>img{width:40px;height:40px;object-fit:contain}.treasureProduct p{margin:5px 0}.treasureBalance{display:flex;align-items:center;gap:6px;color:#ffd700}.treasureBalance img{width:24px;height:18px}

@@ -48,7 +48,7 @@ function partyShareKill(e){
   const recipients=partyRecipients(e);if(!recipients.length)return false;
   const count=recipients.length,base=expFor(e.L)*CLS[e.cls].xp*ctcBossXp(e)*diffOf().rew;
   const diff=e.L-S.lvl,penalty=diff<-10?.2:diff<-5?.6:1;
-  R.jrOn=true;try{gainXp(base*ctcManualXp()*penalty/count)}finally{R.jrOn=false}
+  R.jrOn=true;try{gainMonsterXp(base*ctcManualXp()*penalty/count)}finally{R.jrOn=false}
   const totalGold=Math.round(moneyDrop(e)*diffOf().rew*modeGoldMul());
   recipients.forEach((member,index)=>{
     const gold=Math.floor(totalGold/count)+(index<totalGold%count?1:0);
