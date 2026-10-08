@@ -103,3 +103,26 @@ function partyAllowsPlayerReward(e){
   if(!e.botFinisher||!botInParty(e.botFinisher))return true;
   return partyRecipients(e).some(member=>member.id==='player');
 }
+
+// Tên xanh và danh sách chung cho cả người chơi lẫn đồng đội.
+const PARTY_NAME_COLOR='#4fd04f';
+function partyNameColor(id='player'){
+  const members=botPartyConfig().members;
+  return (id==='player'?members.length>0:members.includes(id))?PARTY_NAME_COLOR:NAME_COL.hero;
+}
+function updatePartyHud(){
+  const hud=document.getElementById('partyHud');if(!hud||typeof S==='undefined'||!S)return;
+  const p=botPartyConfig();hud.classList.toggle('hidden',!p.members.length);
+  if(!p.members.length)return;
+  const cfg=botConfig(),rows=[{id:'player',name:S.name||'Bạn',lvl:S.lvl,hp:R.life,max:R.P&&R.P.life,dead:R.life<=0}];
+  for(const id of p.members){
+    const data=cfg.list.find(b=>b.id===id),actor=TRAIN_BOTS.actors.get(id);
+    rows.push({id,name:data.name,lvl:actor&&actor.profile?actor.profile.state.lvl:data.lvl,hp:actor&&actor.hp,max:actor&&actor.maxhp,dead:actor&&actor.deadT>0,away:!actor});
+  }
+  const html=`<button type="button" class="partyHudTitle">Tổ đội · ${rows.length}/${BOT_PARTY_MAX}</button><div class="partyHudMembers">${rows.map(m=>{
+    const health=m.max?clamp(m.hp/m.max,0,1)*100:0;
+    return `<div class="partyHudMember"><div><b title="${esc(m.name)}">${m.id===p.leader?'★ ':''}${esc(m.name)}${m.id==='player'?' (Bạn)':''}</b><small>${m.lvl}</small></div><div class="partyHudLife"><i style="width:${health}%"></i></div>${m.dead?'<em>Đang hồi sinh</em>':m.away?'<em>Ở xa</em>':''}</div>`;
+  }).join('')}</div>`;
+  if(hud.innerHTML!==html){const list=hud.querySelector('.partyHudMembers'),scroll=list?list.scrollTop:0;hud.innerHTML=html;hud.querySelector('.partyHudMembers').scrollTop=scroll;hud.querySelector('button').onclick=botPartyModal;}
+}
+setInterval(updatePartyHud,500);

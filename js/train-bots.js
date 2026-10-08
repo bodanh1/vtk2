@@ -118,7 +118,7 @@ function drawTrainBot(b,dt) {
   const dollHeight=typeof drawDoll==='function'?drawDoll(c,b.x,b.y,b.act||'st',b.dir||0,b.actT||0,HERO_DOLL_SCALE,b.deadT>0?.4:1,b.profile&&b.profile.state):0;
   const h=dollHeight||hw&&drawAnim(hw.anim,b.act||'st',b.dir||0,b.actT||0,b.x,b.y,HERO_SCALE,b.deadT>0?.4:1);
   if(!h&&hw)drawSprite(img(hw.img),hw.sz,b.x,b.y,.9,b.face<0);
-  label(b.x,b.y-(h?Math.min(h,90)*.9:58)-6,`${b.data.name} · Lv${b.profile?b.profile.state.lvl:b.data.lvl}`,NAME_COL.hero,12,b.hp/b.maxhp,'#4fd04f');
+  label(b.x,b.y-(h?Math.min(h,90)*.9:58)-6,`${b.data.name} · Lv${b.profile?b.profile.state.lvl:b.data.lvl}`,typeof partyNameColor==='function'?partyNameColor(b.data.id):NAME_COL.hero,12,b.hp/b.maxhp,'#4fd04f');
 }
 function setBotPopulation(count) {
   count=clamp(Math.floor(count),0,TRAIN_BOT_MAX);
