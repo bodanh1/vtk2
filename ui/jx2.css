@@ -36,9 +36,9 @@ body.compact #tabs{display:contents!important}
 .hcap{position:relative;flex:none;width:56px;height:17px;background:url(v2/hud_cap.png)}
 .hcap #lv{position:absolute;left:36px;top:0;width:19px;text-align:center;font:700 11px/17px var(--font);color:var(--jx-gold);background:none;border:0;min-width:0;height:auto;padding:0;display:block}
 .hslot{position:relative;flex:none;min-width:0;box-sizing:border-box;width:var(--sw,110px);height:17px;border-style:solid;border-width:0 6px;border-image:url(v2/hud_slot.png) 0 6 fill/0 6px stretch;background:none;border-radius:0;overflow:visible}
-.hslot i{position:absolute;left:-2px;top:3px;height:11px;width:calc((var(--sw,110px) - 8px) * var(--v,0))!important;background:var(--b) 0 0/calc(var(--sw,110px) - 8px) 11px no-repeat;transition:width .15s linear}
+.hslot i{position:absolute;left:-2px;top:3px;height:11px;width:0;background:var(--b) 0 0/100% 11px no-repeat;transition:none}
 .hslot.hp{--b:url(bar_hp.png)} .hslot.mp{--b:url(bar_mp.png)} .hslot.xp{--b:url(bar_xp.png)}
-.hslot span{position:absolute;left:-6px;right:-6px;top:0;text-align:center;font:700 10px/17px var(--font);color:#fff;white-space:nowrap}
+.hslot span{position:absolute;left:-6px;right:-6px;top:0;text-align:center;font:700 10px/17px var(--font);color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums;z-index:1}
 .hname{position:absolute;left:4px;top:calc(19px + var(--safe-t));max-width:calc(100% - 180px);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:15px}
 .hname b{font-weight:700;color:#fff3c0;font-size:12.5px}
 .hname small{display:flex;align-items:center;gap:8px;color:var(--jx-label);font-size:11px;min-width:0}
