@@ -230,4 +230,4 @@ Nút 💬 ở góc dưới bên trái, ngay trên thanh vật phẩm, bật/tắ
 
 Máy chủ chat chung là `https://game.vltk.workers.dev`. Các bản game khác phải tích hợp `js/global-chat.js` và dùng cùng máy chủ để tham gia. Có thể đặt `window.JX_CHAT_API` để chọn máy chủ chat khác (hoặc `window.JX_API` khi thử cục bộ). Bảng D1 được tự tạo sau deploy, không cần thao tác thủ công. Kiểm thử dùng Node.js 22.13+ (SQLite tích hợp).
 
-Nút **Tự tìm quái** cạnh Shop thuốc bật/tắt tự di chuyển đến quái và đánh. Khi tắt, nhân vật vẫn đánh quái trong tầm và có thể điều khiển thủ công; chế độ tự động không tự bật lại sau 3 giây. Khi bật lại, tự di chuyển tiếp tục, giữ nguyên lựa chọn vượt ải và bộ lọc nhặt đồ.
+Nút **Tự tìm quái** cạnh Shop thuốc bật/tắt tự di chuyển đến quái và đánh. Khi tắt, nhân vật đứng yên, ngừng đánh và ngừng tự nhặt đồ; chế độ tự động không tự bật lại sau 3 giây. Khi bật lại, tự di chuyển tiếp tục, giữ nguyên lựa chọn vượt ải và bộ lọc nhặt đồ.
