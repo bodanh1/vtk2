@@ -108,22 +108,23 @@ function drawTrainBot(b,dt) {
   const dollHeight=typeof drawDoll==='function'?drawDoll(c,b.x,b.y,b.act||'st',b.dir||0,b.actT||0,HERO_DOLL_SCALE,b.deadT>0?.4:1,b.profile&&b.profile.state):0;
   const h=dollHeight||hw&&drawAnim(hw.anim,b.act||'st',b.dir||0,b.actT||0,b.x,b.y,HERO_SCALE,b.deadT>0?.4:1);
   if(!h&&hw)drawSprite(img(hw.img),hw.sz,b.x,b.y,.9,b.face<0);
-  label(b.x,b.y-(h?Math.min(h,90)*.9:58)-6,`${b.data.name} · Lv${b.profile?b.profile.state.lvl:b.data.lvl}`,'#8ddcff',11,b.hp/b.maxhp,'#57a9df');
+  label(b.x,b.y-(h?Math.min(h,90)*.9:58)-6,`${b.data.name} · Lv${b.profile?b.profile.state.lvl:b.data.lvl}`,NAME_COL.hero,12,b.hp/b.maxhp,'#4fd04f');
 }
 function setBotPopulation(count) {
+  count=clamp(Math.floor(count),0,TRAIN_BOT_MAX);
   const cfg=botConfig();
   if(count===0){cfg.on=false;TRAIN_BOTS.actors.clear()}
   else {while(cfg.list.length<count)addTrainBot();cfg.list=cfg.list.slice(0,count);cfg.on=true;TRAIN_BOTS.actors.clear()}
   save();trainBotsModal();
 }
 function trainBotsModal() {
-  const cfg=botConfig();
+  const cfg=botConfig(),count=cfg.on?cfg.list.length:0;
   modal(`<h3>Nhân vật luyện cấp <small>${cfg.on?cfg.list.length+' đang hoạt động':'Đã tắt'}</small></h3>
     <p class="desc">Nhân vật tự cày cùng map, mặc đồ và dùng chiêu theo cấp. Khi lên cấp, trang bị và võ công phát triển dần. Chỉ hoạt động ở bãi train.</p>
-    <div class="btnrow"><button class="btn ${cfg.on&&cfg.list.length===4?'on':''}" id="botsMedium">Trung bình · 4</button><button class="btn ${cfg.on&&cfg.list.length===10?'on':''}" id="botsMany">Nhiều · 10</button><button class="btn ${!cfg.on?'on':''}" id="botsOff">Tắt toàn bộ</button></div>
-    <div class="botlist">${cfg.list.map(b=>`<div class="botrow"><b>${esc(b.name)}</b><small>${esc(FAC[b.fac].n)} · Cấp ${Math.min(b.lvl,Math.max(1,stageLevel(S.stage)+2))} · ${fmt(b.kills)} quái</small><small>${botEquipmentSummary(b)}</small></div>`).join('')||'<p class="desc">Chọn mật độ để tạo nhân vật có tên ngẫu nhiên.</p>'}</div>`,()=>{
-      $('#botsMedium').onclick=()=>setBotPopulation(4);
-      $('#botsMany').onclick=()=>setBotPopulation(10);
+    <div class="btnrow"><button class="btn" id="botsAdd" ${count>=TRAIN_BOT_MAX?'disabled':''}>+1 bot</button><button class="btn" id="botsReduce" ${count===0?'disabled':''}>−1 bot</button><button class="btn ${!cfg.on?'on':''}" id="botsOff" ${count===0?'disabled':''}>Tắt toàn bộ</button></div>
+    <div class="botlist">${(cfg.on?cfg.list:[]).map(b=>`<div class="botrow"><b>${esc(b.name)}</b><small>${esc(FAC[b.fac].n)} · Cấp ${Math.min(b.lvl,Math.max(1,stageLevel(S.stage)+2))} · ${fmt(b.kills)} quái</small><small>${botEquipmentSummary(b)}</small></div>`).join('')||'<p class="desc">Bấm +1 bot để thêm nhân vật có tên ngẫu nhiên.</p>'}</div>`,()=>{
+      $('#botsAdd').onclick=()=>setBotPopulation(count+1);
+      $('#botsReduce').onclick=()=>setBotPopulation(count-1);
       $('#botsOff').onclick=()=>setBotPopulation(0);
     });
 }
