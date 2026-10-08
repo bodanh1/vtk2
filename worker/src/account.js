@@ -1,4 +1,5 @@
 // Tài khoản online: đăng ký, heartbeat (đo giờ chơi phía server), đồng bộ save.
+import { cloudAuth } from './cloud-account.js';
 import { HttpError, bearer, sha256Hex, randomToken, ipHash } from "./http.js";
 import { rateLimit } from "./db.js";
 import { applyValidation } from "./ladder.js";
@@ -42,7 +43,16 @@ export function parseSave(save) {
 
 export async function auth(req, env) {
   const tok = bearer(req);
-  if (!tok) throw new HttpError(401, "no_token");
+  if (!tok) {
+    const slot=Number(req.headers.get('x-cloud-slot'));
+    if(req.headers.has('x-cloud-slot')&&Number.isInteger(slot)&&slot>=0&&slot<3&&String(env.CLOUD_ACCOUNTS_ENABLED)!=='0'){
+      if(req.method==="POST"&&req.headers.get("origin")!==new URL(req.url).origin)throw new HttpError(403,"bad_origin");
+      const owner=await cloudAuth(req,env);
+      const linked=await env.DB.prepare('SELECT a.*,c.snapshot AS cloud_snapshot,c.write_owner AS cloud_writer,c.write_until AS cloud_until FROM accounts a JOIN cloud_pvp_links l ON l.pvp_account_id=a.id JOIN cloud_saves c ON c.account_id=l.cloud_account_id WHERE l.cloud_account_id=?1 AND l.slot=?2').bind(owner.id,slot).first();
+      if(linked){if(req.method==='POST'&&(linked.cloud_writer!==req.headers.get('x-cloud-device')||linked.cloud_until<=Date.now()))throw new HttpError(409,'device_changed','Quyền chơi đã chuyển sang máy khác');delete linked.cloud_writer;delete linked.cloud_until;const state=JSON.parse(linked.cloud_snapshot||'null')?.slots[slot];if(state?.mode==='ctc'&&state?.online?.id===linked.id){delete linked.cloud_snapshot;return linked;}}
+    }
+    throw new HttpError(401, "no_token");
+  }
   const acc = await env.DB.prepare("SELECT * FROM accounts WHERE token_hash=?1")
     .bind(await sha256Hex(tok))
     .first();

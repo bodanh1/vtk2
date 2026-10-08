@@ -162,7 +162,7 @@ Kỹ năng phụ trợ có dòng «nội công sát thương» theo hệ (ví d�
 
 ## Lưu game, sao lưu và chuyển thiết bị
 
-Trò chơi tự lưu trong trình duyệt hiện tại. Mỗi trình duyệt có ba ô nhân vật; dữ liệu không tự đồng bộ giữa thiết bị hoặc giữa các trình duyệt.
+Trò chơi tự lưu trong trình duyệt hiện tại. Mỗi trình duyệt có ba ô nhân vật. Khi chơi khách, dữ liệu chỉ ở máy đó; đăng nhập tài khoản cloud và đưa tiến trình lên để đồng bộ giữa các thiết bị.
 
 1. Mở **Hệ thống** rồi tới phần **Lưu game**.
 2. Chọn **Tải file lưu** để tải tệp có đuôi .jxsave.
@@ -255,3 +255,13 @@ EXP và ngân lượng chia đều cho thành viên còn sống trong phạm vi 
 Danh sách thành viên tổ đội hiện ở mép trái chiến trường, gồm cả nhân vật của bạn, cấp độ và thanh máu. Bấm tiêu đề danh sách để mở menu tổ đội. Tên trên map của bạn và đồng đội chuyển sang màu xanh khi chung đội, trở lại màu thường khi rời đội.
 
 Các nút hoạt động xuống hàng từ Tự tìm quái để tránh bản đồ nhỏ trên điện thoại. Mũi tên lên/xuống thu gọn/mở rộng toàn bộ nút hoạt động; mũi tên trái/phải trên danh sách tổ đội ẩn/hiện riêng danh sách. Hai trạng thái được nhớ trong trình duyệt.
+
+## Tài khoản và lưu cloud
+
+Đăng ký/đăng nhập ở màn chọn nhân vật, menu ⋯ → Tài khoản hoặc Hệ thống → Tài khoản và lưu cloud. Đưa tiến trình hiện tại lên tài khoản để lưu cả ba ô cùng kho, gia tộc/bang hội và bộ sưu tập của các chế độ. Máy khác đăng nhập rồi chọn Chơi tiếp. Nhân vật mọi chế độ và cấp độ được sao lưu, không cần file jxsave.
+
+Game lưu tại máy trước, đồng bộ khoảng 60 giây khi đang chơi; trước khi chuyển máy hãy bấm **Lưu ngay** và đợi thành công. Một thiết bị được quyền ghi tại một thời điểm; bản cũ không tự ghi đè bản mới. Có bản lưu trước và bản lưu riêng tại máy, đăng xuất phục hồi dữ liệu guest. Người chơi phải tự ghi nhớ tên đăng nhập và mật khẩu; không có chức năng khôi phục tài khoản hoặc đặt lại mật khẩu.
+
+Mốc quay lại: `stable-before-cloud-accounts-2026-10-08` (`1e41d69`). Công tắc `CLOUD_ACCOUNTS_ENABLED=0` tắt đồng bộ, giữ chơi/lưu tại máy. Xem [hướng dẫn vận hành và quay lại](docs/cloud-accounts-operations.md).
+
+Tên đăng nhập tối thiểu 4 ký tự (tối đa 24; chữ không dấu, số, _); mật khẩu tối thiểu 4 ký tự (tối đa 128). Không có khôi phục tài khoản hoặc đặt lại mật khẩu.

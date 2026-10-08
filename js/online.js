@@ -10,7 +10,7 @@ function onlBase() {
   return (window.JX_API || (local ? ONL_HOST : "")) + "/api";
 }
 const onlKey = () => (typeof saveKey === "function" ? saveKey() : "jx") + "_online";
-function onlGet() { try { const v = JSON.parse(localStorage.getItem(onlKey()) || "null"); return v && v.token ? v : null } catch (e) { return null } }
+function onlGet() { try { const v = JSON.parse(localStorage.getItem(onlKey()) || "null"); if(v&&v.token&&(!S.online||v.id===S.online.id))return v; } catch (e) {} if(typeof CLOUD!=="undefined"&&CLOUD.ready&&CLOUD.user&&S.online&&S.mode==='ctc')return {id:S.online.id,name:S.online.name,cloud:true}; return null; }
 function onlSet(v) { try { v ? localStorage.setItem(onlKey(), JSON.stringify(v)) : localStorage.removeItem(onlKey()) } catch (e) { } }
 const onlEligible = () => typeof S !== "undefined" && S && S.fac && S.mode === "ctc";
 const ONL = { me: null, lastSync: 0, busy: false };
@@ -18,10 +18,10 @@ const ONL = { me: null, lastSync: 0, busy: false };
 async function onlApi(path, opt = {}) {
   const acc = onlGet(), headers = {};
   if (opt.body !== undefined) headers["content-type"] = "application/json";
-  if (opt.auth !== false && acc) headers.authorization = "Bearer " + acc.token;
+  if (opt.auth !== false && acc) {if(acc.cloud){headers["x-cloud-slot"]=String(SLOT);headers["x-cloud-device"]=cloudClientId;}else headers.authorization = "Bearer " + acc.token;}
   let r;
   try {
-    r = await fetch(onlBase() + path, { method: opt.method || (opt.body !== undefined ? "POST" : "GET"), headers, body: opt.body !== undefined ? JSON.stringify(opt.body) : undefined, keepalive: !!opt.keepalive });
+    r = await fetch(onlBase() + path, { method: opt.method || (opt.body !== undefined ? "POST" : "GET"), headers, body: opt.body !== undefined ? JSON.stringify(opt.body) : undefined, credentials:"same-origin", keepalive: !!opt.keepalive });
   } catch (e) { throw { code: "offline", msg: "Không kết nối được máy chủ online" } }
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw { code: d.error || "http_" + r.status, msg: d.msg || "Lỗi máy chủ (" + r.status + ")" };
@@ -58,7 +58,7 @@ async function onlRegister(name) {
 }
 
 async function onlSync(quiet) {
-  if (!onlEligible() || !onlGet() || ONL.busy) return null;
+  if (!onlEligible() || !onlGet() || ONL.busy || (typeof CLOUD!=="undefined"&&CLOUD.ready&&CLOUD.paused)) return null;
   ONL.busy = true;
   try {
     const r = await onlApi("/sync", { body: { save: pack(S) } });
@@ -123,7 +123,7 @@ function onlCardHTML() {
       ${me && me.char ? `<div class="row">Bậc PvP <b>${ONL_BRACKET[me.char.bracket] || "Chưa đủ cấp 40"}</b></div><div class="row">Lực chiến (máy chủ tính) <b>${fmt(me.char.power || 0)}</b></div>` : ""}
       ${me && me.flags && me.flags.length ? `<div class="onlflag"><b>Đang bị loại khỏi bảng xếp hạng vì nghi gian lận</b>${me.flags.map(f => `<small>${esc(f.detail || f.code)}</small>`).join("")}</div>` : ""}
       <div class="btnrow"><button class="btn" id="onlSyncBtn">Đồng bộ ngay</button><button class="btn" id="onlCodeBtn">Mã khôi phục</button></div>
-      <small class="dim" id="onlCode" hidden>Giữ kín mã này, nó thay cho mật khẩu: <code>${esc(acc.token)}</code></small></div>`;
+      <small class="dim" id="onlCode" hidden>Giữ kín mã này, nó thay cho mật khẩu: <code>${acc.cloud?"Đã liên kết tài khoản cloud; đăng nhập trên máy khác để khôi phục.":esc(acc.token)}</code></small></div>`;
   }
   if (S.lvl > ONL_REG_MAX_LVL) return `<h3>Chơi Online</h3><div class="card"><small class="dim">Nhân vật đã quá cấp ${ONL_REG_MAX_LVL}, không đăng ký bảng xếp hạng được. Vẫn PvP được (không xếp hạng).</small></div>`;
   return `<h3>Chơi Online</h3><div class="card lootf onlcard"><div class="row">Tên online <input id="onlName" maxlength="16" value="${esc(S.name || "")}" style="flex:1"></div>

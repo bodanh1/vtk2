@@ -2,6 +2,11 @@
 // nên deploy không cần bước "d1 migrations apply" riêng. Bản SQL tham chiếu: migrations/0001_init.sql.
 
 export const SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS cloud_pvp_links(cloud_account_id TEXT NOT NULL,slot INTEGER NOT NULL,pvp_account_id TEXT NOT NULL UNIQUE,PRIMARY KEY(cloud_account_id,slot))`,
+  `CREATE TABLE IF NOT EXISTS cloud_accounts(id TEXT PRIMARY KEY,username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,password_salt TEXT NOT NULL,password_iterations INTEGER NOT NULL,created_at INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS cloud_sessions(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL,created_at INTEGER NOT NULL,expires_at INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS cloud_sessions_account ON cloud_sessions(account_id)`,
+  `CREATE TABLE IF NOT EXISTS cloud_saves(account_id TEXT PRIMARY KEY,revision INTEGER NOT NULL DEFAULT 0,snapshot TEXT,updated_at INTEGER,previous_snapshot TEXT,previous_revision INTEGER,previous_updated_at INTEGER,write_owner TEXT,write_label TEXT,write_until INTEGER NOT NULL DEFAULT 0)`,
   `CREATE TABLE IF NOT EXISTS chat_sessions(id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, name TEXT NOT NULL, at INTEGER NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS chat_messages(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, sender TEXT NOT NULL, text TEXT NOT NULL, at INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS chat_messages_at ON chat_messages(at)`,

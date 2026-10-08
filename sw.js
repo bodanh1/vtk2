@@ -1,7 +1,7 @@
 // Mang truoc, cache du phong: luon lay ban moi khi co mang, choi offline khi mat mang
 // QA-021: truoc day ten cache co dinh 'jxidle-v1' va khong precache -> co the phuc vu HTML cu tro toi JS moi.
-const C = 'jxidle-v24';   // v24: thanh mau mana cap nhat truc tiep, khong animation width
-const CORE = ['./index.html', './style.css', './ui/jx2.css?v=24', './js/action-collapse.js?v=2', './js/jxshell.js?v=24', './js/ui.js?v=24', './manifest.json', './js/core.js', './js/main.js', './ref.js', './data.js', './world.js'];
+const C = 'jxidle-v25';   // v25: tai khoan va dong bo cloud, khoi phuc storage an toan
+const CORE = ['./index.html', './style.css', './ui/jx2.css?v=24', './js/action-collapse.js?v=2', './js/jxshell.js?v=24', './js/ui.js?v=24', './manifest.json', './js/core.js', './js/main.js', './js/cloud-storage.js?v=1', './js/cloud-account.js?v=1', './ui/cloud-account.css?v=1', './js/online.js?v=25', './ref.js', './data.js', './world.js'];
 self.addEventListener('install', e => e.waitUntil(
   caches.open(C).then(c => c.addAll(CORE)).catch(() => caches.open(C))
     .then(() => self.skipWaiting())

@@ -1,4 +1,4 @@
-// Worker của Võ Lâm Idle: phục vụ file tĩnh (binding ASSETS) và API online cho Công Thành Chiến.
+// Worker của Võ Lâm Idle: phục vụ file tĩnh (binding ASSETS) và API tài khoản/lưu cloud, chat và online Công Thành Chiến.
 // Chỉ đường dẫn /api/* chạy qua Worker (assets.run_worker_first trong wrangler.jsonc).
 import { HttpError, json, readJson, CORS } from "./http.js";
 import { ensureSchema } from "./db.js";
@@ -6,6 +6,7 @@ import { register, heartbeat, sync, me } from "./account.js";
 import { ladder, notices, adminFlags, adminUnflag } from "./ladder.js";
 import { feedback, adminFeedback, adminFeedbackSet } from "./feedback.js";
 
+import { cloudRoute } from './cloud-account.js';
 import { chatSession, chatList, chatSend } from "./chat.js";
 
 const ROUTES = {
@@ -31,13 +32,14 @@ export default {
     const url = new URL(req.url);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(req);
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
-    const fn = ROUTES[req.method + " " + url.pathname];
+    const fn = url.pathname.startsWith("/api/cloud/") ? cloudRoute : ROUTES[req.method + " " + url.pathname];
     if (!fn) return json({ error: "not_found" }, 404);
     try {
       if (!env.DB) throw new HttpError(503, "no_db", "Chưa gắn cơ sở dữ liệu D1");
       await ensureSchema(env.DB);
       const body = req.method === "POST" ? await readJson(req) : null;
-      return json(await fn(req, env, body, url, ctx));
+      const result=await fn(req, env, body, url, ctx);
+      return result instanceof Response ? result : json(result);
     } catch (e) {
       if (e instanceof HttpError) return json({ error: e.code, msg: e.message }, e.status);
       console.error("api", url.pathname, e && e.stack);

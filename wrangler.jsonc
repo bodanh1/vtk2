@@ -23,6 +23,7 @@
   // nên bản xem trước không chạm dữ liệu thật; API online ở bản xem trước trả 503 "no_db".
   "previews": {}
   // Biến tùy chọn (Settings > Variables and Secrets):
+  //   CLOUD_ACCOUNTS_ENABLED=0: tạm tắt tài khoản/đồng bộ cloud, giữ lưu tại máy.
   //   TURNSTILE_SITEKEY (biến) + TURNSTILE_SECRET (secret): bật chống bot khi đăng ký.
   //   IP_SALT (secret): muối khi băm IP.
   //   ADMIN_KEY (secret, ≥16 ký tự): khóa cho /api/admin/* (xem và gỡ cờ nghi gian lận, đọc góp ý).
