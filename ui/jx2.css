@@ -707,3 +707,7 @@ body:not(.jxthumb) #jxStat{top:calc(100px + var(--safe-t,0px));max-width:232px}
 #giftTabs button{position:relative}
 #giftTabs .gdot{position:absolute;right:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#3fd16b;border:1px solid #062;box-shadow:0 0 5px #3fd16b99}
 #mBody .qrow.ready{border-color:#3fd16b88;box-shadow:inset 3px 0 0 #3fd16b}
+
+/* Shop thuốc nằm cạnh các hoạt động tại bãi train. */
+.acts .rnd[data-r=med] i,.acts .rnd[data-r=med]:hover i{background-image:url(v3/q_med.svg);background-position:center;background-size:100% 100%}
+body.jxland .acts{max-width:276px}
