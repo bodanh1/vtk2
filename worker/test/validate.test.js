@@ -80,8 +80,8 @@ test("điểm tiềm năng vượt xa mọi nguồn thưởng vẫn bị gắn c
 });
 
 
-test("CTC cho phép x1/x1.5/x2.5 và ngưỡng cấp tính theo tốc độ tối đa", () => {
-  assert.deepEqual(G.MODES.ctc.speeds, [1, 1.5, 2.5]);
+test("Ba chế độ cho phép x1/x1.5/x2, giữ ngưỡng kiểm định x2.5 lịch sử", () => {
+  for(const mode of ["ctc","phlt","g2"])assert.deepEqual(G.MODES[mode].speeds, [1, 1.5, 2]);
   assert.equal(G.MODES.ctc.defSpeed, 1);
   const lvl = 160;
   let baselineSec = 0;

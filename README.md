@@ -44,9 +44,9 @@ Sau đó mở http://127.0.0.1:8080. Giữ cửa sổ Terminal mở trong lúc c
 
 Khi bắt đầu, chọn chế độ, môn phái, tên, giới tính và thử thách. Đọc mô tả trên màn hình chọn trước khi xác nhận: chế độ được gắn với nhân vật và có thể quy định độ khó, tốc độ, vật phẩm hay giới hạn hoạt động khác nhau.
 
-- **Công Thành Chiến:** tốc độ x1 (mặc định), x1.5 hoặc x2.5; đổi bằng nút tốc độ, phím X hoặc trong Hệ thống.
-- **Phong Hỏa Liên Thành:** thử thách sinh tồn khắc nghiệt hơn; tiến độ và chiến lợi phẩm tuân theo luật riêng của chế độ.
-- **2.0:** nhịp chơi nhanh, thuận tiện thử các hệ thống và hoạt động.
+- **Công Thành Chiến:** tốc độ x1 (mặc định), x1.5 hoặc x2; đổi bằng nút tốc độ, phím X hoặc trong Hệ thống.
+- **Phong Hỏa Liên Thành:** tốc độ x1 / x1.5 / x2; thử thách sinh tồn khắc nghiệt hơn; tiến độ và chiến lợi phẩm tuân theo luật riêng của chế độ.
+- **2.0:** tốc độ x1 / x1.5 / x2 (mặc định x2); nhịp chơi nhanh, thuận tiện thử các hệ thống và hoạt động.
 
 Dã Tẩu ở Công Thành Chiến là chuỗi 7 việc lặp vô hạn, chỉ gồm việc làm được ở chế độ này: hạ quái, hạ tinh anh, vượt ải, leo 3 tầng tháp, hạ trùm, hoàn thành một lượt Luyện công và tìm một món đồ theo hệ có dòng thuộc tính yêu cầu (rơi ra là tính, hoặc nộp từ túi). EXP theo độ khó: 10% đến 35% một cấp mỗi việc, mỗi vòng tăng thêm 15% (tối đa ×2,5). Chuỗi Dã Tẩu ở chế độ khác giữ nguyên.
 
