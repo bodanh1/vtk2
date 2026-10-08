@@ -727,7 +727,7 @@ body.jxthumb #jxActs{flex-wrap:wrap}body.jxland #jxActs{max-width:min(408px,calc
 @media(min-width:360px) and (max-width:430px){#jxActs .rnd,#jxActs .rnd span{width:min(44px,calc((100vw - var(--safe-l,0px) - var(--safe-r,0px) - 8px)/9))}}
 
 /* Danh sách tổ đội ở mép trái, phía trên nút chat. */
-#partyHud{position:absolute;left:calc(var(--safe-l,0px) + 6px);bottom:calc(var(--chat-bar-over,34px) + 60px);z-index:10;width:min(170px,42%);max-height:44%;display:flex;flex-direction:column;background:#09170cbb;border:1px solid #849c6266;border-radius:4px;color:#4fd04f;font:11px/1.3 var(--font);box-sizing:border-box}
+#partyHud{position:absolute;left:calc(var(--safe-l,0px) + 6px);bottom:calc(var(--chat-bar-over,34px) + 60px);z-index:14;width:min(170px,42%);max-height:44%;display:flex;flex-direction:column;background:#09170cbb;border:1px solid #849c6266;border-radius:4px;color:#4fd04f;font:11px/1.3 var(--font);box-sizing:border-box}
 #partyHud.hidden{display:none}
 .partyHudTitle{padding:4px 6px;background:#1c3025cc;border:0;border-bottom:1px solid #849c6255;color:#e3d395;font:inherit;text-align:left;cursor:pointer}
 .partyHudMembers{overflow-y:auto;min-height:0;padding:2px 5px;overscroll-behavior:contain;touch-action:pan-y}
@@ -752,3 +752,5 @@ body:not(.jxthumb).actionsCollapsed #jxStat{top:calc(100px + var(--safe-t,0px))}
 #partyHud.partyHudCollapsed .partyHudTitle,#partyHud.partyHudCollapsed .partyHudMembers{display:none}
 
 body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(169px + var(--safe-t,0px))!important}
+
+.partyHudTitle{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.partyHudToggle{touch-action:none}

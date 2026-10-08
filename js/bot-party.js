@@ -113,6 +113,7 @@ function partyNameColor(id='player'){
 let partyHudCollapsed=false;
 try{partyHudCollapsed=localStorage.getItem('jxidle_party_hud_collapsed')==='1'}catch(e){}
 function updatePartyHud(){
+  if(PARTY_HUD_DRAG.active)return;
   const hud=document.getElementById('partyHud');if(!hud||typeof S==='undefined'||!S)return;
   const p=botPartyConfig();hud.classList.toggle('hidden',!p.members.length);
   if(!p.members.length)return;
@@ -122,10 +123,23 @@ function updatePartyHud(){
     const data=cfg.list.find(b=>b.id===id),actor=TRAIN_BOTS.actors.get(id);
     rows.push({id,name:data.name,lvl:actor&&actor.profile?actor.profile.state.lvl:data.lvl,hp:actor&&actor.hp,max:actor&&actor.maxhp,dead:actor&&actor.deadT>0,away:!actor});
   }
-  const html=`<button type="button" class="partyHudToggle" aria-label="${partyHudCollapsed?'Mở danh sách tổ đội':'Ẩn danh sách tổ đội'}" aria-expanded="${!partyHudCollapsed}" aria-controls="partyHudMembers">${partyHudCollapsed?'›':'‹'}</button><button type="button" class="partyHudTitle">Tổ đội · ${rows.length}/${BOT_PARTY_MAX}</button><div class="partyHudMembers" id="partyHudMembers">${rows.map(m=>{
+  const html=`<button type="button" class="partyHudToggle" aria-label="${partyHudCollapsed?'Mở danh sách tổ đội':'Ẩn danh sách tổ đội'}" aria-expanded="${!partyHudCollapsed}" aria-controls="partyHudMembers">${partyHudCollapsed?'›':'‹'}</button><button type="button" class="partyHudTitle" title="Kéo để di chuyển; bấm để mở menu tổ đội">↕ Tổ đội · ${rows.length}/${BOT_PARTY_MAX}</button><div class="partyHudMembers" id="partyHudMembers">${rows.map(m=>{
     const health=m.max?clamp(m.hp/m.max,0,1)*100:0;
     return `<div class="partyHudMember"><div><b title="${esc(m.name)}">${m.id===p.leader?'★ ':''}${esc(m.name)}${m.id==='player'?' (Bạn)':''}</b><small>${m.lvl}</small></div><div class="partyHudLife"><i style="width:${health}%"></i></div>${m.dead?'<em>Đang hồi sinh</em>':m.away?'<em>Ở xa</em>':''}</div>`;
   }).join('')}</div>`;
   if(hud.innerHTML!==html){const list=hud.querySelector('.partyHudMembers'),scroll=list?list.scrollTop:0;hud.innerHTML=html;hud.querySelector('.partyHudMembers').scrollTop=scroll;hud.querySelector('.partyHudTitle').onclick=botPartyModal;hud.querySelector('.partyHudToggle').onclick=()=>{partyHudCollapsed=!partyHudCollapsed;try{localStorage.setItem('jxidle_party_hud_collapsed',partyHudCollapsed?'1':'0')}catch(e){}updatePartyHud()};}
+  positionPartyHud();
 }
+const PARTY_HUD_DRAG={active:false,moved:false,position:null,suppressClickUntil:0};
+try{const p=JSON.parse(localStorage.getItem('jxidle_party_hud_position')||'null');if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y))PARTY_HUD_DRAG.position={x:clamp(p.x,0,1),y:clamp(p.y,0,1)}}catch(e){}
+function partyHudBounds(){const hud=document.getElementById('partyHud'),battle=document.getElementById('battle'),style=getComputedStyle(battle);return {hud,battle,w:battle.clientWidth,h:battle.clientHeight,maxX:Math.max(0,battle.clientWidth-hud.offsetWidth-26),maxY:Math.max(17,battle.clientHeight-hud.offsetHeight-(parseFloat(style.getPropertyValue('--chat-bar-over'))||0))};}
+function positionPartyHud(){if(!PARTY_HUD_DRAG.position)return;const b=partyHudBounds(),p=PARTY_HUD_DRAG.position;b.hud.style.left=clamp(p.x*b.w,0,b.maxX)+'px';b.hud.style.top=clamp(p.y*b.h,17,b.maxY)+'px';b.hud.style.bottom='auto';}
+(function(){const hud=document.getElementById('partyHud');if(!hud)return;let drag=null;
+  hud.addEventListener('pointerdown',e=>{if(!e.target.closest('.partyHudTitle,.partyHudToggle')||e.button!==0)return;const b=partyHudBounds(),r=hud.getBoundingClientRect(),br=b.battle.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:(r.left-br.left)*b.w/br.width,top:(r.top-br.top)*b.h/br.height,sx:b.w/br.width,sy:b.h/br.height};PARTY_HUD_DRAG.active=true;PARTY_HUD_DRAG.moved=false;e.target.closest('.partyHudTitle,.partyHudToggle').setPointerCapture(e.pointerId);e.stopPropagation();});
+  hud.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!PARTY_HUD_DRAG.moved&&Math.hypot(dx,dy)<5)return;PARTY_HUD_DRAG.moved=true;e.preventDefault();const b=partyHudBounds();PARTY_HUD_DRAG.position={x:clamp(drag.left+dx*drag.sx,0,b.maxX)/b.w,y:clamp(drag.top+dy*drag.sy,17,b.maxY)/b.h};positionPartyHud();});
+  const end=e=>{if(!drag||e.pointerId!==drag.id)return;const moved=PARTY_HUD_DRAG.moved;drag=null;PARTY_HUD_DRAG.active=false;if(moved){PARTY_HUD_DRAG.suppressClickUntil=Date.now()+400;try{localStorage.setItem('jxidle_party_hud_position',JSON.stringify(PARTY_HUD_DRAG.position))}catch(error){}}setTimeout(updatePartyHud,0);};
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])hud.addEventListener(event,end);
+  hud.addEventListener('click',e=>{if(Date.now()<PARTY_HUD_DRAG.suppressClickUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
+  addEventListener('resize',positionPartyHud);if(window.ResizeObserver)new ResizeObserver(positionPartyHud).observe(document.getElementById('battle'));
+})();
 setInterval(updatePartyHud,500);
