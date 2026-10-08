@@ -228,4 +228,4 @@ ZIP gồm tệp cần để chạy trò chơi offline, dữ liệu nhân vật, 
 
 Nút 💬 ở góc dưới bên trái, ngay trên thanh vật phẩm, bật/tắt khung chat. Mọi map và chế độ dùng chung kênh; không cần đăng ký tài khoản PvP. Mã ngắn sau tên giúp phân biệt người chơi trùng tên. Tin nhắn tối đa 300 ký tự, cập nhật khoảng 4 giây khi mở chat và được giữ 7 ngày. Đóng chat hoặc ẩn tab sẽ dừng tải tin.
 
-Máy chủ chat chung là `https://vltk3ae.taiapp1992.workers.dev`. Các bản game khác phải tích hợp `js/global-chat.js` và dùng cùng máy chủ để tham gia. Có thể đặt `window.JX_CHAT_API` để chọn máy chủ chat khác (hoặc `window.JX_API` khi thử cục bộ). Bảng D1 được tự tạo sau deploy, không cần thao tác thủ công. Kiểm thử dùng Node.js 22.13+ (SQLite tích hợp).
+Máy chủ chat chung là `https://vltk3ae.vltk.workers.dev`. Các bản game khác phải tích hợp `js/global-chat.js` và dùng cùng máy chủ để tham gia. Có thể đặt `window.JX_CHAT_API` để chọn máy chủ chat khác (hoặc `window.JX_API` khi thử cục bộ). Bảng D1 được tự tạo sau deploy, không cần thao tác thủ công. Kiểm thử dùng Node.js 22.13+ (SQLite tích hợp).

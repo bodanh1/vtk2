@@ -1,7 +1,7 @@
 "use strict";
 /* Chơi online (PvP Công Thành Chiến): đăng ký tài khoản, heartbeat đo giờ chơi, đồng bộ save lên Worker.
    Token lưu riêng theo slot (saveKey()+"_online"), không nằm trong S, nên xuất/nhập save không mang theo token. */
-const ONL_HOST = "https://jx-idle-final.khoa-vnd92.workers.dev";
+const ONL_HOST = "https://vltk3ae.vltk.workers.dev";
 const ONL_HB_MS = 60e3, ONL_SYNC_MS = 5 * 60e3, ONL_REG_MAX_LVL = 39;
 // Chạy từ Worker thì gọi cùng origin; chạy cục bộ (file://, localhost, IP) thì gọi Worker đã deploy.
 // window.JX_API ghi đè địa chỉ (dùng khi thử với wrangler dev).

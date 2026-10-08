@@ -12,7 +12,7 @@
     const headers = {};
     if (body) headers['content-type'] = 'application/json';
     if (token) headers.authorization = 'Bearer ' + token;
-    const response = await fetch((window.JX_CHAT_API || window.JX_API || 'https://vltk3ae.taiapp1992.workers.dev') + '/api' + path, {method: body ? 'POST' : 'GET', headers, body: body ? JSON.stringify(body) : undefined, signal});
+    const response = await fetch((window.JX_CHAT_API || window.JX_API || 'https://vltk3ae.vltk.workers.dev') + '/api' + path, {method: body ? 'POST' : 'GET', headers, body: body ? JSON.stringify(body) : undefined, signal});
     const data = await response.json();
     if (!response.ok) throw { code: data.error, msg: data.msg || 'Chưa kết nối được chat' };
     return data;
