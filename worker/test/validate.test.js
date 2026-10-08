@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { GAME as G } from "../gen/game.js";
-import { validateChar, levelCapForTime, minSecForLevel, bracketOf } from "../src/validate.js";
+import { validateChar, levelCapForTime, minSecForLevel, bracketOf, LV_TIME } from "../src/validate.js";
 
 const fac = Object.keys(G.FAC)[0];
 function makeChar(lvl) {
@@ -77,4 +77,17 @@ test("điểm tiềm năng vượt xa mọi nguồn thưởng vẫn bị gắn c
   const s = makeChar(50);
   s.attrPts += 5000;
   assert.ok(codes(validateChar(s, 10 * 3600)).includes("attr_points"));
+});
+
+
+test("CTC cho phép x1/x1.5/x2.5 và ngưỡng cấp tính theo tốc độ tối đa", () => {
+  assert.deepEqual(G.MODES.ctc.speeds, [1, 1.5, 2.5]);
+  assert.equal(G.MODES.ctc.defSpeed, 1);
+  const lvl = 160;
+  let baselineSec = 0;
+  for (let L = 1; L < lvl; L++) baselineSec += (10 + 1.4 * L) * G.xpSlow(L) / (LV_TIME.kps * LV_TIME.xpMul);
+  const accelerated = Math.max(0, baselineSec / 2.5 * LV_TIME.slack - LV_TIME.graceSec);
+  assert.ok(Math.abs(minSecForLevel(lvl) - accelerated) < 1e-6);
+  assert.ok(!codes(validateChar(makeChar(lvl), accelerated + 1)).includes("level_time"));
+  assert.ok(codes(validateChar(makeChar(lvl), accelerated - 1)).includes("level_time"));
 });

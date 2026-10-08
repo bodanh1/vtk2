@@ -13,11 +13,11 @@ export const bracketOf = (lvl) => BRACKETS.find((b) => lvl >= b.lo && lvl <= b.h
 /* ---- Ngưỡng cấp theo giờ chơi ----
    Mỗi cấp L cần (10 + 1.4L) × xpSlow(L) lần hạ quái cùng cấp (xem expFor/gainXp trong combat.js).
    Ước lượng cố ý rộng tay: tối đa 2 quái/giây và hệ số EXP ×4 (tinh anh, boss, quái cao cấp hơn, đồ cộng EXP),
-   cộng thêm 25% và 1 giờ dự phòng. Chỉ nhân vật vượt xa mức này mới bị gắn cờ. */
-export const LV_TIME = { kps: 2, xpMul: 4, slack: 1.25, graceSec: 3600 };
+   nhân tốc độ mô phỏng tối đa của chế độ, cộng thêm 25% và 1 giờ dự phòng. Chỉ nhân vật vượt xa mức này mới bị gắn cờ. */
+export const LV_TIME = { kps: 2, xpMul: 4, slack: 1.25, graceSec: 3600, speedMax: Math.max(...G.MODES.ctc.speeds) };
 const LV_SEC = [0, 0];
 for (let L = 1; L <= G.MAX_LEVEL; L++)
-  LV_SEC[L + 1] = LV_SEC[L] + ((10 + 1.4 * L) * G.xpSlow(L)) / (LV_TIME.kps * LV_TIME.xpMul);
+  LV_SEC[L + 1] = LV_SEC[L] + ((10 + 1.4 * L) * G.xpSlow(L)) / (LV_TIME.kps * LV_TIME.xpMul * LV_TIME.speedMax);
 
 // Số giây chơi tối thiểu (đã cộng dự phòng) để đạt cấp lvl.
 export const minSecForLevel = (lvl) => Math.max(0, LV_SEC[Math.min(lvl, G.MAX_LEVEL)] * LV_TIME.slack - LV_TIME.graceSec);

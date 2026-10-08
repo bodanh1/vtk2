@@ -22,7 +22,7 @@ const DATA = { "data.js": "JX", "world.js": "JW" };
 const EXPORTS = [
   "calc", "newSave", "makeItem", "modeItemOk", "itemPower", "baseRow", "lineScale", "reqOk", "isMode",
   "expNeed", "xpSlow", "J", "FAC", "SK", "MAX_LEVEL", "PTS_PER_LEVEL", "SKILL_PTS_PER_LEVEL", "ENH_MAX",
-  "LV_MS", "ACH", "LOGIN30",
+  "LV_MS", "ACH", "LOGIN30", "MODES",
 ];
 
 function dataFile(file, key) {

@@ -44,7 +44,7 @@ Sau đó mở http://127.0.0.1:8080. Giữ cửa sổ Terminal mở trong lúc c
 
 Khi bắt đầu, chọn chế độ, môn phái, tên, giới tính và thử thách. Đọc mô tả trên màn hình chọn trước khi xác nhận: chế độ được gắn với nhân vật và có thể quy định độ khó, tốc độ, vật phẩm hay giới hạn hoạt động khác nhau.
 
-- **Công Thành Chiến:** nhịp chơi tiêu chuẩn, phù hợp hành tẩu và vượt ải theo tiến trình.
+- **Công Thành Chiến:** tốc độ x1 (mặc định), x1.5 hoặc x2.5; đổi bằng nút tốc độ, phím X hoặc trong Hệ thống.
 - **Phong Hỏa Liên Thành:** thử thách sinh tồn khắc nghiệt hơn; tiến độ và chiến lợi phẩm tuân theo luật riêng của chế độ.
 - **2.0:** nhịp chơi nhanh, thuận tiện thử các hệ thống và hoạt động.
 
@@ -195,7 +195,7 @@ Máy chủ là Cloudflare Worker `jx-idle-final` (cấu hình trong `wrangler.js
 4. Đặt secret `ADMIN_KEY` (ít nhất 16 ký tự) để dùng API quản trị, gửi kèm header `x-admin-key`:
    - `GET /api/admin/flags?name=<tên>`: xem cờ của một nhân vật (bỏ `name` để xem 200 cờ mới nhất).
    - `POST /api/admin/unflag` với `{"name":"<tên>"}`: gỡ mọi cờ đang mở. Nếu nhân vật vẫn vi phạm, lần đồng bộ sau sẽ bị gắn cờ lại.
-5. Ngưỡng cấp theo giờ chơi nằm ở `LV_TIME` trong `worker/src/validate.js`. Mặc định cố ý rộng tay: 2 quái/giây, hệ số EXP ×4, thêm 25% và 1 giờ dự phòng. Ví dụ cấp 100 cần khoảng 1,8 giờ, cấp 120 khoảng 4,8 giờ, cấp 160 khoảng 16 giờ.
+5. Ngưỡng cấp theo giờ chơi nằm ở `LV_TIME` trong `worker/src/validate.js`. Mặc định cố ý rộng tay: 2 quái/giây, hệ số EXP ×4, thêm 25% và 1 giờ dự phòng. Ngưỡng giờ chơi được điều chỉnh theo tốc độ tối đa mà Công Thành Chiến cho phép.
 6. Máy chủ dùng lại mã game: `worker/build-game.mjs` đóng gói các script cần thiết thành `worker/gen/game.js`. Wrangler tự chạy bước này trước mỗi lần dev/deploy (`build.command`).
 7. Chạy thử cục bộ: `npx wrangler dev`, kiểm thử: `npm test`.
 
