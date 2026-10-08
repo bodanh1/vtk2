@@ -1,7 +1,7 @@
 // Mang truoc, cache du phong: luon lay ban moi khi co mang, choi offline khi mat mang
 // QA-021: truoc day ten cache co dinh 'jxidle-v1' va khong precache -> co the phuc vu HTML cu tro toi JS moi.
-const C = 'jxidle-v21';   // v21: giao dien gon, bang dieu khien phien, gop y, Da Tau Cong Thanh Chien
-const CORE = ['./index.html', './style.css', './ui/jx2.css', './js/jxshell.js', './manifest.json', './js/core.js', './js/main.js', './ref.js', './data.js', './world.js'];
+const C = 'jxidle-v23';   // v23: hai hang icon va nut thu gon Safari mobile
+const CORE = ['./index.html', './style.css', './ui/jx2.css?v=23', './js/action-collapse.js?v=2', './js/jxshell.js', './manifest.json', './js/core.js', './js/main.js', './ref.js', './data.js', './world.js'];
 self.addEventListener('install', e => e.waitUntil(
   caches.open(C).then(c => c.addAll(CORE)).catch(() => caches.open(C))
     .then(() => self.skipWaiting())

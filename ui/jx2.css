@@ -734,17 +734,18 @@ body.jxthumb #jxActs{flex-wrap:wrap}body.jxland #jxActs{max-width:min(408px,calc
 .partyHudMember{padding:3px 0}.partyHudMember>div:first-child{display:flex;gap:4px;align-items:center;justify-content:space-between}.partyHudMember b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.partyHudMember small{color:#d8d5b0;flex:none}.partyHudMember em{font-size:10px;font-style:normal;color:#c4c7b9}
 .partyHudLife{height:3px;margin-top:3px;background:#281d17;border-radius:2px;overflow:hidden}.partyHudLife i{display:block;height:100%;background:#4fd04f}
 
-/* Hàng thứ hai bắt đầu ở Tự tìm quái; tránh đè lên bản đồ nhỏ trên iPhone. */
-#jxActs,body.jxland #jxActs,body.jxthumb #jxActs{width:264px;max-width:calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 140px);gap:0;justify-content:flex-start}
-#jxActs>.rnd,#jxActs>.rnd span{width:calc(100% / 6)}
-#jxActs>.rnd span{width:100%}
-#jxExtraActs{display:flex;flex:0 0 100%;align-items:flex-start;gap:0}
-#jxActs #jxExtraActs .rnd,#jxActs #jxExtraActs .rnd span{width:44px}
-#jxActsToggle{width:28px;height:30px;flex:none;margin:4px 0 0 3px;border:1px solid #bfa45d88;border-radius:4px;background:#102117d9;color:#e6d094;font-size:20px;line-height:24px;cursor:pointer;touch-action:manipulation}
-#jxActs.actionsCollapsed .rnd{display:none}
-#jxActs.actionsCollapsed,body.jxland #jxActs.actionsCollapsed,body.jxthumb #jxActs.actionsCollapsed{width:32px}
+/* Hai hàng cố định: không phụ thuộc flex-basis phần trăm của Safari. */
+#jxActs,body.jxland #jxActs,body.jxthumb #jxActs{display:block;width:264px;max-width:calc(100% - var(--safe-l,0px) - var(--safe-r,0px) - 140px)}
+#jxMainActs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%}
+#jxExtraActs{display:grid;grid-template-columns:repeat(3,44px) 36px;width:168px;max-width:100%;align-items:start}
+#jxActs #jxMainActs .rnd,#jxActs #jxMainActs .rnd span{width:100%;min-width:0}
+#jxActs #jxExtraActs .rnd,#jxActs #jxExtraActs .rnd span{width:44px;min-width:0}
+#jxActs [hidden]{display:none!important}
+#jxActsToggle{position:relative;z-index:1;width:36px;height:44px;padding:0;border:1px solid #bfa45d88;border-radius:4px;background:#102117d9;color:#e6d094;font-size:22px;line-height:40px;cursor:pointer;touch-action:manipulation;pointer-events:auto;-webkit-appearance:none;appearance:none}
+#jxActs.actionsCollapsed #jxExtraActs{grid-template-columns:36px;width:36px}
+#jxActs.actionsCollapsed,body.jxland #jxActs.actionsCollapsed,body.jxthumb #jxActs.actionsCollapsed{width:36px}
 body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(145px + var(--safe-t,0px))}
-body:not(.jxthumb).actionsCollapsed #jxStat{top:calc(90px + var(--safe-t,0px))}
+body:not(.jxthumb).actionsCollapsed #jxStat{top:calc(100px + var(--safe-t,0px))}
 
 .partyHudToggle{position:absolute;right:-25px;top:0;width:24px;height:30px;padding:0;border:1px solid #849c6277;border-radius:0 4px 4px 0;background:#102117dc;color:#e6d094;font-size:24px;line-height:26px;cursor:pointer;touch-action:manipulation}
 #partyHud.partyHudCollapsed{width:0;height:30px;border:0;background:none}
