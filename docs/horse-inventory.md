@@ -59,6 +59,6 @@ Dữ liệu `data.js` → `JX.items[10]`: 330 bản ghi, 33 mã loại (`k`), 54
 | Truy điện | 28 | 1–10 | 150 |
 | Lưu Tinh | 29 | 1–10 | 150 |
 
-Cửa hàng hiện chỉ bán mã loại 0 với 10 bậc: Liệt Hoàng Mã, Hoàng Mã, Hoàng Phiêu, Đại Uyển Hoàng Mã, Phi Hoàng. Giá mua theo bậc: 5.000, 5.000, 10.000, 10.000, 20.000, 20.000, 50.000, 50.000, 100.000, 100.000 lượng.
+Cửa hàng hiện bán các mã loại 0–8, đến Phi Vân. Các bản ghi mới trùng tên, chỉ số và yêu cầu được gộp thành một lựa chọn. Giá mua các loại thêm bằng hai lần giá gốc, cùng quy tắc giá dòng Hoàng Mã. Dòng mã loại 0 với 10 bậc gồm: Liệt Hoàng Mã, Hoàng Mã, Hoàng Phiêu, Đại Uyển Hoàng Mã, Phi Hoàng. Giá mua theo bậc: 5.000, 5.000, 10.000, 10.000, 20.000, 20.000, 50.000, 50.000, 100.000, 100.000 lượng.
 
 Dữ liệu còn có yêu cầu chuyển sinh ở một số thú cưỡi; bảng trên chỉ ghi yêu cầu cấp. Có dữ liệu vật phẩm không đồng nghĩa đã có cách mua hoặc nhận mọi loại trong game. Phần vẽ cưỡi ngựa trên map hiện dùng chung một bộ ảnh ngựa tám hướng, chưa phân biệt hình dáng theo từng loại.
