@@ -114,10 +114,10 @@ html.jxo #panel[data-jxk=inv] .jxx{width:360px;max-width:calc(var(--jxl) - 16px)
 html.jxo #panel[data-jxk=char] .jxf-char{transform:scale(var(--jxscale,1));transform-origin:top left}
 html.jxo #panel[data-jxk=char] #t-char{touch-action:manipulation}
 
-/* Skill details are opt-in; quick point controls sit in opposing bottom corners. */
+/* Skill details are opt-in; quick point controls sit in diagonal corners. */
 #jxSkillDetails[hidden]{display:none!important}
 .jxf-skill .jx-skill-actions{position:absolute;left:7px;top:341px;width:191px;height:29px;display:flex;z-index:5;background:#575641}
 .jxf-skill .jx-skill-actions button{position:static!important;flex:1;color:#eee8c4;font:bold 12px/1.2 var(--font,sans-serif);border:1px solid #242b20;background:transparent;cursor:pointer}
-.jxf-skill .jxp{left:auto;right:0;top:auto;bottom:0}
-.jxf-skill .jxm{position:absolute;left:0;bottom:0;width:14px;height:14px;box-sizing:border-box;border:1px solid #ddc892;background:#392e19;color:#ffe6a0;font:bold 14px/10px sans-serif;text-align:center;text-decoration:none;cursor:pointer}
+.jxf-skill .jxp{left:auto;right:0;top:-3px;bottom:auto}
+.jxf-skill .jxm{position:absolute;left:0;bottom:0;width:14px;height:14px;box-sizing:border-box;border:1px solid #ddc892;background:linear-gradient(#d74b36,#8c1d13);color:#fff0c6;font:bold 14px/10px sans-serif;text-align:center;text-decoration:none;cursor:pointer}
 .jxf-skill .jxm:hover{filter:brightness(1.3)}
