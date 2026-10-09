@@ -792,3 +792,7 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 .inventorySlot{aspect-ratio:auto;min-height:0}
 .inventoryTools,.inventoryMoney,.inventoryActions{flex-shrink:0}
 .inventoryActions .btn{padding:5px 2px}
+
+#panel:has(.inventoryMenu)>.wx{display:none!important}
+.inventoryTools{cursor:move;touch-action:none;user-select:none;justify-content:space-between;min-height:28px}
+#inventoryClose{width:28px;height:28px;padding:0;border:1px solid #959779;border-radius:50%;background:#303a29;color:#f4e9c6;font:24px/24px Arial,sans-serif;cursor:pointer;flex:none}
