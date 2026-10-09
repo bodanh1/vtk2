@@ -168,9 +168,9 @@ function botProfile(data,lvl) {
       const rows=groups.flatMap(itemD=>(J.items[itemD]&&J.items[itemD].list||[]).map(row=>({...row,itemD}))).filter(row=>row.lvl<=Math.min(10,Math.floor(lvl/10)+1)&&(row.req||[]).every(([id,value])=>id!==36||value<=lvl)).sort((a,b)=>b.lvl-a.lvl);
       for(const row of rows){const it=makeItem(row.itemD,row.k,row.lvl,Math.min(MC().rarMax,lvl<20?0:lvl<50?1:lvl<90?2:3));if(it&&sexOk(it)&&reqOk(it)&&(slot!=='weapon'||desiredWeapon<0||weaponCode({weapon:it})===desiredWeapon)){it.enh=Math.min(ENH_MAX,Math.max(0,Math.floor((lvl-30)/20)));state.eq[slot]=it;break}}
     }
-    const attacks=FAC[data.fac].skills.filter(id=>SK[id]&&SK[id].req<=lvl&&isAttack(SK[id])&&(!choices[data.fac]||SK[id].eqt<0||SK[id].eqt===desiredWeapon)).sort((a,b)=>SK[b].req-SK[a].req);
+    const attacks=FAC[data.fac].skills.filter(id=>SK[id]&&SK[id].req<=lvl&&isAttack(SK[id])&&skillWeaponAllowed(state,{id})).sort((a,b)=>SK[b].req-SK[a].req);
     let budget=lvl;
-    const rule=MOUNT_COMBAT_RULES[data.fac];if(rule&&desiredWeapon===rule.weapon&&lvl>=SK[rule.mastery].req){state.sk[rule.mastery]=1;budget--}
+    const mastery=FAC[data.fac].skills.find(id=>{const skill=SK[id],row=skill&&skill.attr&&skill.attr.addphysicsdamage_p&&skill.attr.addphysicsdamage_p[0];return skill&&lvl>=skill.req&&Array.isArray(row)&&row[2]===desiredWeapon});if(mastery){state.sk[mastery]=1;budget--}
     for(const id of attacks.slice(0,4)){if(budget<=0)break;const points=Math.min(20,Math.max(1,Math.floor((lvl-SK[id].req)/3)+1),Math.max(1,Math.ceil(budget/(4-Object.keys(state.sk).length))));state.sk[id]=points;budget-=points}
     if(attacks.length){state.main=attacks[0];state.mainLock=true}
     const P=calc();state.mounted=mountedAttackAllowed(state,P.main);return {state,P,attack:P.main};

@@ -45,9 +45,9 @@ Liên kết PvP xác minh bằng token đang có trên máy nguồn và lưu qua
 
 ## Giới hạn thực tế
 
-Gói cloud tối đa 900 KB UTF-8; request tối đa giới hạn HTTP hiện có. Giữ một bản trước để giới hạn dung lượng. Tự đồng bộ khoảng 60 giây khi trang hiện, có heartbeat để giữ quyền chơi (lease 180 giây). Save bị giới hạn 180 lần/giờ/tài khoản; đăng ký/đăng nhập giới hạn theo IP. Cookie yêu cầu HTTPS thật hoặc localhost tin cậy; bản chạy file:// không dùng chức năng cloud cookie.
+Gói cloud tối đa 900 KB UTF-8; request tối đa giới hạn HTTP hiện có. Giữ một bản trước để giới hạn dung lượng. Tự đồng bộ mỗi 30 giây khi trang hiện, có heartbeat để giữ quyền chơi (lease 180 giây). Save bị giới hạn 180 lần/giờ/tài khoản; đăng ký/đăng nhập giới hạn theo IP. Cookie yêu cầu HTTPS thật hoặc localhost tin cậy; bản chạy file:// không dùng chức năng cloud cookie.
 
-Với 100 người chơi liên tục, nhịp 60 giây có thể tạo khoảng 144.000 request/ngày chỉ riêng lưu/heartbeat. Kiểm tra quota và theo dõi Workers/D1 trước khi tăng lượng người chơi. Tính năng này sao lưu trạng thái client, không thay thế một máy chủ mô phỏng game/chống gian lận đầy đủ; PvP vẫn giữ cơ chế kiểm định riêng.
+Với 100 người chơi liên tục, nhịp 30 giây có thể tạo khoảng 288.000 request/ngày chỉ riêng lưu/heartbeat. Kiểm tra quota và theo dõi Workers/D1 trước khi tăng lượng người chơi. Tính năng này sao lưu trạng thái client, không thay thế một máy chủ mô phỏng game/chống gian lận đầy đủ; PvP vẫn giữ cơ chế kiểm định riêng.
 
 ## Kiểm tra đã chuẩn bị
 
