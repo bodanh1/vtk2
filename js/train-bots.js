@@ -130,7 +130,7 @@ function drawTrainBot(b,dt) {
   const c=CX,hw=W.hero[b.data.fac];
   b.animKey=hw&&hw.anim;stepAct(b,dt,b.deadT>0?'die':b.moving?'run':'st');
   if(!onScreen(b.x,b.y,160))return;
-  c.fillStyle='#0007';c.beginPath();c.ellipse(b.x,b.y,16,6,0,0,7);c.fill();
+
   const dollHeight=typeof drawDoll==='function'?drawDoll(c,b.x,b.y,b.act||'st',b.dir||0,b.actT||0,HERO_DOLL_SCALE,b.deadT>0?.4:1,b.profile&&b.profile.state):0;
   const h=dollHeight||hw&&drawAnim(hw.anim,b.act||'st',b.dir||0,b.actT||0,b.x,b.y,HERO_SCALE,b.deadT>0?.4:1);
   if(!h&&hw)drawSprite(img(hw.img),hw.sz,b.x,b.y,.9,b.face<0);

@@ -9,18 +9,18 @@ const packs=names.map(name=>{const fd=fs.openSync(path.join(root,'data',name),'r
 function read(p){for(const pak of packs){const e=pak.entries.get(hash(p));if(!e)continue;const b=Buffer.alloc(e.flag&0xffffff);fs.readSync(pak.fd,b,0,b.length,e.offset);const method=e.flag>>>24;if(method!==0&&method!==1&&method!==32&&method!==17)throw Error(`Unsupported method ${method}: ${p}`);return{data:method===17?splitSprite(b):method!==0?nrv(b,e.size):b,pak:pak.name,id:hash(p)}}return null;}
 
 // Decode only sampled frames, then crop their common bounds before allocating an atlas.
-function sprite(b,file){
+function sprite(b,file,options={}){
  if(b.toString('ascii',0,3)!=='SPR')throw Error('SPR signature');
  const w=b.readUInt16LE(4),h=b.readUInt16LE(6),total=b.readUInt16LE(12),colors=b.readUInt16LE(14),d=b.readUInt16LE(16),interval=b.readUInt16LE(18)||1;
  if(!d||total%d||w*h>2000000)throw Error('SPR dimensions');
- const per=total/d,n=Math.min(8,per),frames=Array.from({length:n},(_,i)=>Math.floor(i*per/n)),table=32+colors*3,base=table+total*8,decoded=[];
+ const per=total/d,n=Math.min(options.maxFrames||8,per),frames=Array.from({length:n},(_,i)=>Math.floor(i*per/n)),table=32+colors*3,base=table+total*8,decoded=[];
  let x0=w,y0=h,x1=-1,y1=-1;
  for(let row=0;row<d;row++)for(const frame of frames){const f=row*per+frame,start=base+b.readUInt32LE(table+f*8),end=start+b.readUInt32LE(table+f*8+4),fw=b.readUInt16LE(start),fh=b.readUInt16LE(start+2),ox=b.readInt16LE(start+4),oy=b.readInt16LE(start+6),rgba=Buffer.alloc(w*h*4);let p=start+8,pixel=0;
  while(pixel<fw*fh){if(p+2>end)throw Error('SPR RLE truncated');const count=b[p++],alpha=b[p++];if(!count||pixel+count>fw*fh)throw Error('SPR RLE length');for(let i=0;i<count;i++,pixel++){const x=pixel%fw+ox,y=Math.floor(pixel/fw)+oy;if(alpha){if(p>=end)throw Error('SPR palette truncated');const color=b[p++];if(color>=colors)throw Error('SPR palette index');if(x>=0&&y>=0&&x<w&&y<h){const at=(y*w+x)*4;b.copy(rgba,at,32+color*3,35+color*3);rgba[at+3]=alpha;x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}}}}
  decoded.push(rgba);}
  if(x1<x0)return null;const cw=x1-x0+1,ch=y1-y0+1,W=cw*n,H=ch*d,out=Buffer.alloc(W*H*4);
  decoded.forEach((rgba,f)=>{const row=Math.floor(f/n),col=f%n;for(let y=0;y<ch;y++){const from=((y+y0)*w+x0)*4,to=((row*ch+y)*W+col*cw)*4;rgba.copy(out,to,from,from+cw*4)}});
- fs.writeFileSync(file,png(W,H,out));return{f:file.replaceAll('\\','/'),w:cw,h:ch,ax:160-x0,ay:220-y0,d,n,per,frames,interval,sourceW:w,sourceH:h,compact:true};
+ fs.writeFileSync(file,png(W,H,out));return{f:file.replaceAll('\\','/'),w:cw,h:ch,ax:160-x0,ay:(options.anchorY??220)-y0,d,n,per,frames,interval,sourceW:w,sourceH:h,compact:true};
 }
 function close(){for(const p of packs)fs.closeSync(p.fd)}
 export {root,read,sprite,close};

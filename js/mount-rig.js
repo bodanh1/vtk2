@@ -39,10 +39,10 @@ function drawClientRiding(c,x,y,act,dir,t,scale,alpha,state){
  const bodyCol=Math.min(body.n-1,Math.floor(phase*body.n));
  const syncedPhase=body.frames?body.frames[bodyCol]/(body.per||body.n):bodyCol/body.n;
  const drawOrder=clientRideOrder(plan,dir,syncedPhase),seen=new Set();let top=y;
- c.save();c.globalAlpha=alpha==null?1:alpha;c.fillStyle='#0006';c.beginPath();c.ellipse(x,y+1,24*eff,7*eff,0,0,7);c.fill();
+ c.save();c.globalAlpha=alpha==null?1:alpha;if(typeof drawClientShadow==='function')drawClientShadow(c,clientShadowSheet(state&&state.sex?'lady':'man',plan.action),dir,syncedPhase,x,y,eff,alpha==null?1:alpha,30);
  for(const part of drawOrder){const id=plan.layers[part];if(!id||seen.has(part))continue;seen.add(part);const s=M.sheets[id],row=dollRow(dir,s.d),col=clientRideColumn(s,syncedPhase),dx=x-s.ax*eff,dy=y-s.ay*eff;
  c.drawImage(images[part],col*s.w,row*s.h,s.w,s.h,dx,dy,s.w*eff,s.h*eff);top=Math.min(top,dy);}
  c.restore();return y-top;
 }
 // Warm only the equipped rig; item changes resolve a new plan and different asset paths.
-function clientRideWarm(state){for(const act of ['st','walk','run']){const plan=clientRidePlan(state,act);if(!plan)continue;for(const id of Object.values(plan.layers))img(window.JMRIG.sheets[id].f);}}
+function clientRideWarm(state){for(const act of ['st','walk','run']){const plan=clientRidePlan(state,act);if(!plan)continue;if(typeof clientShadowSheet==='function'){const sh=clientShadowSheet(plan.sex,plan.action);if(sh)img(sh.f);}for(const id of Object.values(plan.layers))img(window.JMRIG.sheets[id].f);}}
