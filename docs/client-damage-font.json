@@ -1,0 +1,10 @@
+{
+  "pak": "font.pak",
+  "hash": "c4a456c",
+  "glyphs": "0123456789",
+  "width": 16,
+  "height": 16,
+  "advance": 8,
+  "color": "#ff0000",
+  "source": "KNpc::PaintBlood / KDrawFont ASF font"
+}
