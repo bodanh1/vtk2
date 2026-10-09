@@ -11,12 +11,14 @@ function clientRidePlan(state,act){
  const sex=state.sex?'lady':'man',action=clientRideAction(state,act),horse=M.horses[sex]?.[kind]||M.horses.man?.[kind];
  if(!horse?.[action]||![12,13,14].every(p=>horse[action][p]&&M.sheets[horse[action][p]]))return null;
  const worn=dollWornParts(state).parts,layers={...horse[action]};
- for(const part of CLIENT_RIDE_PARTS){const index=part===4?worn[5]:worn[part];if(index===undefined)continue;
+ const clothingFallback=!M.riders[sex]?.[5]?.[worn[5]]?.[action];
+ const clothingIndex=clothingFallback?window.JDOLL?.res?.armor?.def:worn[5];
+ for(const part of CLIENT_RIDE_PARTS){const index=[4,5,6,7].includes(part)?clothingIndex:worn[part];if(index===undefined)continue;
   const records=M.riders[sex]?.[part],record=records?.[index],id=record?.[action];if(id&&M.sheets[id])layers[part]=id;
  }
  // A seated body is required: never substitute a standing body into a mounted rig.
  if(!layers[5])return null;
- return {sex,kind,action,layers,body:M.sheets[layers[5]],horse};
+ return {sex,kind,action,layers,body:M.sheets[layers[5]],horse,clothingFallback};
 }
 function clientRideOrder(plan,dir,phase){
  const M=window.JMRIG,row=dollRow(dir,plan.body.d),sourceFrame=row*(plan.body.per||plan.body.n)+Math.floor(phase*(plan.body.per||plan.body.n));

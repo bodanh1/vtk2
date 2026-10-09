@@ -92,3 +92,5 @@ Tái tạo rig:
     node tools/preview-client-riding.mjs
 
 Importer chuẩn hóa đường dẫn tương đối (bảng ngựa nữ tham chiếu ../man), đọc action theo vị trí cột gốc kể cả bảng có header tiếng Trung, hỗ trợ PAK nén nguyên sprite và nén từng frame. Tham khảo GetHorseRes trong Sources/Core/Src/KItemChangeRes.cpp và GetName/Draw/GetSort trong KNpcResNode.cpp, KNpcRes.cpp của source Mignet/Jx đã dùng để kiểm chứng. Cache import nằm trong tools/.riding-import-cache.json, được bỏ qua trong Git và deploy.
+
+Ba chỉ số trang phục 64/66/67 thiếu sprite cưỡi trong client được ghép bằng bộ trang phục cưỡi mặc định gốc (cùng thân/tay), vẫn giữ đúng loại ngựa và đầu/vũ khí đang mặc. Vì vậy một số áo đặc biệt có thể hiện kiểu áo mặc định khi cưỡi. Đã kiểm tra toàn bộ 9 loại × 10 bậc × 2 giới tính × 3 hành động cửa hàng đều có rig.
