@@ -31,6 +31,25 @@ function mountedHorseFrame(im,direction,frame,state){
   const mask=new Uint8Array(sw*sh);for(const at of body)mask[at]=1;
   for(let at=0;at<mask.length;at++)if(!mask[at])p[at*4+3]=0;
 
+  // Vá lỗ trong thân ảnh; giữ nền bên ngoài và khoảng trống giữa các chân.
+  const outside=new Uint8Array(sw*sh),queue=[];
+  function addOutside(at){if(!outside[at]&&p[at*4+3]<20){outside[at]=1;queue.push(at)}}
+  for(let xx=0;xx<sw;xx++){addOutside(xx);addOutside((sh-1)*sw+xx)}
+  for(let yy=0;yy<sh;yy++){addOutside(yy*sw);addOutside(yy*sw+sw-1)}
+  for(let head=0;head<queue.length;head++){
+    const at=queue[head],xx=at%sw,yy=Math.floor(at/sw);
+    if(xx>0)addOutside(at-1);if(xx<sw-1)addOutside(at+1);
+    if(yy>0)addOutside(at-sw);if(yy<sh-1)addOutside(at+sw);
+  }
+  for(let at=0;at<outside.length;at++)if(!outside[at]&&p[at*4+3]<20){
+    const xx=at%sw,yy=Math.floor(at/sw);let nearest=-1;
+    for(let radius=1;radius<Math.max(sw,sh)&&nearest<0;radius++){
+      for(const next of [xx>=radius?at-radius:-1,xx+radius<sw?at+radius:-1,yy>=radius?at-radius*sw:-1,yy+radius<sh?at+radius*sw:-1])
+        if(next>=0&&mask[next]&&p[next*4+3]>=20){nearest=next;break}
+    }
+    if(nearest>=0){for(let k=0;k<3;k++)p[at*4+k]=p[nearest*4+k];p[at*4+3]=255}
+  }
+
   // Chỉ đổi vùng lông nâu; giữ đệm đỏ, giáp đen và viền kim loại.
   for(let i=0;i<p.length;i+=4){const r=p[i],g=p[i+1],b=p[i+2];if(p[i+3]<30||r<28||g<12||r/g<1.13||r/g>2.7||g/Math.max(1,b)<1.08||r>185&&g>140)continue;
     const light=(r*.299+g*.587+b*.114)/93;
@@ -74,7 +93,7 @@ function drawMountedRider(c,x,seatY,act,dir,t,scale,alpha,state){
       for(let py=top;py<165;py++)for(let px=0;px<192;px++)if(pixels[((py-top)*192+px)*4+3]>32){left=Math.min(left,px);right=Math.max(right,px);bottom=Math.max(bottom,py)}
       if(right>=left&&bottom>top){
         const heading=((dir||0)%8+8)%8,side=heading>=1&&heading<=3?-1:heading>=5&&heading<=7?1:0;
-        const unit=characterScale/(1/.6),length=bottom-top+1,targetHeight=27*unit;
+        const unit=characterScale/(1/.6),length=bottom-top+1,targetHeight=24*unit;
         const middle=Math.round((left+right+1)/2);
         // Tách hai chân: đùi mở ra hai bên yên, gối co và ủng thả xuống.
         // Các lát ảnh vẫn lấy đúng quần/ủng đang mặc, không kéo cả hai chân thẳng đứng.
@@ -106,7 +125,10 @@ drawDoll=function(c,x,y,act,dir,t,scale,alpha,state){
   if(!rider||!rider.mounted||!mountEquipped(rider)||act==='die'||!c||c.x!==undefined)return drawFootDoll(c,x,y,act,dir,t,scale,alpha,state);
   const bob=drawMountedHorse(c,x,y,dir,t,rider,act==='run'?'run':act==='walk'?'walk':false,alpha);if(bob===null)return drawFootDoll(c,x,y,act,dir,t,scale,alpha,rider);
   const direction=(4+(dir||0))%8,seatOffsets=[87,84,79,85,91,85,79,84],seatY=y-seatOffsets[direction]*(HORSE_RENDER_WIDTH/125)-4-bob;
-  const height=drawMountedRider(c,x,seatY,act,dir,t,scale,alpha,rider);return height?y-seatY+height:0;
+  // Lùi hông về sau yên theo hướng đầu ngựa, không dịch chính con ngựa.
+  const rearX=[0,4,6,4,0,-4,-6,-4],rearY=[-3,-2,0,2,3,2,0,-2];
+  const heading=((dir||0)%8+8)%8;
+  const height=drawMountedRider(c,x+rearX[heading],seatY+rearY[heading],act,dir,t,scale,alpha,rider);return height?y-seatY-rearY[heading]+height:0;
 };
 img('img/mount-horse-armored.png');
 img('img/mount-horse-gallop.png');
