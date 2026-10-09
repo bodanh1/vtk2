@@ -12,7 +12,7 @@ const OUT = path.join(ROOT, "worker/gen/game.js");
 
 // Đúng thứ tự trong index.html. Chỉ những file calc() và kiểm định cần.
 const FILES = [
-  "data.js", "world.js", "js/core.js", "js/modes.js", "js/stats.js", "js/loot.js",
+  "data.js", "world.js", "js/core.js", "js/modes.js", "js/mount-rules.js", "js/stats.js", "js/loot.js",
   "js/sets.js", "js/combat.js", "js/save.js", "js/rewards.js", "js/depth.js",
 ];
 // File chỉ chứa một object dữ liệu lớn: nhúng dạng chuỗi JSON (JSON.parse nhanh hơn literal JS).

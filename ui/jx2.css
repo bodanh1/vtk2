@@ -767,3 +767,7 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 .treasureProduct{display:flex;align-items:center;gap:12px}.treasureProduct>img{width:40px;height:40px;object-fit:contain}.treasureProduct p{margin:5px 0}.treasureBalance{display:flex;align-items:center;gap:6px;color:#ffd700}.treasureBalance img{width:24px;height:18px}
 
 .heroNameLine{display:flex;align-items:center;gap:6px;min-width:0}.heroNameLine #heroName{min-width:0;overflow:hidden;text-overflow:ellipsis}#playerOnline{flex:none;color:#7cff7d;font:700 10px/15px Arial,sans-serif;text-shadow:1px 1px #000}
+
+#jxMount i,#jxMount:hover i{background-image:url(v2/ic_horse.png);background-position:0 0;background-size:auto 100%}#jxR #jxMount span{font-size:8.5px}
+
+#jxRanking i{background-image:url(v3/q_journal.png)}.rankingTable{overflow-x:auto}.rankingTable table{width:100%;border-collapse:collapse;font-size:12px}.rankingTable th,.rankingTable td{padding:7px 5px;text-align:left;border-bottom:1px solid #83936555}.rankingTable th{color:#e5d18b}.rankingTable td:nth-child(2){min-width:95px}

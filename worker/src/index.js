@@ -11,7 +11,11 @@ import { chatSession, chatList, chatSend } from "./chat.js";
 
 import {presence} from "./presence.js";
 
+import {playerRankingSync,playerRankingList} from "./player-rankings.js";
+
 const ROUTES = {
+  "POST /api/player-rankings": playerRankingSync,
+  "GET /api/player-rankings": playerRankingList,
   "POST /api/presence": presence,
   "POST /api/chat/session": chatSession,
   "GET /api/chat": chatList,

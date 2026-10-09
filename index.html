@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="ui/global-chat.css">
 <link rel="stylesheet" href="ui/cloud-account.css?v=1">
-<link rel="stylesheet" href="ui/jx2.css?v=41">
+<link rel="stylesheet" href="ui/jx2.css?v=42">
 <link rel="stylesheet" href="ui/jx/jx_layout.css">
 <link rel="stylesheet" href="ui/jx/jx_win.css?v=37">
 </head>
@@ -45,6 +45,7 @@
       <button class="rnd tg" id="jxHunt" data-r="hunt" title="Bật / tắt tự di chuyển tìm và đánh quái" aria-label="Tự di chuyển tìm và đánh quái" aria-pressed="false"><i aria-hidden="true"></i><span class="sk">Tự tìm quái</span></button>
       <button class="rnd" id="jxBots" data-r="train" title="Menu mật độ nhân vật luyện cấp" aria-label="Menu nhân vật luyện cấp"><i></i><span class="sk">Menu bot</span></button>
       <button class="rnd" id="jxParty" data-r="party" title="Mời nhân vật xung quanh vào tổ đội" aria-label="Menu tổ đội"><i></i><span class="sk">Tổ đội</span></button>
+      <button class="rnd" id="jxRanking" data-r="ranking" title="Xếp hạng người chơi theo chế độ" aria-label="Bảng xếp hạng"><i></i><span class="sk">Xếp hạng</span></button>
       <button id="jxActsToggle" type="button" aria-label="Thu gọn các nút hoạt động" aria-expanded="true" aria-controls="jxActs">▴</button>
       </div>
     </div>
@@ -54,6 +55,7 @@
       <button class="rbtn" id="jxAuto" data-ic="char" title="Cày thông minh: bật Vượt ải + Tự nhặt + Xoay chiêu cùng lúc"><i></i><span class="sk">Tự cày</span></button>
       <button class="rbtn" id="jxToday" data-ic="pk" title="Việc hôm nay: điểm danh, nhiệm vụ, hoạt động còn lượt"><i></i><span class="sk">Hôm nay</span></button>
       <button class="rbtn" id="jxPick" data-ic="pick" title="Bật / tắt tự nhặt đồ theo bộ lọc Hành trang (phím G)"><i></i><span class="sk">Nhặt</span></button>
+      <button class="rbtn" id="jxMount" data-ic="horse" title="Lên hoặc xuống ngựa" aria-pressed="false"><i></i><span class="sk">Lên ngựa</span></button>
       <button class="rbtn" id="jxMenu" title="Mở rộng điều khiển" aria-label="Mở rộng điều khiển" aria-expanded="false" aria-controls="jxOverflow"><i></i><span class="sk">Mở rộng</span></button>
       <div id="jxOverflow" class="hidden" aria-label="Điều khiển bổ sung">
         <button class="rbtn" id="jxGear" data-jt="inv" data-ic="item" title="Trang bị và bộ lọc"><i></i><span class="sk">Bộ lọc</span></button>
@@ -137,20 +139,22 @@
 <script defer src="js/core.js"></script>
 <script defer src="js/modes.js?v=27"></script>
 <script defer src="js/mapobs.js"></script>
-<script defer src="js/stats.js"></script>
+<script defer src="js/mount-rules.js?v=42"></script>
+<script defer src="js/stats.js?v=42"></script>
 <script defer src="js/loot.js"></script>
 <script defer src="js/gear_policy.js"></script>
 <script defer src="rdata.js"></script>
 <script defer src="js/sets.js"></script>
 <script defer src="ref.js"></script>
 <script defer src="js/recipes.js"></script>
-<script defer src="js/combat.js?v=38"></script>
-<script defer src="js/save.js?v=38"></script>
+<script defer src="js/combat.js?v=42"></script>
+<script defer src="js/save.js?v=42"></script>
 <script defer src="js/doll-data.js"></script>
-<script defer src="js/doll.js"></script>
+<script defer src="js/doll.js?v=42"></script>
 <script defer src="js/render.js?v=32"></script>
+<script defer src="js/mount-render.js?v=42"></script>
 <script defer src="js/audio.js"></script>
-<script defer src="js/ui.js?v=34"></script>
+<script defer src="js/ui.js?v=42"></script>
 <script defer src="js/control.js"></script>
 <script defer src="js/shop.js"></script>
 <script defer src="js/rewards.js?v=33"></script>
@@ -165,11 +169,12 @@
 <script defer src="js/admin.js"></script>
 <script defer src="js/guide.js"></script>
 <script defer src="js/stash.js"></script>
-<script defer src="js/survival.js?v=38"></script>
+<script defer src="js/survival.js?v=42"></script>
 <script defer src="js/modes_play.js"></script>
 <script defer src="js/online.js?v=25"></script>
-<script defer src="js/train-bots.js?v=32"></script>
+<script defer src="js/train-bots.js?v=42"></script>
 <script defer src="js/bot-party.js?v=38"></script>
+<script defer src="js/mount-ui.js?v=42"></script>
 <script defer src="js/main.js"></script>
 <script defer src="js/jxshell.js?v=38"></script>
 <script defer src="js/quick.js?v=27"></script>
@@ -177,6 +182,7 @@
 <script defer src="js/feedback.js"></script>
 <script defer src="js/jxorig.js?v=37"></script>
 <script defer src="js/player-presence.js?v=41"></script>
+<script defer src="js/player-rankings.js?v=42"></script>
 <script defer src="js/global-chat.js"></script>
 <script defer src="js/action-collapse.js?v=2"></script>
 <script defer src="js/cloud-account.js?v=3"></script>

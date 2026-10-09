@@ -79,7 +79,7 @@ export function attrBudget(state, playSec) {
 }
 
 // Trả về { flags: [[code, detail]], power, bracket, P } . playSec: giờ chơi máy chủ đã đo (null với khách).
-export function validateChar(state, playSec) {
+export function validateChar(state, playSec, mode="ctc") {
   const flags = [];
   const lvl = Math.floor(state.lvl);
   for (const [slot, it] of Object.entries(state.eq || {})) if (it) checkItem(it, slot, flags);
@@ -107,7 +107,7 @@ export function validateChar(state, playSec) {
   try {
     // Bổ sung trường thiếu bằng giá trị mặc định (migrate() của game cần cả code giao diện).
     const s = Object.assign(G.newSave(), JSON.parse(JSON.stringify(state)));
-    s.mode = "ctc";
+    s.mode = G.isMode(mode)?mode:"ctc";
     G.setS(s);
     P = G.calc();
     const dps = (P.main && P.main.dps) || 0;
