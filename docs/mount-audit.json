@@ -1,0 +1,507 @@
+{
+  "clientItemRecords": 330,
+  "h5ItemRecords": 330,
+  "itemTypes": 33,
+  "names": 54,
+  "referencedModels": 31,
+  "readyModels": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    15,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
+  ],
+  "readyModelCount": 29,
+  "readyItemTypes": 31,
+  "shopTypes": 9,
+  "shopModels": 13,
+  "verifiedSpr": 581,
+  "unavailable": [],
+  "rows": [
+    {
+      "k": 0,
+      "names": [
+        "Liệt Hoàng Mã",
+        "Hoàng Mã",
+        "Hoàng Phiêu",
+        "Đại Uyển Hoàng Mã",
+        "Phi Hoàng"
+      ],
+      "records": 10,
+      "models": [
+        8
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 1,
+      "names": [
+        "Liệt Thanh Mã",
+        "Thanh Thông",
+        "Tử Lưu",
+        "Đại Uyển Thanh Mã",
+        "Hoa Lưu"
+      ],
+      "records": 10,
+      "models": [
+        4
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 2,
+      "names": [
+        "Liệt Bạch Mã",
+        "Bạch Mã",
+        "Ngọc Hoa Thông",
+        "Đại Uyển Bạch Mã",
+        "Túc Sương"
+      ],
+      "records": 10,
+      "models": [
+        7
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 3,
+      "names": [
+        "Liệt Hắc Mã",
+        "Hắc Mã",
+        "Hắc Kỳ",
+        "Đại Uyển Hắc Mã",
+        "Ô Chùy"
+      ],
+      "records": 10,
+      "models": [
+        3
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 4,
+      "names": [
+        "Liệt Hồng Mã",
+        "Hồng Mã",
+        "Hồng Ly",
+        "Đại Uyển Hãn Huyết Mã",
+        "Xích Ký"
+      ],
+      "records": 10,
+      "models": [
+        6
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 5,
+      "names": [
+        "Ô Vân Đạp Tuyết",
+        "Xích Thố",
+        "Tuyệt ảnh",
+        "Đích Lô",
+        "Chiếu Dạ Ngọc Sư Tử"
+      ],
+      "records": 10,
+      "models": [
+        5,
+        0,
+        9,
+        2,
+        1
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 6,
+      "names": [
+        "Bôn Tiêu"
+      ],
+      "records": 10,
+      "models": [
+        10
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 7,
+      "names": [
+        "Phiên Vũ"
+      ],
+      "records": 10,
+      "models": [
+        11
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 8,
+      "names": [
+        "Phi Vân"
+      ],
+      "records": 10,
+      "models": [
+        12
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 9,
+      "names": [
+        "Xích Long Câu"
+      ],
+      "records": 10,
+      "models": [
+        13
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 10,
+      "names": [
+        "Tuyệt Địa"
+      ],
+      "records": 10,
+      "models": [
+        14
+      ],
+      "ready": false,
+      "female": false,
+      "femaleFallback": []
+    },
+    {
+      "k": 11,
+      "names": [
+        "Du Huy"
+      ],
+      "records": 10,
+      "models": [
+        15
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 12,
+      "names": [
+        "Đằng Vụ"
+      ],
+      "records": 10,
+      "models": [
+        16
+      ],
+      "ready": false,
+      "female": false,
+      "femaleFallback": []
+    },
+    {
+      "k": 13,
+      "names": [
+        "Siêu Quang"
+      ],
+      "records": 10,
+      "models": [
+        17
+      ],
+      "ready": true,
+      "female": false,
+      "femaleFallback": [
+        17
+      ]
+    },
+    {
+      "k": 14,
+      "names": [
+        "Kim Tinh Hổ Vương"
+      ],
+      "records": 10,
+      "models": [
+        18
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 15,
+      "names": [
+        "Hỏa Tinh Kim Hổ Vương"
+      ],
+      "records": 10,
+      "models": [
+        19
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 16,
+      "names": [
+        "Kim Tinh Bạch Hổ Vương"
+      ],
+      "records": 10,
+      "models": [
+        20
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 17,
+      "names": [
+        "Long Tinh Hắc Hổ Vương"
+      ],
+      "records": 10,
+      "models": [
+        21
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 18,
+      "names": [
+        "Hãn Huyết Long Câu"
+      ],
+      "records": 10,
+      "models": [
+        22
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 19,
+      "names": [
+        "Phong Vân Bạch Mã"
+      ],
+      "records": 10,
+      "models": [
+        11
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 20,
+      "names": [
+        "Phong Vân Chiến Mã"
+      ],
+      "records": 10,
+      "models": [
+        11
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 21,
+      "names": [
+        "Phong Vân Thần Mã"
+      ],
+      "records": 10,
+      "models": [
+        11
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 22,
+      "names": [
+        "Sư tử"
+      ],
+      "records": 10,
+      "models": [
+        23
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 23,
+      "names": [
+        "Lạc đà"
+      ],
+      "records": 10,
+      "models": [
+        24
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 24,
+      "names": [
+        "Dương Đà"
+      ],
+      "records": 10,
+      "models": [
+        25
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 25,
+      "names": [
+        "Hươu đốm"
+      ],
+      "records": 10,
+      "models": [
+        26
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 26,
+      "names": [
+        "Dương Sa"
+      ],
+      "records": 10,
+      "models": [
+        27
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 27,
+      "names": [
+        "Ngự Phong"
+      ],
+      "records": 10,
+      "models": [
+        28
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 28,
+      "names": [
+        "Truy điện"
+      ],
+      "records": 10,
+      "models": [
+        29
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 29,
+      "names": [
+        "Lưu Tinh"
+      ],
+      "records": 10,
+      "models": [
+        30
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 30,
+      "names": [
+        "Phiên Vũ"
+      ],
+      "records": 10,
+      "models": [
+        11
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 31,
+      "names": [
+        "Xích Long Câu"
+      ],
+      "records": 10,
+      "models": [
+        13
+      ],
+      "ready": true,
+      "female": true,
+      "femaleFallback": []
+    },
+    {
+      "k": 32,
+      "names": [
+        "Siêu Quang"
+      ],
+      "records": 10,
+      "models": [
+        17
+      ],
+      "ready": true,
+      "female": false,
+      "femaleFallback": [
+        17
+      ]
+    }
+  ]
+}
