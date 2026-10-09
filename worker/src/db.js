@@ -2,6 +2,8 @@
 // nên deploy không cần bước "d1 migrations apply" riêng. Bản SQL tham chiếu: migrations/0001_init.sql.
 
 export const SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS player_presence(tab_key TEXT PRIMARY KEY,actor_key TEXT NOT NULL,seen_at INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS player_presence_seen ON player_presence(seen_at)`,
   `CREATE TABLE IF NOT EXISTS cloud_pvp_links(cloud_account_id TEXT NOT NULL,slot INTEGER NOT NULL,pvp_account_id TEXT NOT NULL UNIQUE,PRIMARY KEY(cloud_account_id,slot))`,
   `CREATE TABLE IF NOT EXISTS cloud_accounts(id TEXT PRIMARY KEY,username TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,password_salt TEXT NOT NULL,password_iterations INTEGER NOT NULL,created_at INTEGER NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS cloud_sessions(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL,created_at INTEGER NOT NULL,expires_at INTEGER NOT NULL)`,

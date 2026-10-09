@@ -9,7 +9,10 @@ import { feedback, adminFeedback, adminFeedbackSet } from "./feedback.js";
 import { cloudRoute } from './cloud-account.js';
 import { chatSession, chatList, chatSend } from "./chat.js";
 
+import {presence} from "./presence.js";
+
 const ROUTES = {
+  "POST /api/presence": presence,
   "POST /api/chat/session": chatSession,
   "GET /api/chat": chatList,
   "POST /api/chat": chatSend,

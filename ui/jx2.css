@@ -765,3 +765,5 @@ html.jxo #bb:not(.touchbar) #jxTreasure{width:64px;height:48px;border:0;backgrou
 html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #bb.touchbar #jxTreasure{width:44px;height:44px;flex-direction:column;font-size:10px;gap:2px}
 .treasureProduct{display:flex;align-items:center;gap:12px}.treasureProduct>img{width:40px;height:40px;object-fit:contain}.treasureProduct p{margin:5px 0}.treasureBalance{display:flex;align-items:center;gap:6px;color:#ffd700}.treasureBalance img{width:24px;height:18px}
+
+.heroNameLine{display:flex;align-items:center;gap:6px;min-width:0}.heroNameLine #heroName{min-width:0;overflow:hidden;text-overflow:ellipsis}#playerOnline{flex:none;color:#7cff7d;font:700 10px/15px Arial,sans-serif;text-shadow:1px 1px #000}
