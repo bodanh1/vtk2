@@ -8,7 +8,7 @@ function clientRideAction(state,act){
 function clientRidePlan(state,act){
  const M=window.JMRIG,h=state&&state.eq&&state.eq.horse;if(!M||!h)return null;
  const kind=M.res[h.d+':'+h.k+':'+h.lvl];if(kind===undefined)return null;
- const sex=state.sex?'lady':'man',action=clientRideAction(state,act),horse=M.horses[sex]?.[kind]||M.horses.man?.[kind];
+ const sex=state.sex?'lady':'man',action=clientRideAction(state,act),preferred=M.horses[sex]?.[kind],horse=[12,13,14].every(p=>preferred?.[action]?.[p]&&M.sheets[preferred[action][p]])?preferred:M.horses.man?.[kind];
  if(!horse?.[action]||![12,13,14].every(p=>horse[action][p]&&M.sheets[horse[action][p]]))return null;
  const worn=dollWornParts(state).parts,layers={...horse[action]};
  const clothingFallback=!M.riders[sex]?.[5]?.[worn[5]]?.[action];
