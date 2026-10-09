@@ -775,8 +775,8 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 /* Vật phẩm: túi sáu cột, bộ lọc mở riêng. */
 #panel:has(.inventoryMenu){width:312px!important;max-width:calc(100% - 8px)!important}
 .inventoryMenu{color:#e4ddba;width:100%;max-width:300px;margin:auto}
-.inventoryTools{display:flex;align-items:center;gap:12px;margin-bottom:7px}.inventoryTools select{flex:1;min-width:0}
-.inventorySlots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:3px;border:2px ridge #807e69;background:#080b08;max-height:52vh;overflow-y:auto}
+.inventoryTools{display:flex;align-items:center;gap:12px;margin-bottom:7px}
+.inventorySlots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:3px;border:2px ridge #807e69;background:#080b08;max-height:none;overflow:hidden}
 .inventorySlot{position:relative;aspect-ratio:1;border:1px solid #565b4c;background:#030604;padding:1px;min-width:0;overflow:hidden}
 .inventorySlot img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.inventorySlot small{position:absolute;right:2px;bottom:0;color:#eee;font-size:11px}.inventorySlot i{position:absolute;bottom:3px;left:3px;width:8px;height:8px;border-radius:50%}.inventorySlot span{position:absolute;right:0;top:0;font-size:10px}
 .inventoryMoney{display:grid;grid-template-columns:92px 1fr;gap:4px;margin:8px 0}.inventoryMoney b{text-align:right;color:#ffd452;border:1px solid #555d44;background:#0b120e;padding:3px;white-space:nowrap;font-size:12px}
@@ -785,3 +785,10 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #panel:has(.inventoryMenu)>.wx{background:linear-gradient(#555948,#2c3226)!important;border-bottom:1px solid #8e8a6d;color:#f4df9b}
 .inventoryActions .btn{background:linear-gradient(#64704a,#303e28)!important;color:#eee6c3;border:1px solid #9caa78!important;border-image:none!important;text-shadow:0 1px #17200f}
 .inventoryActions .btn.red{background:linear-gradient(#885a32,#452a19)!important}
+
+#panel:has(.inventoryMenu) #t-inv{overflow:hidden;max-height:none}
+.inventoryMenu{display:flex;flex-direction:column;height:min(650px,calc(var(--wmax,60vh) - 18px));min-height:0}
+.inventorySlots{flex:1;min-height:0;grid-template-rows:repeat(10,minmax(0,1fr))}
+.inventorySlot{aspect-ratio:auto;min-height:0}
+.inventoryTools,.inventoryMoney,.inventoryActions{flex-shrink:0}
+.inventoryActions .btn{padding:5px 2px}
