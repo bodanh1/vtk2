@@ -1,0 +1,7 @@
+import fs from 'node:fs';import vm from 'node:vm';import {png,read} from './mount-png.mjs';
+const ctx={window:{},setTimeout(){},setInterval(){},mountWeaponType:s=>s.eq.weapon?.k||-1};vm.createContext(ctx);for(const f of ['js/doll-data.js','js/doll.js','js/mount-rig-data.js','js/mount-rig.js'])vm.runInContext(fs.readFileSync(f,'utf8'),ctx);
+const cache=new Map();ctx.img=f=>{if(!cache.has(f))cache.set(f,{...read(f),complete:true,naturalWidth:1,f});return cache.get(f)};
+const W=960,H=1280,out=Buffer.alloc(W*H*4);for(let i=0;i<out.length;i+=4){out[i]=38;out[i+1]=44;out[i+2]=48;out[i+3]=255;}
+const c={globalAlpha:1,save(){},restore(){},beginPath(){},ellipse(){},fill(){},drawImage(im,sx,sy,sw,sh,dx,dy,dw,dh){for(let y=0;y<dh;y++)for(let x=0;x<dw;x++){const tx=Math.round(dx+x),ty=Math.round(dy+y);if(tx<0||ty<0||tx>=W||ty>=H)continue;const from=((sy+Math.min(sh-1,Math.floor(y/dh*sh)))*im.w+sx+Math.min(sw-1,Math.floor(x/dw*sw)))*4,to=(ty*W+tx)*4,a=im.rgba[from+3]/255;for(let k=0;k<3;k++)out[to+k]=Math.round(im.rgba[from+k]*a+out[to+k]*(1-a))}}};
+for(let dir=0;dir<8;dir++)for(let col=0;col<6;col++){const state={sex:col>=3?1:0,eq:{horse:{d:10,k:col%3,lvl:1}}},act=dir%2?'run':'st',result=ctx.drawClientRiding(c,col*160+80,dir*160+140,act,dir,.25,1/.6,1,state);if(result===null)throw Error('Preview missing rig: '+col+':'+dir);}
+fs.writeFileSync('docs/horse-rig-preview.png',png(W,H,out));

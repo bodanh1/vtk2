@@ -3,3 +3,5 @@ node_modules/
 .dev.vars
 _backup_truoc_toi_uu/
 worker/gen/
+
+tools/.riding-import-cache.json

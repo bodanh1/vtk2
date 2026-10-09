@@ -7,6 +7,7 @@ function toggleMount(){
     if(!mountEquipped(S)){toast('Trang bị một con ngựa trong Hành trang trước');return}
     if(typeof reqOk==='function'&&!reqOk(S.eq.horse)){toast('Chưa đủ điều kiện cưỡi ngựa này');return}
     if(R.deadT>0||R.life<=0){toast('Chờ hồi sinh để lên ngựa');return}
+    if(typeof clientRideWarm==='function')clientRideWarm(S);
     S.mounted=true;toast('Đã lên ngựa · chiêu không phù hợp sẽ tự xuống ngựa');
   }
   save();refreshMountButton();
@@ -14,6 +15,7 @@ function toggleMount(){
 function refreshMountButton(){
   if(typeof S==='undefined'||!S)return;
   if(S.mounted&&(S.fac==='tangmen'||!mountEquipped(S)||!reqOk(S.eq.horse)||R.deadT>0))S.mounted=false;
+  if(S.mounted&&typeof clientRideWarm==='function')clientRideWarm(S);
   const b=document.getElementById('jxMount');if(!b)return;
   b.classList.toggle('on',!!S.mounted);b.setAttribute('aria-pressed',String(!!S.mounted));
   b.querySelector('span').textContent=S.mounted?'Xuống ngựa':'Lên ngựa';

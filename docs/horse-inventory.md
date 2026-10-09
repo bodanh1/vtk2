@@ -77,3 +77,18 @@ Tái tạo từ thư mục repository:
     node tools/compact-client-mounts.mjs
 
 Tham khảo cấu trúc PAK/SPR và NRV2B: https://github.com/Mignet/Jx/tree/master/Sources/Engine/Src . Không đưa EXE/DLL hoặc PAK gốc vào bản deploy. Công cụ import không tham gia build Cloudflare; asset và dữ liệu đã xuất được commit sẵn.
+
+## Sửa mã ngựa và rig người cưỡi (09/10/2026)
+
+Bản trước tra nhầm cột số 40 trong horse.txt, khiến nhiều ngựa trỏ về cùng bộ hình. Client tra theo ParticularType và Level: dòng dữ liệu horseres (bỏ header) = k*10+lvl; giá trị cột 2 trừ 2 là chỉ số equip zero-based của bảng NPC. Các sprite mã 0–8 trong cửa hàng lần lượt là MA_HH_009, 005, 008, 004, 007, 006, 011, 012, 013. Các bậc cùng loại có thể dùng chung ngoại hình theo bảng gốc.
+
+Renderer hiện dùng mount-rig-data.js và mount-rig.js. Người cưỡi dùng sprite Ride gốc cho đầu/tóc/thân/tay/vũ khí của cả nam và nữ, cùng tọa độ và tỷ lệ với ngựa. Đã bỏ renderer uốn chân/cắt thân từ sprite đi bộ. Thứ tự các phần HorseFront=12, HorseMiddle=13, HorseBack=14 và người lấy từ bảng texture sort, có override theo hướng/hành động/frame. Một đồng hồ và frame nguồn của thân điều khiển cả ngựa và người để tránh lệch nhịp giữa atlas đầy đủ và atlas lấy mẫu.
+
+Có 4.484 sheet trong manifest rig (gồm 249 sheet ngựa đã có); bộ mới tải theo trang bị đang dùng, không precache toàn bộ ảnh. Ảnh người cưỡi được lấy tối đa 8 frame/hướng, giữ màu/palette/alpha và tọa độ từ SPR. Một số tham chiếu cosmetic không có trong các PAK, và hai sprite vũ khí có header frame/direction bất hợp lệ; manifest ghi lại để kiểm tra. Khi chưa có rig đầy đủ hoặc ảnh chưa tải xong, hiển thị nhân vật bình thường thay vì ghép người đứng lên ngựa. Bản xem thử: horse-rig-preview.png (ba loại ngựa, nam/nữ, tám hướng).
+
+Tái tạo rig:
+
+    node tools/import-client-riding.mjs "đường dẫn tới Client_VLTK_SHXT"
+    node tools/preview-client-riding.mjs
+
+Importer chuẩn hóa đường dẫn tương đối (bảng ngựa nữ tham chiếu ../man), đọc action theo vị trí cột gốc kể cả bảng có header tiếng Trung, hỗ trợ PAK nén nguyên sprite và nén từng frame. Tham khảo GetHorseRes trong Sources/Core/Src/KItemChangeRes.cpp và GetName/Draw/GetSort trong KNpcResNode.cpp, KNpcRes.cpp của source Mignet/Jx đã dùng để kiểm chứng. Cache import nằm trong tools/.riding-import-cache.json, được bỏ qua trong Git và deploy.

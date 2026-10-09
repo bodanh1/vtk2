@@ -26,3 +26,5 @@ FIX_PROPOSAL.md
 tools
 tools/**
 docs/mount-client-manifest.json
+
+docs/mount-rig-manifest.json
