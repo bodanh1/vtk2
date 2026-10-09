@@ -9,9 +9,9 @@ const SLOTS=['Vũ khí','Ám khí','Áo giáp','Nhẫn','Dây chuyền','Giày',
 const fold=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
 let catalogue;
 function allEntries(){
-  if(catalogue)return catalogue; const rows=[],horses=new Set(REF.horses);
+  if(catalogue)return catalogue; const rows=[],horses=new Set(REF.horses),seenMounts=new Set();
   const add=(id,group,row,extra={})=>rows.push({id,group,n:row.n,ic:row.ic||'',d:row.d??null,tier:row.lvl||0,level:(row.req||[]).find(r=>r[0]===36)?.[1]||0,fac:(row.req||[]).find(r=>r[0]===39)?.[1]??-1,sex:(row.req||[]).find(r=>r[0]===38)?.[1]??-1,...extra});
-  for(const[d,g]of Object.entries(G.J.items))g.list.forEach((r,i)=>{if(+d!==10||horses.has(i))add(`e:${d}:${i}`,+d===10?'mount':'gear',{...r,d:+d});});
+  for(const[d,g]of Object.entries(G.J.items))g.list.map((r,i)=>({r,i})).sort((a,b)=>+d===10?a.r.lvl-b.r.lvl:0).forEach(({r,i})=>{if(+d===10){if(!horses.has(i))return;const signature=JSON.stringify([r.n.normalize('NFC').trim(),r.s,[...(r.base||[])].sort((a,b)=>a[0]-b[0])]);if(seenMounts.has(signature))return;seenMounts.add(signature);}add(`e:${d}:${i}`,+d===10?'mount':'gear',{...r,d:+d});});
   for(const kind of ['gold','platina'])G.J.sets[kind].forEach((r,i)=>add(`${kind}:${i}`,kind,r));
   G.J.potions.forEach((p,i)=>add(`p:${i}`,'potion',p,{note:`Hồi ${p.total} ${p.kind==='life'?'sinh lực':'nội lực'}`}));
   for(let l=1;l<=10;l++)add(`m:ht:${l}`,'material',{n:`Huyền Tinh Khoáng Thạch cấp ${l}`,lvl:l});

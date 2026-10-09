@@ -9,3 +9,5 @@ Nút Admin cạnh Xếp hạng chỉ hiện khi API xác nhận `isAdmin`. Menu 
 Danh mục lấy từ dữ liệu game đang port, không phát những vật phẩm PC chưa có cơ chế H5. Tham chiếu đồ bộ/mảnh và thú cưỡi được sinh bằng `node tools/build-admin-reference.mjs` sau `node worker/build-game.mjs`, không đưa sprite hay toàn bộ ref.js vào Worker. Chạy lại khi thay dữ liệu vật phẩm/ref/thú cưỡi. Lược đồ được ensureSchema tạo tự động; SQL tham chiếu nằm trong migrations/0005_account_admin.sql.
 
 Nếu mất kết nối khi nhận đồ, dừng đồng bộ để tránh ghi đè kết quả đã cấp. Mở Tài khoản và tải bản máy chủ để tiếp tục.
+
+Danh mục thú cưỡi gộp theo tên, hệ và các chỉ số cơ bản (không phân biệt thứ tự dòng), giữ mẫu cấp thấp nhất; cấp và yêu cầu cấp khác nhau không tạo lựa chọn trùng. Hiện có 55 lựa chọn thay cho 310 dòng nguồn. Việc gộp chỉ áp dụng danh mục Admin, giữ nguyên đồ đã nhận. Giao diện kho dùng chữ 12px, cửa sổ tối đa 780px và danh sách cuộn riêng.
