@@ -1,0 +1,24 @@
+{
+  "before": {
+    "frames": 180,
+    "actors": 96,
+    "canvasAllocations": 17280,
+    "tintOperations": 17280,
+    "shadowDraws": 17280,
+    "cache": null
+  },
+  "after": {
+    "frames": 180,
+    "actors": 96,
+    "canvasAllocations": 96,
+    "tintOperations": 96,
+    "shadowDraws": 15024,
+    "cache": {
+      "builds": 96,
+      "hits": 14928,
+      "deferred": 2256,
+      "pixels": 3538944,
+      "entries": 96
+    }
+  }
+}
