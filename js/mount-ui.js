@@ -14,7 +14,7 @@ function toggleMount(){
 }
 function refreshMountButton(){
   if(typeof S==='undefined'||!S)return;
-  if(S.mounted&&(S.fac==='tangmen'||!mountEquipped(S)||!reqOk(S.eq.horse)||R.deadT>0))S.mounted=false;
+  if(S.mounted&&(!mountEquipped(S)||!reqOk(S.eq.horse)||R.deadT>0))S.mounted=false;
   if(S.mounted&&typeof clientRideWarm==='function')clientRideWarm(S);
   const b=document.getElementById('jxMount');if(!b)return;
   b.classList.toggle('on',!!S.mounted);b.setAttribute('aria-pressed',String(!!S.mounted));

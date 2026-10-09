@@ -104,3 +104,9 @@ html.jxo #panel[data-jxk=inv] .jxx{width:360px;max-width:calc(var(--jxl) - 16px)
 .jx-detail-handle{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;background:#15271c;border-bottom:1px solid #3b6a50;margin:0 -8px 8px;padding:7px 8px;cursor:grab;touch-action:none;user-select:none;z-index:1}
 .jx-detail-handle:active{cursor:grabbing}
 .jx-detail-handle button{padding:0 6px;border:0;background:transparent;color:#e8f2ea;font-size:20px;cursor:pointer}
+.jxf-char .jx-char-drag{left:7px;top:30px;width:407px;height:34px;cursor:grab;touch-action:none;z-index:2}
+.jxf-char .jx-char-drag:active{cursor:grabbing}
+.jxo-inventory-window{position:fixed;width:312px;max-width:calc(100vw - 16px);padding:6px;background:linear-gradient(#303426,#12190f);border:1px solid #8e8a6d;color:#e4ddba;z-index:130;overflow:hidden;box-shadow:0 3px 14px #0008}
+.jxo-inventory-window[hidden]{display:none!important}
+.jxo-inventory-window>.jx-detail-handle{margin:-6px -6px 6px;padding:6px 8px}
+.jxo-inventory-window>.tab{padding:0;max-height:none;overflow:hidden}

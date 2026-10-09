@@ -1,0 +1,1370 @@
+{
+  "semantics": {
+    "0": "Cả trên và dưới ngựa",
+    "1": "Chỉ dưới ngựa",
+    "2": "Chỉ trên ngựa"
+  },
+  "source": "settings/skills.txt",
+  "rows": [
+    {
+      "id": 4,
+      "fac": "Thiếu Lâm phái",
+      "name": "Thiếu Lâm Côn pháp",
+      "horse": 0,
+      "weapon": 2,
+      "enemy": 0
+    },
+    {
+      "id": 6,
+      "fac": "Thiếu Lâm phái",
+      "name": "Thiếu Lâm Đao pháp",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 0
+    },
+    {
+      "id": 8,
+      "fac": "Thiếu Lâm phái",
+      "name": "Thiếu Lâm Quyền Pháp",
+      "horse": 0,
+      "weapon": -1,
+      "enemy": 0
+    },
+    {
+      "id": 10,
+      "fac": "Thiếu Lâm phái",
+      "name": "Kim Cang Phục Ma",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 14,
+      "fac": "Thiếu Lâm phái",
+      "name": "Hàng Long Bất Vũ",
+      "horse": 0,
+      "weapon": -1,
+      "enemy": 1
+    },
+    {
+      "id": 15,
+      "fac": "Thiếu Lâm phái",
+      "name": "Bất động Minh Vương",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 16,
+      "fac": "Thiếu Lâm phái",
+      "name": "La Hán Trận",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 20,
+      "fac": "Thiếu Lâm phái",
+      "name": "Sư Tử Hống",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 11,
+      "fac": "Thiếu Lâm phái",
+      "name": "Hoành Tảo Lục Hợp",
+      "horse": 1,
+      "weapon": 2,
+      "enemy": 1
+    },
+    {
+      "id": 19,
+      "fac": "Thiếu Lâm phái",
+      "name": "Ma Ha Vô Lượng",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 271,
+      "fac": "Thiếu Lâm phái",
+      "name": "Long Trảo Hổ Trảo",
+      "horse": 1,
+      "weapon": -1,
+      "enemy": 1
+    },
+    {
+      "id": 21,
+      "fac": "Thiếu Lâm phái",
+      "name": "Dịch Cân kinh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 273,
+      "fac": "Thiếu Lâm phái",
+      "name": "Như Lai Thiên Diệp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 318,
+      "fac": "Thiếu Lâm phái",
+      "name": "Đạt Ma Độ Giang",
+      "horse": 1,
+      "weapon": -1,
+      "enemy": 1
+    },
+    {
+      "id": 319,
+      "fac": "Thiếu Lâm phái",
+      "name": "Hoành Tảo Thiên Quân",
+      "horse": 1,
+      "weapon": 2,
+      "enemy": 1
+    },
+    {
+      "id": 321,
+      "fac": "Thiếu Lâm phái",
+      "name": "Vô Tướng Trảm",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 23,
+      "fac": "Thiên Vương Bang",
+      "name": "Thiên Vương  Thương pháp",
+      "horse": 0,
+      "weapon": 3,
+      "enemy": 0
+    },
+    {
+      "id": 24,
+      "fac": "Thiên Vương Bang",
+      "name": "Thiên Vương  Đao pháp",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 0
+    },
+    {
+      "id": 26,
+      "fac": "Thiên Vương Bang",
+      "name": "Thiên Vương  Chùy Pháp",
+      "horse": 0,
+      "weapon": 4,
+      "enemy": 0
+    },
+    {
+      "id": 29,
+      "fac": "Thiên Vương Bang",
+      "name": "Trảm Long quyết",
+      "horse": 1,
+      "weapon": 4,
+      "enemy": 1
+    },
+    {
+      "id": 30,
+      "fac": "Thiên Vương Bang",
+      "name": "Hồi Phong Lạc Nhạn",
+      "horse": 1,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 34,
+      "fac": "Thiên Vương Bang",
+      "name": "Kinh Lôi Trảm",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 33,
+      "fac": "Thiên Vương Bang",
+      "name": "Tĩnh Tâm Quyết",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 31,
+      "fac": "Thiên Vương Bang",
+      "name": "Hàng Vân Quyết",
+      "horse": 1,
+      "weapon": 4,
+      "enemy": 1
+    },
+    {
+      "id": 35,
+      "fac": "Thiên Vương Bang",
+      "name": "Dương Quan Tam Điệp",
+      "horse": 1,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 37,
+      "fac": "Thiên Vương Bang",
+      "name": "Bát Phong Trảm",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 40,
+      "fac": "Thiên Vương Bang",
+      "name": "Đoạn Hồn Thích",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 42,
+      "fac": "Thiên Vương Bang",
+      "name": "Kim Chung Tráo",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 32,
+      "fac": "Thiên Vương Bang",
+      "name": "Vô Tâm Trảm",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 36,
+      "fac": "Thiên Vương Bang",
+      "name": "Thiên Vương Chiến ý",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 41,
+      "fac": "Thiên Vương Bang",
+      "name": "Huyết Chiến Bát Phương",
+      "horse": 1,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 324,
+      "fac": "Thiên Vương Bang",
+      "name": "Thừa Long Quyết",
+      "horse": 1,
+      "weapon": 4,
+      "enemy": 1
+    },
+    {
+      "id": 322,
+      "fac": "Thiên Vương Bang",
+      "name": "Phá Thiên Trảm",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 323,
+      "fac": "Thiên Vương Bang",
+      "name": "Truy Tinh Trục Nguyệt",
+      "horse": 1,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 325,
+      "fac": "Thiên Vương Bang",
+      "name": "Truy Phong Quyết",
+      "horse": 1,
+      "weapon": 4,
+      "enemy": 1
+    },
+    {
+      "id": 43,
+      "fac": "Đường Môn",
+      "name": "Đường Môn ám khí",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 45,
+      "fac": "Đường Môn",
+      "name": "Phích Lịch đơn",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 347,
+      "fac": "Đường Môn",
+      "name": "Địa Diệm Hỏa",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 303,
+      "fac": "Đường Môn",
+      "name": "Độc Thích Cốt",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 47,
+      "fac": "Đường Môn",
+      "name": "Đoạt Hồn Tiêu",
+      "horse": 1,
+      "weapon": 100,
+      "enemy": 1
+    },
+    {
+      "id": 50,
+      "fac": "Đường Môn",
+      "name": "Truy Tâm Tiễn",
+      "horse": 1,
+      "weapon": 101,
+      "enemy": 1
+    },
+    {
+      "id": 54,
+      "fac": "Đường Môn",
+      "name": "Mạn Thiên Hoa Vũ",
+      "horse": 1,
+      "weapon": 102,
+      "enemy": 1
+    },
+    {
+      "id": 343,
+      "fac": "Đường Môn",
+      "name": "Xuyên Tâm Thích",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 345,
+      "fac": "Đường Môn",
+      "name": "Hàn Băng Thích",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 349,
+      "fac": "Đường Môn",
+      "name": "Lôi Kích Thuật",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 48,
+      "fac": "Đường Môn",
+      "name": "Tâm Nhãn",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 58,
+      "fac": "Đường Môn",
+      "name": "Thiên La Địa Võng",
+      "horse": 0,
+      "weapon": 102,
+      "enemy": 1
+    },
+    {
+      "id": 249,
+      "fac": "Đường Môn",
+      "name": "Tiểu Lý Phi Đao",
+      "horse": 1,
+      "weapon": 101,
+      "enemy": 1
+    },
+    {
+      "id": 341,
+      "fac": "Đường Môn",
+      "name": "Tán Hoa Tiêu",
+      "horse": 1,
+      "weapon": 100,
+      "enemy": 1
+    },
+    {
+      "id": 302,
+      "fac": "Đường Môn",
+      "name": "Bạo Vũ Lê Hoa",
+      "horse": 0,
+      "weapon": 102,
+      "enemy": 1
+    },
+    {
+      "id": 339,
+      "fac": "Đường Môn",
+      "name": "Nhiếp Hồn Nguyệt ảnh",
+      "horse": 1,
+      "weapon": 101,
+      "enemy": 1
+    },
+    {
+      "id": 342,
+      "fac": "Đường Môn",
+      "name": "Cửu Cung Phi Tinh",
+      "horse": 1,
+      "weapon": 100,
+      "enemy": 1
+    },
+    {
+      "id": 351,
+      "fac": "Đường Môn",
+      "name": "Loạn Hoàn Kích",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 60,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Ngũ Độc Đao pháp",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 0
+    },
+    {
+      "id": 62,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Ngũ Độc Chưởng Pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 63,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Độc Sa chưởng",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 65,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Huyết Đao Độc Sát",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 67,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Cửu Thiên Cuồng Lôi",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 66,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Tạp Nan Dược Kinh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 70,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Xích Diệm Thực Thiên",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 64,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Băng Lam Huyền Tinh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 68,
+      "fac": "Ngũ Độc Giáo",
+      "name": "U Minh Khô Lâu",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 69,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Vô Hình Độc",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 384,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Bách Độc Xuyên Tâm",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 73,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Vạn Độc Thực Tâm",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 356,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Xuyên Y Phá Giáp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 72,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Xuyên Tâm Độc Thích",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 71,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Thiên Cương Địa Sát",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 74,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Chu Cáp Thanh Minh",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 75,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Ngũ Độc Kỳ Kinh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 353,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Âm Phong Thực Cốt",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 355,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Huyền Âm Trảm",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 390,
+      "fac": "Ngũ Độc Giáo",
+      "name": "Đoạn Cân Hủ Cốt",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 77,
+      "fac": "Nga My phái",
+      "name": "Nga Mi Kiếm pháp",
+      "horse": 0,
+      "weapon": 0,
+      "enemy": 0
+    },
+    {
+      "id": 79,
+      "fac": "Nga My phái",
+      "name": "Nga Mi Chưởng pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 80,
+      "fac": "Nga My phái",
+      "name": "Phiêu Tuyết Xuyên Vân",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 85,
+      "fac": "Nga My phái",
+      "name": "Nhất Diệp Tri Thu",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 93,
+      "fac": "Nga My phái",
+      "name": "Từ Hàng Phổ Độ",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 82,
+      "fac": "Nga My phái",
+      "name": "Tứ Tượng Đồng Quy",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 89,
+      "fac": "Nga My phái",
+      "name": "Mộng Điệp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 385,
+      "fac": "Nga My phái",
+      "name": "Thôi Song Vọng Nguyệt",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 86,
+      "fac": "Nga My phái",
+      "name": "Lưu Thủy",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 92,
+      "fac": "Nga My phái",
+      "name": "Phật Tâm Từ Hữu",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 88,
+      "fac": "Nga My phái",
+      "name": "Bất Diệt Bất Tuyệt",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 91,
+      "fac": "Nga My phái",
+      "name": "Phật Quang Phổ Chiếu",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 252,
+      "fac": "Nga My phái",
+      "name": "Phật Pháp Vô Biên",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 282,
+      "fac": "Nga My phái",
+      "name": "Thanh Âm Phạn Xướng",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 328,
+      "fac": "Nga My phái",
+      "name": "Tam Nga Tề Tuyết",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 332,
+      "fac": "Nga My phái",
+      "name": "Phổ Độ Chúng Sinh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 380,
+      "fac": "Nga My phái",
+      "name": "Phong Sương Toái ảnh",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 95,
+      "fac": "Thúy Yên môn",
+      "name": "Thúy Yên Đao pháp",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 0
+    },
+    {
+      "id": 97,
+      "fac": "Thúy Yên môn",
+      "name": "Thúy Yên Song đao",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 99,
+      "fac": "Thúy Yên môn",
+      "name": "Phong Hoa Tuyết Nguyệt",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 102,
+      "fac": "Thúy Yên môn",
+      "name": "Phong Quyển Tàn Tuyết",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 269,
+      "fac": "Thúy Yên môn",
+      "name": "Băng Tâm Trái ảnh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 105,
+      "fac": "Thúy Yên môn",
+      "name": "Vũ Đả Lê Hoa",
+      "horse": 1,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 113,
+      "fac": "Thúy Yên môn",
+      "name": "Phù Vân Tán Tuyết",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 100,
+      "fac": "Thúy Yên môn",
+      "name": "Hộ Thể Hàn Băng",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 109,
+      "fac": "Thúy Yên môn",
+      "name": "Tuyết ảnh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 108,
+      "fac": "Thúy Yên môn",
+      "name": "Mục Dã Lưu Tinh",
+      "horse": 1,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 111,
+      "fac": "Thúy Yên môn",
+      "name": "Bích Hải Triều Sinh",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 114,
+      "fac": "Thúy Yên môn",
+      "name": "Băng Cốt Tuyết Tâm",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 336,
+      "fac": "Thúy Yên môn",
+      "name": "Băng Tung Vô ảnh",
+      "horse": 1,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 337,
+      "fac": "Thúy Yên môn",
+      "name": "Băng Tâm Tiên Tử",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 115,
+      "fac": "Cái Bang",
+      "name": "Cái Bang Bổng pháp",
+      "horse": 0,
+      "weapon": 2,
+      "enemy": 0
+    },
+    {
+      "id": 116,
+      "fac": "Cái Bang",
+      "name": "Cái Bang Chưởng Pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 119,
+      "fac": "Cái Bang",
+      "name": "Diên Môn Thác Bát",
+      "horse": 0,
+      "weapon": 2,
+      "enemy": 1
+    },
+    {
+      "id": 122,
+      "fac": "Cái Bang",
+      "name": "Kiến Nhân Thần Thủ",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 129,
+      "fac": "Cái Bang",
+      "name": "Hóa Hiểm Vi Di",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 124,
+      "fac": "Cái Bang",
+      "name": "Đả Cẩu Bổng Pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 274,
+      "fac": "Cái Bang",
+      "name": "Giáng Long Chưởng",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 277,
+      "fac": "Cái Bang",
+      "name": "Hoạt Bất Lưu Thủ",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 125,
+      "fac": "Cái Bang",
+      "name": "Bổng Đả ác Cẩu",
+      "horse": 1,
+      "weapon": 2,
+      "enemy": 1
+    },
+    {
+      "id": 128,
+      "fac": "Cái Bang",
+      "name": "Kháng Long Hữu Hối",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 130,
+      "fac": "Cái Bang",
+      "name": "Túy Điệp Cuồng Vũ",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 360,
+      "fac": "Cái Bang",
+      "name": "Tiêu Diêu Công",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 357,
+      "fac": "Cái Bang",
+      "name": "Phi Long Tại Thiên",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 359,
+      "fac": "Cái Bang",
+      "name": "Thiên Hạ Vô Cẩu",
+      "horse": 1,
+      "weapon": 2,
+      "enemy": 1
+    },
+    {
+      "id": 131,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Thiên Nhẫn Đao pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 132,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Thiên Nhẫn Mâu pháp",
+      "horse": 0,
+      "weapon": 3,
+      "enemy": 0
+    },
+    {
+      "id": 135,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Tàn Dương Như Huyết",
+      "horse": 0,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 136,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Hỏa Liên Phần Hoa",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 145,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Đơn Chỉ Liệt Diệm",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 137,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Ảo ảnh Phi Hồ",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 138,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Thôi sơn Điền Hải",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 140,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Phi Hồng Vô Tích",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 141,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Liệt Hỏa Tình Thiên",
+      "horse": 0,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 364,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Bi Tô Thanh Phong",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 143,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Lịch Ma Đoạt Hồn",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 142,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Thâu Thiên Hoán Nhật",
+      "horse": 0,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 148,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Ma Diệm Thất Sát",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 150,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Thiên Ma Giải Thể",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 361,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Vân Long Kích",
+      "horse": 0,
+      "weapon": 3,
+      "enemy": 1
+    },
+    {
+      "id": 362,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Thiên Ngoại Lưu Tinh",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 391,
+      "fac": "Thiên Nhẫn Giáo",
+      "name": "Nhiếp Hồn Loạn Tâm",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 151,
+      "fac": "Võ Đang phái",
+      "name": "Võ Đang Kiếm pháp",
+      "horse": 0,
+      "weapon": 0,
+      "enemy": 0
+    },
+    {
+      "id": 152,
+      "fac": "Võ Đang phái",
+      "name": "Võ Đang Quyền Pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 153,
+      "fac": "Võ Đang phái",
+      "name": "Nộ Lôi Chỉ",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 155,
+      "fac": "Võ Đang phái",
+      "name": "Thương Hải Minh Nguyệt",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 159,
+      "fac": "Võ Đang phái",
+      "name": "Thất Tinh Trận",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 158,
+      "fac": "Võ Đang phái",
+      "name": "Kiếm Phi Kinh Thiên",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 164,
+      "fac": "Võ Đang phái",
+      "name": "Bác Cấp Nhi Phục",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 160,
+      "fac": "Võ Đang phái",
+      "name": "Thế Vân Tung",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 157,
+      "fac": "Võ Đang phái",
+      "name": "Tọa Vọng Vô Ngã",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 165,
+      "fac": "Võ Đang phái",
+      "name": "Vô Ngã Vô Kiếm",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 166,
+      "fac": "Võ Đang phái",
+      "name": "Thái Cực Thần Công",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 267,
+      "fac": "Võ Đang phái",
+      "name": "Tam Hoàn Thao Nguyệt",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 365,
+      "fac": "Võ Đang phái",
+      "name": "Thiên Địa Vô Cực",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 368,
+      "fac": "Võ Đang phái",
+      "name": "Nhân Kiếm Hợp Nhất",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 167,
+      "fac": "Côn Lôn phái",
+      "name": "Côn Lôn Đao pháp",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 0
+    },
+    {
+      "id": 168,
+      "fac": "Côn Lôn phái",
+      "name": "Côn Lôn Kiếm pháp",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 169,
+      "fac": "Côn Lôn phái",
+      "name": "Hô Phong Pháp",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 171,
+      "fac": "Côn Lôn phái",
+      "name": "Thanh Phong phù",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 179,
+      "fac": "Côn Lôn phái",
+      "name": "Cuồng Lôi Chấn Địa",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 392,
+      "fac": "Côn Lôn phái",
+      "name": "Thúc Phược Chú",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 174,
+      "fac": "Côn Lôn phái",
+      "name": "Ki Bán phù",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 172,
+      "fac": "Côn Lôn phái",
+      "name": "Thiên Tế Tấn Lôi",
+      "horse": 1,
+      "weapon": 0,
+      "enemy": 1
+    },
+    {
+      "id": 173,
+      "fac": "Côn Lôn phái",
+      "name": "Thiên Thanh Địa Trọc",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 178,
+      "fac": "Côn Lôn phái",
+      "name": "Nhất Khí Tam Thanh",
+      "horse": 0,
+      "weapon": 1,
+      "enemy": 0
+    },
+    {
+      "id": 393,
+      "fac": "Côn Lôn phái",
+      "name": "Bắc Minh Đáo Hải",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 175,
+      "fac": "Côn Lôn phái",
+      "name": "Khi Hàn Ngạo Tuyết",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 181,
+      "fac": "Côn Lôn phái",
+      "name": "Khí Tâm phù",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 90,
+      "fac": "Côn Lôn phái",
+      "name": "Mê Tung ảo ảnh",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 176,
+      "fac": "Côn Lôn phái",
+      "name": "Cuồng Phong Sậu Điện",
+      "horse": 1,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 182,
+      "fac": "Côn Lôn phái",
+      "name": "Ngũ Lôi Chánh Pháp",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 275,
+      "fac": "Côn Lôn phái",
+      "name": "Sương Ngạo Côn Lôn",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 630,
+      "fac": "Côn Lôn phái",
+      "name": "Huyền Thiên Vô Cực",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 0
+    },
+    {
+      "id": 372,
+      "fac": "Côn Lôn phái",
+      "name": "Ngạo Tuyết Tiêu Phong",
+      "horse": 1,
+      "weapon": 1,
+      "enemy": 1
+    },
+    {
+      "id": 375,
+      "fac": "Côn Lôn phái",
+      "name": "Lôi động Cửu Thiên",
+      "horse": 1,
+      "weapon": -2,
+      "enemy": 1
+    },
+    {
+      "id": 394,
+      "fac": "Côn Lôn phái",
+      "name": "Túy Tiên Tá Cốt",
+      "horse": 0,
+      "weapon": -2,
+      "enemy": 1
+    }
+  ]
+}

@@ -1,24 +1,8 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import vm from 'node:vm';
-import {GAME as G} from '../gen/game.js';
-const context={SK:G.SK,FAC:G.FAC};vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../../js/mount-rules.js',import.meta.url),'utf8')+';this.rules=MOUNT_COMBAT_RULES;',context);
-test('cưỡi ngựa: bốn phái đúng nhánh, đúng vũ khí, có điểm võ công nền; Đường Môn hoãn',()=>{
- for(const fac of ['tianwang','shaolin','wudu','tianren']){
-  const rule=context.rules[fac],s={fac,eq:{horse:{},weapon:{d:0,k:rule.weapon}},sk:{[rule.mastery]:1},mounted:true};
-  const allowed=G.FAC[fac].skills.map(id=>G.SK[id]).filter(sk=>sk.enemy&&sk.eqt===rule.weapon);
-  for(const sk of allowed)assert.equal(context.mountedAttackAllowed(s,{id:sk.id}),true,sk.n);
-  const wrong=G.FAC[fac].skills.map(id=>G.SK[id]).find(sk=>sk.enemy&&sk.eqt!==rule.weapon);
-  assert.equal(context.mountedAttackAllowed(s,{id:wrong.id}),false);context.prepareMountedAttack(s,{id:wrong.id});assert.equal(s.mounted,false);
-  s.sk={};assert.equal(context.mountedAttackAllowed(s,{id:allowed[0].id}),false);
-  s.sk[rule.mastery]=1;s.eq.weapon={d:0,k:rule.weapon===1?3:1};assert.equal(context.mountedAttackAllowed(s,{id:allowed[0].id}),false);
- }
- assert.equal(context.mountedAttackAllowed({fac:'tangmen',eq:{horse:{},weapon:{d:1,k:2}},sk:{43:1}},{id:302}),false);
-});
-test('cưỡi ngựa: tháo ngựa tự xuống, đánh thường đúng nhánh, tự mặc giữ vũ khí nhánh đã học',()=>{
- const s={fac:'shaolin',eq:{horse:{},weapon:{d:0,k:1}},sk:{6:1},mounted:true};
- assert.equal(context.mountedAttackAllowed(s,{id:0}),true);assert.equal(context.preferredWeaponCode(s),1);
- delete s.eq.horse;context.prepareMountedAttack(s,{id:0});assert.equal(s.mounted,false);
- s.eq.weapon={d:0,k:2};s.sk={4:1};assert.equal(context.preferredWeaponCode(s),2);
-});
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';import {GAME as G} from '../gen/game.js';
+const context={window:{},SK:G.SK,FAC:G.FAC};vm.createContext(context);for(const file of ['js/mount-skill-data.js','js/mount-rules.js'])vm.runInContext(fs.readFileSync(file,'utf8'),context);
+const weapon=eq=>eq>=100?{d:1,k:eq-100}:eq>=0?{d:0,k:eq}:null;
+function state(fac,eq){return{fac,eq:{horse:{},weapon:weapon(eq)},sk:{},mounted:true}}
+test('all faction skills obey exact client HorseLimit and EqtLimit on and off a mount',()=>{const doc=JSON.parse(fs.readFileSync('docs/client-mounted-skills.json'));for(const row of doc.rows){const eq=row.weapon===-2?1:row.weapon,s=state(G.SK[row.id].fac?.key||'shaolin',eq);assert.equal(context.skillPostureAllowed(s,{id:row.id},true),row.horse===0||row.horse===2,row.id+' mounted');assert.equal(context.skillPostureAllowed(s,{id:row.id},false),row.horse!==2,row.id+' foot');if(row.weapon!==-2){s.eq.weapon=weapon(eq===1?3:1);assert.equal(context.skillWeaponAllowed(s,{id:row.id}),false,row.id+' wrong weapon');}}});
+test('branch exceptions stay mounted and foot-only attacks dismount before casting',()=>{for(const [fac,id,eq] of [['shaolin',19,1],['tianwang',34,1],['wudu',63,-1],['emei',80,-1],['cuiyan',99,1],['gaibang',119,2],['tianren',135,3],['wudang',153,-1],['kunlun',169,1],['tangmen',302,102]]){const s=state(fac,eq);assert.equal(context.prepareSkillAttack(s,{id}),true,id+' prepare');assert.equal(s.mounted,true,id+' remains mounted');}for(const [fac,id,eq] of [['shaolin',11,2],['tianwang',41,3],['emei',85,0],['gaibang',125,2],['tangmen',47,100]]){const s=state(fac,eq);assert.equal(context.prepareSkillAttack(s,{id}),true);assert.equal(s.mounted,false,id+' dismount');}});
+test('wrong weapon and unknown skill cannot be cast; horse-only semantics require mounted state',()=>{const s=state('shaolin',3);assert.equal(context.prepareSkillAttack(s,{id:19}),false);assert.equal(s.mounted,true);assert.equal(context.prepareSkillAttack(s,{id:999999}),false);const previous=context.window.JMOUNTSKILL[19];context.window.JMOUNTSKILL[19]=[2,1];s.eq.weapon=weapon(1);s.mounted=false;assert.equal(context.prepareSkillAttack(s,{id:19}),false);s.mounted=true;assert.equal(context.prepareSkillAttack(s,{id:19}),true);delete s.eq.horse;assert.equal(context.prepareSkillAttack(s,{id:19}),false);context.window.JMOUNTSKILL[19]=previous;});
+test('calc excludes attacks with incompatible client weapon limits',()=>{const s=G.newSave();s.fac='shaolin';s.lvl=150;s.sk={19:1,11:1,10:1};G.setS(s);s.eq.weapon=G.makeItem(0,1,1,0);let p=G.calc();assert.ok(p.actives.some(a=>a.id===19));assert.ok(!p.actives.some(a=>a.id===11));s.eq.weapon=G.makeItem(0,2,1,0);p=G.calc();assert.ok(p.actives.some(a=>a.id===11));assert.ok(!p.actives.some(a=>a.id===19));});

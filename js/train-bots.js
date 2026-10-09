@@ -93,7 +93,7 @@ function botsTick(dt) {
       else {
         if(b.hp<=0){b.deadT=5;b.act='die';b.actT=0;continue}
         if(b.cd<=0) {
-          prepareMountedAttack(b.profile.state,attack);b.mana=Math.max(0,b.mana-attack.cost);
+          if(!prepareSkillAttack(b.profile.state,attack)){b.cd=.3;continue}b.mana=Math.max(0,b.mana-attack.cost);
           b.skillIndex++;
           const center=attack.around?b:target,splash=attack.around?attack.rad+40:110;
           const victims=[target,...alive().filter(e=>e!==target&&Math.hypot(e.x-center.x,e.y-center.y)<(attack.targets>1?splash:0)).slice(0,attack.targets-1)];
