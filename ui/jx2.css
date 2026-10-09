@@ -796,3 +796,5 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #panel:has(.inventoryMenu)>.wx{display:none!important}
 .inventoryTools{cursor:move;touch-action:none;user-select:none;justify-content:space-between;min-height:28px}
 #inventoryClose{width:28px;height:28px;padding:0;border:1px solid #959779;border-radius:50%;background:#303a29;color:#f4e9c6;font:24px/24px Arial,sans-serif;cursor:pointer;flex:none}
+
+#townBar{left:50%;right:auto;transform:translateX(-50%);z-index:14}
