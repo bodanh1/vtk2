@@ -58,6 +58,7 @@ function mountedHorseFrame(im,direction,frame,state){
   ctx.putImageData(pixels,0,0);if(HORSE_FRAME_CACHE.size>=192)HORSE_FRAME_CACHE.delete(HORSE_FRAME_CACHE.keys().next().value);HORSE_FRAME_CACHE.set(key,canvas);return canvas;
 }
 function drawMountedHorse(c,x,y,dir,t,state,moving,alpha){
+  const original=drawClientMount(c,x,y,dir,t,state,moving,alpha);if(original!==null)return original;
   let gallop=!!moving&&moving!=='walk',im=img(gallop?'img/mount-horse-gallop.png':'img/mount-horse-armored.png');
   if(!im.complete||!im.naturalWidth){gallop=false;im=img('img/mount-horse-armored.png');if(!im.complete||!im.naturalWidth)return null}
   const frames=gallop?8:4,direction=(4+(dir||0))%8,frame=moving?Math.floor(t/(gallop ? 0.075 : 0.125))%frames:0,cellWidth=im.naturalWidth/frames;
@@ -124,7 +125,8 @@ drawDoll=function(c,x,y,act,dir,t,scale,alpha,state){
   const rider=state||(typeof S!=='undefined'?S:null);
   if(!rider||!rider.mounted||!mountEquipped(rider)||act==='die'||!c||c.x!==undefined)return drawFootDoll(c,x,y,act,dir,t,scale,alpha,state);
   const bob=drawMountedHorse(c,x,y,dir,t,rider,act==='run'?'run':act==='walk'?'walk':false,alpha);if(bob===null)return drawFootDoll(c,x,y,act,dir,t,scale,alpha,rider);
-  const direction=(4+(dir||0))%8,seatOffsets=[87,84,79,85,91,85,79,84],seatY=y-seatOffsets[direction]*(HORSE_RENDER_WIDTH/125)-4-bob;
+  const clientLayers=clientMountSet(rider,act==='run'?'run':act==='walk'?'walk':'st'),clientReady=clientLayers&&clientLayers.every(s=>{const im=img(s.f);return im.complete&&im.naturalWidth});
+  const direction=(4+(dir||0))%8,seatOffsets=[87,84,79,85,91,85,79,84],seatY=clientReady?y-64:y-seatOffsets[direction]*(HORSE_RENDER_WIDTH/125)-4-bob;
   // Lùi hông về sau yên theo hướng đầu ngựa, không dịch chính con ngựa.
   const rearX=[0,4,6,4,0,-4,-6,-4],rearY=[-3,-2,0,2,3,2,0,-2];
   const heading=((dir||0)%8+8)%8;

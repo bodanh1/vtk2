@@ -1,0 +1,4 @@
+import fs from 'node:fs';import {png,read} from './mount-png.mjs';
+const m=JSON.parse(fs.readFileSync('docs/mount-client-manifest.json')),set=m.horses['m:10'],W=640,H=1280,out=Buffer.alloc(W*H*4);for(let i=0;i<out.length;i+=4){out[i]=38;out[i+1]=44;out[i+2]=48;out[i+3]=255}
+for(let row=0;row<8;row++)for(let pose=0;pose<4;pose++)for(const part of [12,11,10]){const s=m.sheets[set[pose?'run':'st'][part]],p=read(s.f),col=pose?Math.floor((pose-1)*s.n/3):0;for(let y=0;y<s.h;y++)for(let x=0;x<s.w;x++){const src=((row*s.h+y)*p.w+col*s.w+x)*4,dx=pose*160+80+x-s.ax,dy=row*160+140+y-s.ay;if(dx<0||dy<0||dx>=W||dy>=H)continue;const dst=(dy*W+dx)*4,a=p.rgba[src+3]/255;for(let k=0;k<3;k++)out[dst+k]=Math.round(p.rgba[src+k]*a+out[dst+k]*(1-a));}}
+fs.writeFileSync('docs/horse-client-preview.png',png(W,H,out));

@@ -64,3 +64,16 @@ Cửa hàng hiện bán các mã loại 0–8, đến Phi Vân. Các bản ghi m
 Dữ liệu còn có yêu cầu chuyển sinh ở một số thú cưỡi; bảng trên chỉ ghi yêu cầu cấp. Có dữ liệu vật phẩm không đồng nghĩa đã có cách mua hoặc nhận mọi loại trong game. Phần vẽ cưỡi ngựa dùng bộ `img/mount-horse-armored.png` khi đứng/đi chậm và bộ `img/mount-horse-gallop.png` khi chạy: tám hướng, tám khung chạy mỗi hướng (64 khung), một vòng khoảng 0,6 giây. Quần và ủng lấy trực tiếp từ phần thân sprite trang phục đang mặc, tách hai chân và mở đùi hai bên yên, co gối thành dáng ngồi theo hướng; thay áo cập nhật cả phần chân. Áo/mũ/mặt/vũ khí vẫn dùng sprite trang bị của nhân vật. Ngựa rộng 103px; màu lông chọn theo 11 icon ngựa trong shop. Khung ngựa chỉ giữ vùng ảnh liên thông của chính con ngựa để loại mảnh của ô bên cạnh. Texture màu dùng chung và giới hạn cache 192 khung.
 
 Bản mới được dựng theo ảnh và video người dùng cung cấp, chưa phải bộ SPR gốc của game trong video. Chuyển động chân người hiện dùng tư thế ngồi riêng, không phải bộ quần/ủng gốc theo từng trang bị. Xem `docs/horse-riding-preview.gif` để xem thử bốn hướng chạy.
+
+## Ngựa gốc từ client (09/10/2026)
+
+Bổ sung 249 atlas PNG từ PAK của Client_VLTK_SHXT: ba lớp HorseBack/HorseMiddle/HorseFront, đứng (RideStand), đi (RideWalk), chạy (RideRun), tám hướng. Renderer dùng cùng đồng hồ hoạt ảnh cho các lớp, giữ màu gốc và ánh xạ từ item/horse.txt + horseres.txt. Dữ liệu nữ không tìm thấy trong các gói hiện có nên dùng sprite ngựa nam khi đủ lớp; nhân vật nữ vẫn dùng trang phục nữ. Một số mã thiếu lớp/hoạt ảnh tiếp tục dùng renderer dự phòng. Người cưỡi hiện giữ cách ghép trang phục của bản H5; chưa chuyển toàn bộ sprite Ride của quần áo/vũ khí.
+
+Provenance (đường dẫn SPR, hash, PAK ưu tiên, kích thước và frame) nằm trong mount-client-manifest.json. Asset tải theo ngựa đang mặc, không precache toàn bộ bộ ngựa. Công cụ dùng package.ini để lấy thứ tự override, kiểm tra độ dài giải nén NRV2B và RLE/palette trước khi xuất ảnh. PNG được crop theo bounds chung mọi frame để giảm bộ nhớ texture, giữ cùng tọa độ gốc (160,220).
+
+Tái tạo từ thư mục repository:
+
+    node tools/import-client-mounts.mjs "đường dẫn tới Client_VLTK_SHXT"
+    node tools/compact-client-mounts.mjs
+
+Tham khảo cấu trúc PAK/SPR và NRV2B: https://github.com/Mignet/Jx/tree/master/Sources/Engine/Src . Không đưa EXE/DLL hoặc PAK gốc vào bản deploy. Công cụ import không tham gia build Cloudflare; asset và dữ liệu đã xuất được commit sẵn.
