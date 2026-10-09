@@ -110,3 +110,6 @@ html.jxo #panel[data-jxk=inv] .jxx{width:360px;max-width:calc(var(--jxl) - 16px)
 .jxo-inventory-window[hidden]{display:none!important}
 .jxo-inventory-window>.jx-detail-handle{margin:-6px -6px 6px;padding:6px 8px}
 .jxo-inventory-window>.tab{padding:0;max-height:none;overflow:hidden}
+
+html.jxo #panel[data-jxk=char] .jxf-char{transform:scale(var(--jxscale,1));transform-origin:top left}
+html.jxo #panel[data-jxk=char] #t-char{touch-action:manipulation}
