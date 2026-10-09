@@ -33,7 +33,7 @@ function drawClientRiding(c,x,y,act,dir,t,scale,alpha,state){
  const plan=clientRidePlan(state,act);if(!plan)return null;
  const M=window.JMRIG,images={};
  for(const part of Object.keys(plan.layers)){const sheet=M.sheets[plan.layers[part]],im=img(sheet.f);if(!im.complete||!im.naturalWidth)return null;images[part]=im;}
- const body=plan.body,eff=.8*dollEffScale(Number.isFinite(scale)&&scale>0?scale:1/.6),time=Math.max(0,t||0);
+ const body=plan.body,eff=dollEffScale(Number.isFinite(scale)&&scale>0?scale:1/.6),time=Math.max(0,t||0);
  const once=act==='at'||act==='mag'||act==='hurt',duration=once?dollActLen(state,act):(body.per||body.n)*(body.interval||1)/18;
  const phase=once?Math.min(time/Math.max(.05,duration),.999999):time/Math.max(.05,duration)%1;
  const bodyCol=Math.min(body.n-1,Math.floor(phase*body.n));
