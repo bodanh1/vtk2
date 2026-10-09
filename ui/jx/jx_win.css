@@ -94,3 +94,13 @@ html.jxo #jxDim{background:transparent;pointer-events:none}                     
 /* Give the companion skill list enough space for Vietnamese names and controls. */
 html.jxo #panel[data-jxk=skill] .jxx{width:360px;max-width:calc(100vw - var(--jxl) - var(--jxw) - 16px)}
 html.jxo #panel[data-jxk=inv] .jxx{width:360px;max-width:calc(var(--jxl) - 16px)}
+/* Character details open separately and move only from their title bar. */
+.jxf-char .jx-char-actions{left:7px;top:369px;width:407px;height:29px;display:flex;background:linear-gradient(#aaa58b,#858168);border:1px solid #342f23;box-shadow:inset 0 0 0 1px #cbc4a0}
+.jxf-char .jx-char-actions>button{position:static;width:auto;height:100%;flex:1;color:#16170a;font-weight:bold;font-size:14px;text-shadow:0 1px #e6dfb3;border-right:1px solid #5d5945}
+.jxf-char .jx-char-actions>button:last-child{border-right:0}
+.jxf-char .jx-char-actions>button:hover,.jxf-char .jx-char-actions>button[aria-expanded=true]{background:#ffeb9a33}
+.jxx.jx-char-details{position:fixed;right:auto;max-height:calc(100vh - 24px);z-index:120;padding-top:0}
+.jxx.jx-char-details[hidden]{display:none!important}
+.jx-detail-handle{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;background:#15271c;border-bottom:1px solid #3b6a50;margin:0 -8px 8px;padding:7px 8px;cursor:grab;touch-action:none;user-select:none;z-index:1}
+.jx-detail-handle:active{cursor:grabbing}
+.jx-detail-handle button{padding:0 6px;border:0;background:transparent;color:#e8f2ea;font-size:20px;cursor:pointer}
