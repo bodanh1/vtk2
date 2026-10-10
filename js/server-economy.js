@@ -58,7 +58,7 @@ function economyAction(action,args=[],after){
  return true;
 }
 function economyWrap(name,encode,argsAfter){const original=window[name];if(typeof original!=='function')return;window[name]=function(...args){if(!serverEconomy()||ECON.applying)return original.apply(this,args);if(encode===false)return;const encoded=encode?encode(args):args;economyAction(name,encoded,argsAfter?()=>argsAfter(args):null);return {ok:false,n:0,gold:0,msg:'Đang xử lý trên server…'};};}
-for(const n of ['sell','equip','enhance','reroll','upgradePlatina','stashDeposit'])economyWrap(n,args=>[args[0]?.uid],args=>{if(n==='stashDeposit')stashModal();else if(n==='enhance'||n==='reroll'||n==='upgradePlatina'){const item=findItem(args[0]?.uid);if(item)forgeModal(item);}else refresh();});
+for(const n of ['sell','discardItem','equip','enhance','reroll','upgradePlatina','stashDeposit'])economyWrap(n,args=>[args[0]?.uid],args=>{if(n==='sell'||n==='discardItem'){closeModal();refresh();}else if(n==='stashDeposit')stashModal();else if(n==='enhance'||n==='reroll'||n==='upgradePlatina'){const item=findItem(args[0]?.uid);if(item)forgeModal(item);}else refresh();});
 economyWrap('enchase',a=>[a[0]?.uid,a[1],a[2]],a=>{const it=findItem(a[0]?.uid);if(it)forgeModal(it);});
 economyWrap('fuse',a=>[a[0].map(it=>it.uid)],()=>htModal());
 economyWrap('makePlatina',a=>[a[0]?.uid,a[1]?.uid],()=>htModal());
