@@ -110,3 +110,6 @@ const jhOldSVApply=svApply;svApply=function(o){if(o.t!=="evo")return jhOldSVAppl
 const jhOldSVInfo=svInfo;svInfo=function(id){const info=jhOldSVInfo(id),evo=SV.evolutions?.[id];if(!evo)return info;return {...info,tot:info.tot*(evo==="power"?1.25:1),rad:info.rad*(evo==="reach"?1.25:1),rate:info.rate*(evo==="swift"?1.2:1)};};
 const jhOldSVCast=svCast;svCast=function(id){const from=SV.shots.length,trapFrom=SV.traps.length,result=jhOldSVCast(id);if(SV.evolutions?.[id]==="reach"){for(let i=from;i<SV.shots.length;i++){SV.shots[i].pierce++;SV.shots[i].life*=1.25;}for(let i=trapFrom;i<SV.traps.length;i++)SV.traps[i].r*=1.25;}return result;};
 const jhOldGiftBody=giftBody;giftBody=function(r){const body=jhOldGiftBody(r);return giftTab==="reborn"?body+'<p class="desc">TS1–TS5 nhận tâm pháp. TS6–TS10 nhận điểm nâng cao trong mục Tháp II. Tháp II mở sau TS5.</p>':body;};
+
+function jhOpenActivity(tab){if(!S?.fac)return;giftTab=tab;document.getElementById("jxOverflow")?.classList.add("hidden");const menu=document.getElementById("jxMenu");if(menu)menu.setAttribute("aria-expanded","false");giftModal();}
+for(const [id,tab] of [["jxTower2","tower2"],["jxDungeons","dungeons"],["jxFerry","ferry"]]){const button=document.getElementById(id);if(button)button.onclick=()=>jhOpenActivity(tab);}

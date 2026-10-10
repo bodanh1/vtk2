@@ -36,3 +36,5 @@ test('five-star evolutions change combat, reject duplicates and reset each train
   c.svStart();assert.equal(c.svInfo(1).tot,100);c.svApply({t:'evo',id:1,evo:'swift'});assert.equal(c.svInfo(1).rate,1.2);
   c.svStart();c.svApply({t:'evo',id:1,evo:'reach'});c.svCast(1);assert.equal(c.svInfo(1).rad,125);assert.equal(c.SV.shots[0].pierce,2);
 });
+
+test("expanded controls open each new activity and close the controls panel",()=>{const {c}=setup();const nodes={jxOverflow:{classList:{add(name){this.hidden=name==="hidden";}}},jxMenu:{setAttribute(key,value){this[key]=value;}}};c.document.getElementById=id=>nodes[id]||null;let opens=0;c.giftModal=()=>opens++;for(const tab of ["tower2","dungeons","ferry"]){c.jhOpenActivity(tab);assert.equal(c.giftTab,tab);assert.equal(nodes.jxOverflow.classList.hidden,true);assert.equal(nodes.jxMenu["aria-expanded"],"false");}assert.equal(opens,3);const html=fs.readFileSync("index.html","utf8"),start=html.indexOf("id=\"jxOverflow\""),end=html.indexOf("</div>",start);for(const id of ["jxTower2","jxDungeons","jxFerry"])assert.ok(html.slice(start,end).includes(id));});

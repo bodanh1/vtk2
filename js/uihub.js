@@ -45,7 +45,7 @@ function groupMore(){
 if(typeof renderMore==="function"){const _rm=renderMore;renderMore=function(){_rm();const t=$("#t-more");if(!t)return;addToggles(t);groupMore()}}
 
 /* ---------- 2. Hộp Quà: nhóm thẻ + gập phần mô tả dài ---------- */
-const GIFT_GROUPS=[["Hôm nay",["login","quest","yt","lvms"]],["Hoạt động",["tk","siege","tower"]],["Thưởng",["ach","chest","event","tx"]],["Nhân vật",["pet","reborn","mode"]],["Cộng đồng",["guild","clan"]]];
+const GIFT_GROUPS=[["Hôm nay",["login","quest","yt","lvms"]],["Hoạt động",["tk","siege","tower","tower2","dungeons","ferry"]],["Thưởng",["ach","chest","event","tx"]],["Nhân vật",["pet","reborn","mode"]],["Cộng đồng",["guild","clan"]]];
 const descOpen=new Set();
 if(typeof giftModal==="function"){const _gm=giftModal;giftModal=function(){_gm();
  const bar=$("#giftTabs");if(!bar)return;
