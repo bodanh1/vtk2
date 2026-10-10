@@ -1,3 +1,4 @@
+import {economyMeta} from './economy.js';
 import {checkStateSecurity} from './state-security.js';
 // Tài khoản online: đăng ký, heartbeat (đo giờ chơi phía server), đồng bộ save.
 import {GAME as G} from '../gen/game.js';
@@ -51,7 +52,7 @@ export async function auth(req, env) {
       if(req.method==="POST"&&req.headers.get("origin")!==new URL(req.url).origin)throw new HttpError(403,"bad_origin");
       const owner=await cloudAuth(req,env);
       const linked=await env.DB.prepare('SELECT a.*,c.snapshot AS cloud_snapshot,c.write_owner AS cloud_writer,c.write_until AS cloud_until FROM accounts a JOIN cloud_pvp_links l ON l.pvp_account_id=a.id JOIN cloud_saves c ON c.account_id=l.cloud_account_id WHERE l.cloud_account_id=?1 AND l.slot=?2').bind(owner.id,slot).first();
-      if(linked){if(req.method==='POST'&&(linked.cloud_writer!==req.headers.get('x-cloud-device')||linked.cloud_until<=Date.now()))throw new HttpError(409,'device_changed','Quyền chơi đã chuyển sang máy khác');delete linked.cloud_writer;delete linked.cloud_until;const state=JSON.parse(linked.cloud_snapshot||'null')?.slots[slot];if(G.isMode(state?.mode)&&state?.online?.id===linked.id){delete linked.cloud_snapshot;return linked;}}
+      if(linked){if(req.method==='POST'&&(linked.cloud_writer!==req.headers.get('x-cloud-device')||linked.cloud_until<=Date.now()))throw new HttpError(409,'device_changed','Quyền chơi đã chuyển sang máy khác');delete linked.cloud_writer;delete linked.cloud_until;const state=JSON.parse(linked.cloud_snapshot||'null')?.slots[slot];if(G.isMode(state?.mode)&&(state?.online?.id===linked.id||await economyMeta(env.DB,owner.id))){delete linked.cloud_snapshot;return linked;}}
     }
     throw new HttpError(401, "no_token");
   }
@@ -81,7 +82,7 @@ export async function register(req, env, body) {
   if (!(await verifyTurnstile(env, body.turnstile, req.headers.get("cf-connecting-ip"))))
     throw new HttpError(403, "captcha", "Xác minh chống bot không thành công");
   const name = cleanName(body.name);
-  const state = parseSave(body.save);
+  let state = parseSave(body.save);if(req.headers.get('cookie')){let owner;try{owner=await cloudAuth(req,env);}catch(e){if(e.status!==401)throw e;}if(owner&&await economyMeta(env.DB,owner.id)){const row=await env.DB.prepare('SELECT snapshot FROM cloud_saves WHERE account_id=?1').bind(owner.id).first();const trusted=JSON.parse(row?.snapshot||'null')?.slots.find(x=>x?.cid===state.cid);if(!trusted)throw new HttpError(409,'online_character','Lưu nhân vật lên tài khoản trước khi đăng ký online');state=trusted;}}
   if (state.lvl > REGISTER_MAX_LVL)
     throw new HttpError(400, "too_late", `Chỉ đăng ký được khi nhân vật dưới cấp ${REGISTER_MAX_LVL + 1}`);
 
@@ -133,11 +134,13 @@ export async function heartbeat(req, env) {
   return { play_sec: Math.floor(t.play_sec) };
 }
 
+async function serverState(env,id){const link=await env.DB.prepare('SELECT l.cloud_account_id,l.slot,c.snapshot FROM cloud_pvp_links l JOIN cloud_saves c ON c.account_id=l.cloud_account_id WHERE l.pvp_account_id=?1').bind(id).first();if(link&&await economyMeta(env.DB,link.cloud_account_id)){const state=JSON.parse(link.snapshot||'null')?.slots[link.slot];if(!state)throw new HttpError(409,'online_character');return state;}return null;}
+
 export async function sync(req, env, body) {
   const acc = await auth(req, env);
   if (!(await rateLimit(env.DB, "sync:" + acc.id, 20, 3600)))
     throw new HttpError(429, "rate_limited", "Đồng bộ quá nhiều, thử lại sau");
-  const state = parseSave(body.save);
+  const state = await serverState(env,acc.id)||parseSave(body.save);
   const previous=await env.DB.prepare('SELECT snapshot FROM chars WHERE account_id=?1').bind(acc.id).first();
   if(!previous||JSON.parse(previous.snapshot||'null')?.mode!==state.mode)throw new HttpError(409,'online_mode','Nhân vật online không thể đổi chế độ');
   const now = Date.now();

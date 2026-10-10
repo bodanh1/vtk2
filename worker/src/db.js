@@ -2,6 +2,15 @@
 // nên deploy không cần bước "d1 migrations apply" riêng. Bản SQL tham chiếu: migrations/0001_init.sql.
 
 export const SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS economy_backup_marks(id TEXT PRIMARY KEY,created_at INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS economy_market_backup(id TEXT PRIMARY KEY,row_json TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS economy_states(account_id TEXT PRIMARY KEY,meta_json TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS economy_backups(account_id TEXT PRIMARY KEY,snapshot TEXT,previous_snapshot TEXT,revision INTEGER NOT NULL,updated_at INTEGER NOT NULL,market_json TEXT NOT NULL,created_at INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS economy_requests(account_id TEXT NOT NULL,request_id TEXT NOT NULL,client_id TEXT NOT NULL,revision INTEGER NOT NULL,created_at INTEGER NOT NULL,ok INTEGER NOT NULL CHECK(ok=1),PRIMARY KEY(account_id,request_id))`,
+  `CREATE INDEX IF NOT EXISTS economy_requests_age ON economy_requests(account_id,created_at)`,
+  `CREATE TABLE IF NOT EXISTS economy_ledger(account_id TEXT NOT NULL,request_id TEXT NOT NULL,action TEXT NOT NULL,delta_json TEXT NOT NULL,created_at INTEGER NOT NULL,PRIMARY KEY(account_id,request_id))`,
+  `CREATE INDEX IF NOT EXISTS economy_ledger_age ON economy_ledger(account_id,created_at)`,
+
   `CREATE TABLE IF NOT EXISTS market_listings(id TEXT PRIMARY KEY,seller TEXT NOT NULL,seller_name TEXT NOT NULL,cid TEXT NOT NULL,slot INTEGER NOT NULL,mode TEXT NOT NULL,name TEXT NOT NULL,item_json TEXT NOT NULL,currency TEXT NOT NULL,price INTEGER NOT NULL,created_at INTEGER NOT NULL,expires_at INTEGER NOT NULL,status TEXT NOT NULL,claimed INTEGER NOT NULL DEFAULT 0,buyer TEXT,sold_at INTEGER)`,
   `CREATE INDEX IF NOT EXISTS market_browse ON market_listings(mode,status,expires_at,created_at)`,
   `CREATE INDEX IF NOT EXISTS market_seller ON market_listings(seller,cid,status,claimed)`,
@@ -82,6 +91,12 @@ export function ensureSchema(db) {
     ready = db
       .batch(SCHEMA.map((s) => db.prepare(s)))
       .then(async () => {
+        // Freeze existing saves and market escrow before any migration or new economy write.
+        await db.batch([
+          db.prepare("INSERT OR IGNORE INTO economy_backups(account_id,snapshot,previous_snapshot,revision,updated_at,market_json,created_at) SELECT account_id,snapshot,previous_snapshot,revision,COALESCE(updated_at,0),'[]',CAST(strftime('%s','now') AS INTEGER)*1000 FROM cloud_saves WHERE NOT EXISTS(SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97')"),
+          db.prepare("INSERT OR IGNORE INTO economy_market_backup(id,row_json) SELECT id,json_object('id',id,'seller',seller,'seller_name',seller_name,'cid',cid,'slot',slot,'mode',mode,'name',name,'item_json',item_json,'currency',currency,'price',price,'created_at',created_at,'expires_at',expires_at,'status',status,'claimed',claimed,'buyer',buyer,'sold_at',sold_at) FROM market_listings WHERE NOT EXISTS(SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97')"),
+          db.prepare("INSERT OR IGNORE INTO economy_backup_marks(id,created_at) VALUES('pre-server-economy-v97',CAST(strftime('%s','now') AS INTEGER)*1000)")
+        ]);
         let addedMode=false;
         for(const sql of COLUMNS){try{await db.prepare(sql).run();if(sql===COLUMNS[0])addedMode=true;}catch(e){if(!/duplicate column/i.test(String(e&&e.message)))throw e;}}
         if(addedMode)await db.prepare("UPDATE chars SET mode=json_extract(snapshot,'$.mode') WHERE snapshot IS NOT NULL AND json_valid(snapshot) AND json_extract(snapshot,'$.mode') IN ('ctc','phlt','g2') AND mode<>json_extract(snapshot,'$.mode')").run();

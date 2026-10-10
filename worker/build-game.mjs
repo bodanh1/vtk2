@@ -13,10 +13,10 @@ const OUT = path.join(ROOT, "worker/gen/game.js");
 // Đúng thứ tự trong index.html. Chỉ những file calc() và kiểm định cần.
 const FILES = [
   "js/game-clock.js", "data.js", "world.js", "js/ge_patch.js", "js/core.js", "js/modes.js", "js/mount-skill-data.js", "js/mount-rules.js", "js/stats.js", "js/loot.js",
-  "js/sets.js", "js/combat.js", "js/save.js", "js/rewards.js", "js/depth.js",
+  "js/sets.js", "js/combat.js", "js/save.js", "js/rewards.js", "js/depth.js", "rdata.js", "ref.js", "js/mask-data.js", "js/gear_policy.js", "js/recipes.js", "js/builds.js", "js/ui.js", "js/shop.js", "js/forge.js", "js/auto.js", "js/activities.js", "js/modes_play.js", "js/horse-shop-data.js", "js/siege.js", "js/jianghu-expansion.js",
 ];
 // File chỉ chứa một object dữ liệu lớn: nhúng dạng chuỗi JSON (JSON.parse nhanh hơn literal JS).
-const DATA = { "data.js": "JX", "world.js": "JW" };
+const DATA = { "data.js": "JX", "world.js": "JW", "ref.js":"REF", "js/mask-data.js":"JMASK" };
 
 // Những gì module trả về cho máy chủ.
 const EXPORTS = [
@@ -29,7 +29,8 @@ function dataFile(file, key) {
   const src = fs.readFileSync(path.join(ROOT, file), "utf8");
   const ctx = { window: {} };
   vm.runInNewContext(src, ctx, { filename: file });
-  const obj = ctx.window[key];
+let obj = ctx.window[key];
+  if(key==='REF')obj=Object.fromEntries(['v','refIdByName','setTemplateIds','setLegacyIds','setLegacyNameIds','itemPairById','shardNeeds','shardNames','shardLegacyIds'].map(k=>[k,obj[k]]));
   // JSON chỉ giữ nguyên dữ liệu nếu không có undefined, NaN/Infinity, hàm hay kiểu lạ.
   const check = (v, at) => {
     const t = typeof v;
@@ -46,7 +47,13 @@ function dataFile(file, key) {
 let body = "";
 for (const f of FILES) {
   body += `// ---- ${f}\n`;
-  body += DATA[f] ? dataFile(f, DATA[f]) : fs.readFileSync(path.join(ROOT, f), "utf8") + "\n";
+  let source=fs.readFileSync(path.join(ROOT,f),'utf8');
+  if(f==='js/jianghu-expansion.js')source=source.split('const jhOldSVStart=')[0];
+  if(f==='js/loot.js')source=source.replace('items=df.items.filter(x=>x[0]===0&&x[1]<=9);const n=', 'items=null;const n=').replace('for(let i=0;i<cnt;i++){const x=wpick(items,','if(!cnt)return out;const candidates=df.items.filter(x=>x[0]===0&&x[1]<=9);for(let i=0;i<cnt;i++){const x=wpick(candidates,');
+  if(f==='js/core.js')source=source.replace('(d=new Date)=>','(d=new Date(gameNow()+25200000))=>');
+  if(f==='js/activities.js')source=source.replace('new Date(clockNow())','new Date(clockNow()+25200000)');
+  if(f==='js/rewards.js')source=source.replace('new Date(gameNow())','new Date(gameNow()+25200000)').replace('new Date(gameNow());','new Date(gameNow()+25200000);').replace('new Date(gameNow())).getMonth()','new Date(gameNow()+25200000)).getMonth()').replace('setTimeout(()=>grant({xpp:.2,xpb:60},"Xong nhiệm vụ ngày"),0)','grant({xpp:.2,xpb:60},"Xong nhiệm vụ ngày")').replace('const y=new Date;','const y=new Date(gameNow());').replace('(new Date).getMonth()','(new Date(gameNow())).getMonth()');
+  body += DATA[f] ? dataFile(f, DATA[f]) : source + "\n";
 }
 
 const out = `// TỰ SINH bởi worker/build-game.mjs — không sửa tay.
@@ -60,11 +67,14 @@ for (const [k, v] of Object.entries({
   matchMedia: () => ({ matches: false, addEventListener: noop }),
 })) if (!(k in globalThis)) globalThis[k] = v;
 export const GAME = (function () {
+const SV={on:false};
+const setTimeout=fn=>{fn();return 0},clearTimeout=()=>{};
 ${body}
+${fs.readFileSync(path.join(ROOT,"worker/economy-engine.js"),"utf8")}
 return {
   setS(v) { S = v },
   getS() { return S },
-  R,
+  R, economyEngine,
   ${EXPORTS.join(",\n  ")}
 };
 })();

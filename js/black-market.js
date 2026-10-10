@@ -15,7 +15,7 @@
    const r=await cloudApi('market/'+action,{...extra,clientId:cloudClientId,revision:CLOUD.revision,requestId:crypto.randomUUID(),slot:SLOT,bundle:cloudCapture()});
    if(r.unchanged){CLOUD.marketPending=false;if(!automatic&&r.message)toast(r.message);return true;}
    if(CLOUD.user?.id!==identity.user||SLOT!==identity.slot||S.cid!==identity.cid||r.cid!==S.cid||SAVE_LOCK)throw new Error('Giao dịch đã lưu; tải bản tài khoản của đúng nhân vật');
-   Object.assign(S,r.changes);CLOUD.revision=r.revision;CLOUD.lastSaved=r.updatedAt;CLOUD.lastLeaseAt=Date.now();save();cloudSaveBinding(cloudFingerprint(cloudCapture(false)));invDirty=true;R.dirty=true;recalc();updateTop();CLOUD.marketPending=false;cloudStatus('Đã lưu giao dịch Chợ đen');if(!automatic||r.message)toast(r.message);if(automatic&&panel&&!panel.hidden){inventory();load();}return true;
+   Object.assign(S,r.changes);if(r.patch&&typeof economyApply==='function')economyApply(r);CLOUD.revision=r.revision;CLOUD.lastSaved=r.updatedAt;CLOUD.lastLeaseAt=Date.now();save();cloudSaveBinding(cloudFingerprint(cloudCapture(false)));invDirty=true;R.dirty=true;recalc();updateTop();CLOUD.marketPending=false;cloudStatus('Đã lưu giao dịch Chợ đen');if(!automatic||r.message)toast(r.message);if(automatic&&panel&&!panel.hidden){inventory();load();}return true;
   }catch(e){if(sent&&(!e.code||e.code==='offline')){e.code='save_conflict';e.message+=' · Tải bản trên tài khoản để kiểm tra kết quả trước khi giao dịch tiếp';}error(e);return false;}
   finally{if(panel)panel.inert=false;CLOUD.busy=false;M.busy=false;window.JXADMINBUSY=false;lastT=performance.now();}
  }

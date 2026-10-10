@@ -20,7 +20,7 @@ const ROUTES = {
   "POST /api/chat/session": chatSession,
   "GET /api/chat": chatList,
   "POST /api/chat": chatSend,
-  "GET /api/config": (req, env) => ({ turnstile: env.TURNSTILE_SITEKEY || "", v: 1 }),
+  "GET /api/config": (req, env) => ({ turnstile: env.TURNSTILE_SITEKEY || "", v: 1, economyVersion:env.SERVER_ECONOMY_ENABLED==='1'?1:0 }),
   "POST /api/register": (req, env, body) => register(req, env, body),
   "POST /api/hb": (req, env) => heartbeat(req, env),
   "POST /api/sync": (req, env, body) => sync(req, env, body),

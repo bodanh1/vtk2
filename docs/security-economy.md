@@ -1,3 +1,5 @@
+> Bản v98 đã triển khai kinh tế tài khoản do server quản lý. Xem [server-economy.md](server-economy.md) để biết phạm vi, mô hình idle theo đợt và cách restore. Nội dung bên dưới ghi lại giới hạn của v97.
+
 # Bảo mật thời gian và tiền — v97
 
 Tốc độ thực tế bị giới hạn x2, kể cả hệ số bảng điều khiển cũ. Save x2 được giữ khi tải lại; save cũ x2.5 được chuyển về x2. API cloud, online và bundle giao dịch dùng chung kiểm tra tốc độ và số dư: từ chối tiền âm, không hữu hạn, sai kiểu hoặc vượt độ chính xác số JavaScript. Chợ vẫn dùng giao dịch nguyên tử, revision và chống phát lại.
