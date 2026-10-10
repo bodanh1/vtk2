@@ -30,10 +30,10 @@ export class SocialRoom {
  }
  webSocketMessage(ws,message){
   if(typeof message!=='string'||message.length>1024){ws.close(1008,'Invalid message');return;}let body;try{body=JSON.parse(message)}catch{ws.close(1008,'Invalid JSON');return;}
-  const row=ws.deserializeAttachment();if(!row)return;const now=Date.now();if(now-row.at<1000){if((row.burst=(row.burst||0)+1)>10){ws.close(1008,'Too fast');return;}}else row.burst=0;
+  if(!body||typeof body!=='object'||Array.isArray(body)){ws.close(1008,'Invalid payload');return;}const row=ws.deserializeAttachment();if(!row)return;const now=Date.now();if(now-row.at<1000){if((row.burst=(row.burst||0)+1)>10){ws.close(1008,'Too fast');return;}}else row.burst=0;
   if(body.type!=='heartbeat'&&body.type!=='chat'){ws.close(1008,'Invalid action');return;}row.at=now;if(body.type==='chat')row.chat=body.open===true;ws.serializeAttachment(row);this.prune(now);ws.send(JSON.stringify({type:'online',online:this.online(now)}));
  }
- webSocketClose(ws,code){const row=ws.deserializeAttachment();if(row){row.at=0;ws.serializeAttachment(row);}ws.close(code);}
+ webSocketClose(ws,code){const row=ws.deserializeAttachment();if(row){row.at=0;ws.serializeAttachment(row);}ws.close([1005,1006,1015].includes(code)?1000:code);}
  webSocketError(ws){this.webSocketClose(ws,1011);}
  broadcast(message){const data=JSON.stringify({type:'chat',messages:[message]});for(const ws of this.ctx.getWebSockets?.()||[])if(ws.deserializeAttachment()?.chat)try{ws.send(data)}catch{}}
  async history(){
