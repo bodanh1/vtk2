@@ -31,10 +31,11 @@ test("cửa sổ offline 24 giờ được làm mới", () => {
   assert.equal(b.play_sec - a.play_sec, OFFLINE_MAX);
 });
 
-test("parseSave nhận chuỗi pack và từ chối chế độ khác ctc", () => {
+test("parseSave nhận chuỗi pack và cả ba chế độ, từ chối chế độ lạ", () => {
   const st = { mode: "ctc", fac: "gaibang", lvl: 12, xp: 5 };
   assert.equal(parseSave(JSON.stringify({ d: JSON.stringify(st), h: "x" })).lvl, 12);
-  assert.throws(() => parseSave({ ...st, mode: "g2" }), { code: "not_ctc" });
+  for(const mode of ["ctc","phlt","g2"])assert.equal(parseSave({...st,mode}).mode,mode);
+  assert.throws(() => parseSave({ ...st, mode: "invalid" }), { code: "bad_mode" });
   assert.throws(() => parseSave({ ...st, lvl: "abc" }), { code: "bad_level" });
   assert.throws(() => parseSave("{not json"), { code: "bad_save" });
 });

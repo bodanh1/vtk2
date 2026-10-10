@@ -1,4 +1,5 @@
 // Tài khoản online: đăng ký, heartbeat (đo giờ chơi phía server), đồng bộ save.
+import {GAME as G} from '../gen/game.js';
 import { cloudAuth } from './cloud-account.js';
 import { HttpError, bearer, sha256Hex, randomToken, ipHash } from "./http.js";
 import { rateLimit } from "./db.js";
@@ -34,8 +35,8 @@ export function parseSave(save) {
     }
   }
   if (!state || typeof state !== "object" || Array.isArray(state)) throw new HttpError(400, "bad_save");
-  if (state.mode !== "ctc") throw new HttpError(400, "not_ctc", "Chỉ nhân vật Công Thành Chiến được chơi online");
-  if (!state.fac) throw new HttpError(400, "no_faction");
+  if (!G.isMode(state.mode)) throw new HttpError(400, "bad_mode", "Chế độ chơi không hợp lệ");
+  if (!Object.hasOwn(G.FAC,state.fac)) throw new HttpError(400, "no_faction");
   const lvl = Math.floor(+state.lvl);
   if (!(lvl >= 1 && lvl <= 300)) throw new HttpError(400, "bad_level");
   return state;
@@ -49,7 +50,7 @@ export async function auth(req, env) {
       if(req.method==="POST"&&req.headers.get("origin")!==new URL(req.url).origin)throw new HttpError(403,"bad_origin");
       const owner=await cloudAuth(req,env);
       const linked=await env.DB.prepare('SELECT a.*,c.snapshot AS cloud_snapshot,c.write_owner AS cloud_writer,c.write_until AS cloud_until FROM accounts a JOIN cloud_pvp_links l ON l.pvp_account_id=a.id JOIN cloud_saves c ON c.account_id=l.cloud_account_id WHERE l.cloud_account_id=?1 AND l.slot=?2').bind(owner.id,slot).first();
-      if(linked){if(req.method==='POST'&&(linked.cloud_writer!==req.headers.get('x-cloud-device')||linked.cloud_until<=Date.now()))throw new HttpError(409,'device_changed','Quyền chơi đã chuyển sang máy khác');delete linked.cloud_writer;delete linked.cloud_until;const state=JSON.parse(linked.cloud_snapshot||'null')?.slots[slot];if(state?.mode==='ctc'&&state?.online?.id===linked.id){delete linked.cloud_snapshot;return linked;}}
+      if(linked){if(req.method==='POST'&&(linked.cloud_writer!==req.headers.get('x-cloud-device')||linked.cloud_until<=Date.now()))throw new HttpError(409,'device_changed','Quyền chơi đã chuyển sang máy khác');delete linked.cloud_writer;delete linked.cloud_until;const state=JSON.parse(linked.cloud_snapshot||'null')?.slots[slot];if(G.isMode(state?.mode)&&state?.online?.id===linked.id){delete linked.cloud_snapshot;return linked;}}
     }
     throw new HttpError(401, "no_token");
   }
@@ -99,7 +100,7 @@ export async function register(req, env, body) {
     if (/UNIQUE/i.test(String(e && e.message))) throw new HttpError(409, "name_taken", "Tên đã có người dùng");
     throw e;
   }
-  const v = await applyValidation(env, id, state, 0);
+  const v = await onlineValidation(env, id, state, 0);
   return { id, token, name, play_sec: 0, ...v };
 }
 
@@ -136,13 +137,15 @@ export async function sync(req, env, body) {
   if (!(await rateLimit(env.DB, "sync:" + acc.id, 20, 3600)))
     throw new HttpError(429, "rate_limited", "Đồng bộ quá nhiều, thử lại sau");
   const state = parseSave(body.save);
+  const previous=await env.DB.prepare('SELECT snapshot FROM chars WHERE account_id=?1').bind(acc.id).first();
+  if(!previous||JSON.parse(previous.snapshot||'null')?.mode!==state.mode)throw new HttpError(409,'online_mode','Nhân vật online không thể đổi chế độ');
   const now = Date.now();
   await env.DB.prepare(
     `UPDATE chars SET fac=?2,sex=?3,lvl=?4,xp=?5,snapshot=?6,updated_at=?7,sync_n=sync_n+1 WHERE account_id=?1`
   )
     .bind(acc.id, String(state.fac), state.sex ? 1 : 0, Math.floor(state.lvl), +state.xp || 0, JSON.stringify(state), now)
     .run();
-  const v = await applyValidation(env, acc.id, state, +acc.play_sec || 0);
+  const v = await onlineValidation(env, acc.id, state, +acc.play_sec || 0);
   return { ok: true, lvl: Math.floor(state.lvl), play_sec: Math.floor(acc.play_sec), ...v };
 }
 
@@ -151,4 +154,14 @@ export async function me(req, env) {
   const ch = await env.DB.prepare("SELECT fac,lvl,updated_at,power,bracket,flagged FROM chars WHERE account_id=?1").bind(acc.id).first();
   const fl = await env.DB.prepare("SELECT code,detail,at FROM flags WHERE account_id=?1 AND cleared_at IS NULL ORDER BY at").bind(acc.id).all();
   return { id: acc.id, name: acc.name, created_at: acc.created_at, play_sec: Math.floor(acc.play_sec), char: ch || null, flags: fl.results };
+}
+
+// Các chế độ có đồ Hoàng Kim/Bạch Kim không dùng trần đồ và ngưỡng giờ của PvP CTC.
+async function onlineValidation(env,id,state,playSec){
+ if(state.mode==='ctc')return applyValidation(env,id,state,playSec);
+ const previous=G.getS();let power;
+ try{G.setS(Object.assign(G.newSave(),structuredClone(state)));const p=G.calc();power=Math.round(Math.sqrt(Math.max(1,p.life)*Math.max(1,p.main?.dps||0))*10);if(!Number.isFinite(power))throw new Error('power');}
+ catch(e){throw new HttpError(400,'bad_character','Không tính được chỉ số nhân vật');}finally{G.setS(previous);}
+ await env.DB.prepare('UPDATE chars SET power=?2,bracket=NULL,flagged=0 WHERE account_id=?1').bind(id,power).run();
+ return {power,bracket:null,flagged:false,flags:[]};
 }
