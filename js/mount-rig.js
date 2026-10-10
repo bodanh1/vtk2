@@ -1,8 +1,10 @@
 'use strict';
+const CLIENT_RIDE_ATTACKS=new WeakMap;
+function setClientRideAttack(state,attack){if(state)CLIENT_RIDE_ATTACKS.set(state,window.JMOUNTANIM?.[attack?.id]??9);}
 const CLIENT_RIDE_PARTS=[0,1,4,5,6,7,8,9];
 function clientRideAction(state,act){
  if(act==='run')return 'RideRun';if(act==='walk')return 'RideWalk';if(act==='hurt')return 'RideWound';
- if(act==='mag')return 'RideMagic';if(act==='at')return mountWeaponType(state)===3?'RidePuncture':'RideCut';
+ if(act==='mag')return 'RideMagic';if(act==='at2')return 'RidePuncture';if(act==='at')return CLIENT_RIDE_ATTACKS.get(state)===10?'RidePuncture':'RideCut';
  return 'RideStand';
 }
 function clientRidePlan(state,act){
@@ -34,7 +36,7 @@ function drawClientRiding(c,x,y,act,dir,t,scale,alpha,state){
  const M=window.JMRIG,images={};
  for(const part of Object.keys(plan.layers)){const sheet=M.sheets[plan.layers[part]],im=img(sheet.f);if(!im.complete||!im.naturalWidth)return null;images[part]=im;}
  const body=plan.body,eff=dollEffScale(Number.isFinite(scale)&&scale>0?scale:1/.6),time=Math.max(0,t||0);
- const once=act==='at'||act==='mag'||act==='hurt',duration=once?dollActLen(state,act):(body.per||body.n)*(body.interval||1)/18;
+ const once=act==='at'||act==='at2'||act==='mag'||act==='hurt',duration=once?dollActLen(state,act):(body.per||body.n)*(body.interval||1)/18;
  const phase=once?Math.min(time/Math.max(.05,duration),.999999):time/Math.max(.05,duration)%1;
  const bodyCol=Math.min(body.n-1,Math.floor(phase*body.n));
  const syncedPhase=body.frames?body.frames[bodyCol]/(body.per||body.n):bodyCol/body.n;
@@ -45,4 +47,5 @@ function drawClientRiding(c,x,y,act,dir,t,scale,alpha,state){
  c.restore();return y-top;
 }
 // Warm only the equipped rig; item changes resolve a new plan and different asset paths.
-function clientRideWarm(state){for(const act of ['st','walk','run']){const plan=clientRidePlan(state,act);if(!plan)continue;if(typeof clientShadowSheet==='function'){const sh=clientShadowSheet(plan.sex,plan.action);if(sh)img(sh.f);}for(const id of Object.values(plan.layers))img(window.JMRIG.sheets[id].f);}}
+const CLIENT_RIDE_WARMED=new WeakMap;
+function clientRideWarm(state){const eq=state?.eq||{},signature=[state?.sex,eq.horse?.k,eq.horse?.lvl,eq.armor?.uid,eq.helm?.uid,eq.weapon?.uid].join(':');if(CLIENT_RIDE_WARMED.get(state)===signature)return;CLIENT_RIDE_WARMED.set(state,signature);for(const act of ['st','walk','run','at','at2','mag']){const plan=clientRidePlan(state,act);if(!plan)continue;if(typeof clientShadowSheet==='function'){const sh=clientShadowSheet(plan.sex,plan.action);if(sh)img(sh.f);}for(const id of Object.values(plan.layers))img(window.JMRIG.sheets[id].f);}}

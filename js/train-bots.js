@@ -98,6 +98,7 @@ function botsTick(dt) {
           const center=attack.around?b:target,splash=attack.around?attack.rad+40:110;
           const victims=[target,...alive().filter(e=>e!==target&&Math.hypot(e.x-center.x,e.y-center.y)<(attack.targets>1?splash:0)).slice(0,attack.targets-1)];
           for(const victim of victims){botSkillHit(b,attack,victim);if(onScreen(b.x,b.y,160)||onScreen(victim.x,victim.y,160))skillFx(b,victim,attack)}
+          if(typeof setClientRideAttack==='function')setClientRideAttack(b.profile.state,attack);
           b.cd=1/Math.max(.2,attack.rate);b.act=heroAttackAction(attack)||'at';b.actT=0;
           const length=typeof dollActLen==='function'?dollActLen(b.profile.state,b.act):0;
           b.actK=length>0?Math.min(3,Math.max(1,length/(.9/attack.rate))):1;
