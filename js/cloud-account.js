@@ -20,10 +20,11 @@ function cloudArchive(){if(S&&S.fac&&!SAVE_LOCK)save();const raw={};for(const ke
 function cloudSaveBinding(fingerprint){cloudPut(CLOUD_BINDING,{id:CLOUD.user.id,username:CLOUD.user.username,revision:CLOUD.revision,fingerprint,lastSaved:CLOUD.lastSaved,economyVersion:CLOUD.economyVersion||0});localStorage.setItem(CLOUD_OWNER,CLOUD.user.id);cloudLoadedOwner=CLOUD.user.id;localStorage.setItem('jxidle_cloud_tab',cloudClientId);}
 function cloudStatus(text){CLOUD.status=text;const b=document.getElementById('jxCloud');if(b)b.title='Tài khoản · '+text;const el=document.getElementById('cloudState');if(el)el.textContent=text;}
 async function cloudApi(path,body){
+  if(Date.now()<(CLOUD.retryAt||0)){const e=new Error(CLOUD.status);e.code='database_cooldown';throw e;}
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
   const opts={credentials:'same-origin',cache:'no-store',signal:controller.signal};
   if(body!==undefined){opts.method='POST';opts.headers={'content-type':'application/json'};opts.body=JSON.stringify(body);}
-  try{const r=await fetch('/api/cloud/'+path,opts);const data=await r.json();if(r.ok&&data.economyVersion!==undefined)CLOUD.economyVersion=data.economyVersion;if(r.ok&&typeof gameClockSync==='function')gameClockSync(Number(r.headers.get('x-game-time')));if(!r.ok){const e=new Error(data.msg||'Máy chủ chưa hỗ trợ tài khoản ('+r.status+')');e.code=data.error||'http';throw e;}return data;}
+  try{const r=await fetch('/api/cloud/'+path,opts);const data=await r.json();if(r.ok&&data.economyVersion!==undefined)CLOUD.economyVersion=data.economyVersion;if(r.ok&&typeof gameClockSync==='function')gameClockSync(Number(r.headers.get('x-game-time')));if(!r.ok){const e=new Error(data.msg||'Máy chủ chưa hỗ trợ tài khoản ('+r.status+')');e.code=data.error||'http';e.retryAfter=Number(data.retryAfter)||0;if(e.retryAfter){CLOUD.retryAt=Date.now()+e.retryAfter*1000;cloudStatus(e.message);}throw e;}return data;}
   catch(e){if(e.code)throw e;const error=new Error(e.name==='AbortError'?'Máy chủ phản hồi quá lâu. Hãy thử lại.':'Không kết nối được máy chủ · tiến trình vẫn lưu tại máy');error.code='offline';throw error;}
   finally{clearTimeout(timer);}
 }

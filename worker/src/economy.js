@@ -47,11 +47,12 @@ export async function economyCommit(env,acc,body,type='sync'){
  if(!/^[A-Za-z0-9_-]{16,80}$/.test(body.clientId||'')||!/^[A-Za-z0-9_-]{20,80}$/.test(body.requestId||''))fail('economy_refresh','Hãy tải lại trang để dùng cơ chế kinh tế server',409);
  let row=await stmt(db,'SELECT * FROM cloud_saves WHERE account_id=?1',acc.id).first();
  if(row.write_owner!==body.clientId||row.write_until<=now)fail('device_changed','Máy này không có quyền chơi',409);
- const previous=await stmt(db,'SELECT client_id FROM economy_requests WHERE account_id=?1 AND request_id=?2',acc.id,body.requestId).first();
+ const previous=type==='action'?await stmt(db,'SELECT client_id FROM economy_requests WHERE account_id=?1 AND request_id=?2',acc.id,body.requestId).first():null;
  if(previous){if(previous.client_id!==body.clientId)fail('device_changed','Thiết bị đã đổi',409);const meta=await economyMeta(db,acc.id);return {ok:true,replayed:true,revision:row.revision,updatedAt:row.updated_at,patch:economyPatch(JSON.parse(row.snapshot||'{"v":1,"slots":[null,null,null],"shared":{}}'),meta)};}
  if(!Number.isSafeInteger(body.revision)||body.revision!==row.revision)fail('save_conflict','Tiến trình đã thay đổi; tải bản trên tài khoản',409);
- if(!await rateLimit(db,'economy:'+acc.id,type==='sync'?240:360,3600))fail('cloud_rate','Thao tác quá nhanh; thử lại sau',429);
+ if(type==='action'&&!await rateLimit(db,'economy:'+acc.id,360,3600))fail('cloud_rate','Thao tác quá nhanh; thử lại sau',429);
  const meta=await economyMeta(db,acc.id),bundle=JSON.parse(row.snapshot||'{"v":1,"slots":[null,null,null],"shared":{}}'),before=summary(bundle);
+ if(type==='sync'){const hour=Math.floor(now/3600000);if(meta.syncHour!==hour){meta.syncHour=hour;meta.syncCount=0;}if((meta.syncCount||0)>=240)fail('cloud_rate','Thao tác quá nhanh; thử lại sau',429);meta.syncCount=(meta.syncCount||0)+1;}
  let result,reward,notices=[];
  try{
   reward=settleEconomy(bundle,meta,now);
@@ -67,16 +68,22 @@ export async function economyCommit(env,acc,body,type='sync'){
  }catch(e){if(e instanceof HttpError)throw e;fail('economy_action',e.message||'Thao tác không hợp lệ');}
  const response={ok:true,revision:row.revision+1,updatedAt:now,patch:economyPatch(bundle,meta),result,reward,notices};
  const delta=summary(bundle).map((s,i)=>s?{slot:i,gold:s.gold-(before[i]?.gold||0),knb:s.knb-(before[i]?.knb||0)}:null).filter(Boolean);
- const statements=[
+ const cleanup=now-(meta.purgedAt||0)>=3600000;if(cleanup)meta.purgedAt=now;
+ const statements=type==='sync'?[
+ stmt(db,'UPDATE cloud_saves SET previous_snapshot=snapshot,previous_revision=revision,previous_updated_at=updated_at,snapshot=?2,revision=revision+1,updated_at=?3,write_until=?4 WHERE account_id=?1 AND revision=?5 AND write_owner=?6 AND write_until>?3',acc.id,JSON.stringify(bundle),now,now+180000,row.revision,body.clientId),
+ stmt(db,'UPDATE economy_states SET meta_json=?2 WHERE account_id=?1 AND changes()=1',acc.id,JSON.stringify(meta))
+ ]:[
   stmt(db,`INSERT INTO economy_requests(account_id,request_id,client_id,revision,created_at,ok) VALUES(?1,?2,?3,?4,?5,CASE WHEN EXISTS(SELECT 1 FROM cloud_saves WHERE account_id=?1 AND revision=?6 AND write_owner=?3 AND write_until>?5) THEN 1 ELSE 0 END)`,acc.id,body.requestId,body.clientId,response.revision,now,row.revision),
   stmt(db,'UPDATE cloud_saves SET previous_snapshot=snapshot,previous_revision=revision,previous_updated_at=updated_at,snapshot=?2,revision=revision+1,updated_at=?3,write_until=?4 WHERE account_id=?1',acc.id,JSON.stringify(bundle),now,now+180000),
   stmt(db,'UPDATE economy_states SET meta_json=?2 WHERE account_id=?1',acc.id,JSON.stringify(meta)),
-  stmt(db,'INSERT INTO economy_ledger(account_id,request_id,action,delta_json,created_at) VALUES(?1,?2,?3,?4,?5)',acc.id,body.requestId,type==='action'?body.action:'farm',JSON.stringify(delta),now),
+  stmt(db,'INSERT INTO economy_ledger(account_id,request_id,action,delta_json,created_at) VALUES(?1,?2,?3,?4,?5)',acc.id,body.requestId,type==='action'?body.action:'farm',JSON.stringify(delta),now)
+ ];
+ if(cleanup)statements.push(
   stmt(db,'DELETE FROM economy_requests WHERE account_id=?1 AND created_at<?2',acc.id,now-7*DAY),
   stmt(db,'DELETE FROM economy_ledger WHERE account_id=?1 AND created_at<?2',acc.id,now-30*DAY)
- ];
+ );
  if(type==='action'&&body.action==='deleteCharacter')statements.push(stmt(db,'DELETE FROM cloud_pvp_links WHERE cloud_account_id=?1 AND slot=?2',acc.id,body.args[0]));
- try{await db.batch(statements);}catch(e){if(/CHECK|UNIQUE/i.test(e.message))fail('save_conflict','Thao tác vừa được xử lý hoặc tiến trình đã đổi',409);throw e;}
+ try{const committed=await db.batch(statements);if(type==='sync'&&committed[0].meta.changes!==1)fail('save_conflict','Tiến trình đã thay đổi; tải bản trên tài khoản',409);}catch(e){if(/CHECK|UNIQUE/i.test(e.message))fail('save_conflict','Thao tác vừa được xử lý hoặc tiến trình đã đổi',409);throw e;}
  return response;
 }
 export async function economyBackup(env,acc,url){

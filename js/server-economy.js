@@ -26,7 +26,7 @@ cloudApi=async function(path,body){const r=await economyOriginalCloudApi(path,bo
 const economyOriginalSync=cloudSync;
 cloudSync=async function(force=false){
  if(!serverEconomy())return economyOriginalSync(force);
- if(SAVE_LOCK||CLOUD.paused||CLOUD.busy||document.hidden&&!force)return false;
+ if(Date.now()<(CLOUD.retryAt||0)||SAVE_LOCK||CLOUD.paused||CLOUD.busy||document.hidden&&!force)return false;
  CLOUD.busy=true;
  try{
   if(!CLOUD.lease||Date.now()-CLOUD.lastLeaseAt>90000){const claimed=await cloudClaim();if(claimed.revision!==CLOUD.revision){const e=new Error('Có tiến trình mới trên server; tải bản tài khoản');e.code='save_conflict';throw e;}}
@@ -39,6 +39,7 @@ cloudSync=async function(force=false){
 };
 function economyAction(action,args=[],after){
  if(!serverEconomy())return false;
+ if(Date.now()<(CLOUD.retryAt||0)){toast(CLOUD.status);return true;}
  if(CLOUD.paused||SAVE_LOCK){toast('Tải tiến trình tài khoản để tiếp tục');return true;}
  const owner=CLOUD.user.id,slot=SLOT,cid=S?.cid;ECON.chain=ECON.chain.then(async()=>{
   if(!serverEconomy()||CLOUD.paused||CLOUD.user.id!==owner||SLOT!==slot||S?.cid!==cid)return;

@@ -4,17 +4,19 @@
   const toggle = $('globalChatToggle'), panel = $('globalChat'), list = $('globalChatMessages');
   const status = $('globalChatStatus'), form = $('globalChatForm'), input = $('globalChatInput');
   let open = false, timer = null, reading = false, sending = false, cursor = 0, controller = null;
+  let retryAt=0,retryMsg='';
   const seen = new Set();
   const ready = () => typeof S !== 'undefined' && S && S.fac;
   const key = () => saveKey() + '_global_chat';
   const identity = () => { try { const value = JSON.parse(localStorage.getItem(key()) || 'null'); return value && value.name === S.name ? value : null } catch { return null } };
   const api = async (path, body, token, signal) => {
+    if(Date.now()<retryAt)throw {msg:retryMsg,retryAfter:Math.ceil((retryAt-Date.now())/1000)};
     const headers = {};
     if (body) headers['content-type'] = 'application/json';
     if (token) headers.authorization = 'Bearer ' + token;
     const response = await fetch((window.JX_CHAT_API || window.JX_API || 'https://game.vltk.workers.dev') + '/api' + path, {method: body ? 'POST' : 'GET', headers, body: body ? JSON.stringify(body) : undefined, signal});
     const data = await response.json();
-    if (!response.ok) throw { code: data.error, msg: data.msg || 'Chưa kết nối được chat' };
+    if (!response.ok) {if(data.retryAfter){retryAt=Date.now()+data.retryAfter*1000;retryMsg=data.msg;}throw { code: data.error, msg: data.msg || 'Chưa kết nối được chat',retryAfter:data.retryAfter };}
     return data;
   };
   function append(messages) {
@@ -41,8 +43,8 @@
       const data = await api('/chat?after=' + cursor, null, null, controller.signal);
       if (open) { append(data.messages); status.textContent = 'Mọi map · mọi chế độ' }
     } catch (error) {
-      delay = 10000;
-      if (open) status.textContent = 'Mất kết nối chat, đang thử lại…';
+      delay = Math.max(10000,(error.retryAfter||0)*1000);
+      if (open) status.textContent = error.msg||'Mất kết nối chat, đang thử lại…';
     } finally {
       clearTimeout(timeout); reading = false; controller = null;
       if (open && !document.hidden) timer = setTimeout(poll, delay);
