@@ -69,7 +69,7 @@ function jhClear(){
   j.runs[d.id]=jhInt(j.runs[d.id])+1;
   const prev=j.records[d.id]||{};j.records[d.id]={clears:jhInt(prev.clears)+1,best:Math.min(prev.best||Infinity,Math.ceil(run.elapsed)),rank:!prev.rank||"SAB".indexOf(rank)<"SAB".indexOf(prev.rank)?rank:prev.rank};
   jhReward(Math.round(d.fd*mul),Math.round(d.knb*mul),`${d.n} · hạng ${rank}`);
-  S.tienThaoUntil=Math.max(Date.now(),S.tienThaoUntil||0)+(rank==="S"?30:rank==="A"?20:10)*60000;
+  S.tienThaoUntil=Math.max(gameNow(),S.tienThaoUntil||0)+(rank==="S"?30:rank==="A"?20:10)*60000;
   grant(MC().lab?{ht:rank==="S"?3:rank==="A"?2:1}:{gold:100},"Nguyên liệu phó bản");
   if(Math.random()<.006*mul)grant({set:1},"Phó bản · đồ bộ hiếm");
   if(Math.random()<.003*mul){const goods=horseShopGoods().filter(g=>g.d===10),g=goods.length?pick(goods):null;if(g&&S.inv.length<INV_MAX){const it=makeItem(10,g.k,g.lvl,0);if(it)addItem(it,true,true,true);}}

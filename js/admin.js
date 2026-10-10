@@ -2,9 +2,9 @@
 const adminHomNay=()=>localISODay();
 const adminDaDung=()=>false;
 const ADM_DEF={xp:1,gold:1,drop:1,hp:1,dmg:1,heroDmg:1,spawn:1,lucky:0,speed:0,god:0,infMana:0};
-const ADM_MUL=[["xp","EXP nhận được",[.5,1,2,3,5,10,25,100]],["gold","Vàng rơi",[.5,1,2,5,10,50]],["drop","Tỉ lệ rơi đồ",[.5,1,2,3,5,10]],["hp","Máu quái",[.1,.25,.5,1,2,5,10]],["dmg","Sát thương quái",[0,.25,.5,1,2,5]],["heroDmg","Sát thương của bạn",[.5,1,2,5,10,100,1e6]],["spawn","Số quái mỗi đợt",[.5,1,2,3,5]],["lucky","May mắn cộng thêm",[0,10,25,50,100,200]],["speed","Tốc độ game (0 = theo chế độ)",[0,.5,1,1.5,2.5,5,10]]];
+const ADM_MUL=[["xp","EXP nhận được",[.5,1,2,3,5,10,25,100]],["gold","Vàng rơi",[.5,1,2,5,10,50]],["drop","Tỉ lệ rơi đồ",[.5,1,2,3,5,10]],["hp","Máu quái",[.1,.25,.5,1,2,5,10]],["dmg","Sát thương quái",[0,.25,.5,1,2,5]],["heroDmg","Sát thương của bạn",[.5,1,2,5,10,100,1e6]],["spawn","Số quái mỗi đợt",[.5,1,2,3,5]],["lucky","May mắn cộng thêm",[0,10,25,50,100,200]],["speed","Tốc độ game (0 = theo chế độ)",[0,.5,1,1.5,2]]];
 const ADM_FLAG=[["god","Bất tử (không mất máu)"],["infMana","Nội lực vô hạn"]];
-const ADM_PRESET=[["Cày nhanh",{xp:10,speed:5,spawn:2}],["Săn đồ",{drop:5,lucky:50,gold:3,spawn:2}],["Đánh trùm",{hp:.5,heroDmg:5,spawn:1}],["Thử tải",{spawn:5,speed:10}],["Đặt lại hệ số",ADM_DEF]];
+const ADM_PRESET=[["Cày nhanh",{xp:10,speed:2,spawn:2}],["Săn đồ",{drop:5,lucky:50,gold:3,spawn:2}],["Đánh trùm",{hp:.5,heroDmg:5,spawn:1}],["Thử tải",{spawn:5,speed:2}],["Đặt lại hệ số",ADM_DEF]];
 const admV=v=>v===1e6?"Một đòn":v===0?"Mặc định":"×"+v;
 let ADM_TAB="mul";
 const admStage=()=>Math.min(S.stage,STAGES);

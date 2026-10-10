@@ -1,3 +1,4 @@
+import {checkStateSecurity} from './state-security.js';
 // Tài khoản online: đăng ký, heartbeat (đo giờ chơi phía server), đồng bộ save.
 import {GAME as G} from '../gen/game.js';
 import { cloudAuth } from './cloud-account.js';
@@ -39,7 +40,7 @@ export function parseSave(save) {
   if (!Object.hasOwn(G.FAC,state.fac)) throw new HttpError(400, "no_faction");
   const lvl = Math.floor(+state.lvl);
   if (!(lvl >= 1 && lvl <= 300)) throw new HttpError(400, "bad_level");
-  return state;
+  return checkStateSecurity(state);
 }
 
 export async function auth(req, env) {

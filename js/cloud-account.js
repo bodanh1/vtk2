@@ -23,7 +23,7 @@ async function cloudApi(path,body){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
   const opts={credentials:'same-origin',cache:'no-store',signal:controller.signal};
   if(body!==undefined){opts.method='POST';opts.headers={'content-type':'application/json'};opts.body=JSON.stringify(body);}
-  try{const r=await fetch('/api/cloud/'+path,opts);const data=await r.json();if(!r.ok){const e=new Error(data.msg||'Máy chủ chưa hỗ trợ tài khoản ('+r.status+')');e.code=data.error||'http';throw e;}return data;}
+  try{const r=await fetch('/api/cloud/'+path,opts);const data=await r.json();if(r.ok&&typeof gameClockSync==='function')gameClockSync(Number(r.headers.get('x-game-time')));if(!r.ok){const e=new Error(data.msg||'Máy chủ chưa hỗ trợ tài khoản ('+r.status+')');e.code=data.error||'http';throw e;}return data;}
   catch(e){if(e.code)throw e;const error=new Error(e.name==='AbortError'?'Máy chủ phản hồi quá lâu. Hãy thử lại.':'Không kết nối được máy chủ · tiến trình vẫn lưu tại máy');error.code='offline';throw error;}
   finally{clearTimeout(timer);}
 }
