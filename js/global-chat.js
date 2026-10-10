@@ -7,7 +7,7 @@
   let retryAt=0,retryMsg='';
   const seen = new Set();
   const ready = () => typeof S !== 'undefined' && S && S.fac;
-  const key = () => saveKey() + '_global_chat';
+  const key = () => saveKey() + '_global_chat_social_v1';
   const identity = () => { try { const value = JSON.parse(localStorage.getItem(key()) || 'null'); return value && value.name === S.name ? value : null } catch { return null } };
   const api = async (path, body, token, signal) => {
     if(Date.now()<retryAt)throw {msg:retryMsg,retryAfter:Math.ceil((retryAt-Date.now())/1000)};
@@ -47,15 +47,19 @@
       if (open) status.textContent = error.msg||'Mất kết nối chat, đang thử lại…';
     } finally {
       clearTimeout(timeout); reading = false; controller = null;
-      if (open && !document.hidden) timer = setTimeout(poll, delay);
+      if (open && !document.hidden&&!window.JXSocialConnected) timer = setTimeout(poll, delay);
     }
   }
   function setOpen(value) {
     if (value && !ready()) return;
     open = value; panel.classList.toggle('hidden', !open);
     toggle.setAttribute('aria-expanded', String(open));
+    window.JXSocialChat?.(open);
     if (open) poll(); else { clearTimeout(timer); controller?.abort() }
   }
+  addEventListener('jx-social-chat',e=>{if(open&&Array.isArray(e.detail))append(e.detail)});
+  addEventListener('jx-social-open',()=>{window.JXSocialChat?.(open);if(open)poll()});
+  addEventListener('jx-social-close',()=>{if(open)poll()});
   toggle.onclick = () => setOpen(!open);
   $('globalChatClose').onclick = () => setOpen(false);
   // Chat consumes input so movement/skill shortcuts and arena targeting do not fire.

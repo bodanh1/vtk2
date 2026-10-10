@@ -64,6 +64,7 @@ export async function economyCommit(env,acc,body,type='sync'){
    if(!Number.isInteger(meta.activeSlot))throw new Error('Chọn nhân vật để chơi');
    const outcome=engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>engine.execute(body.action,body.args||[],meta));result=outcome.result;meta.runtime=outcome.runtime;notices=outcome.notices;
   }
+  if(type==='sync'&&Number.isInteger(meta.activeSlot))engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>engine.collect());
   identify(bundle);
  }catch(e){if(e instanceof HttpError)throw e;fail('economy_action',e.message||'Thao tác không hợp lệ');}
  const response={ok:true,revision:row.revision+1,updatedAt:now,patch:economyPatch(bundle,meta),result,reward,notices};

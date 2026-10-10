@@ -45,6 +45,6 @@ export async function chatSend(req, env, body) {
   const at = Date.now();
   const message = await env.DB.prepare('INSERT INTO chat_messages(name,sender,text,at) VALUES(?1,?2,?3,?4) RETURNING id,name,sender,text,at')
     .bind(sender.name, sender.id, text, at).first();
-  await env.DB.prepare('DELETE FROM chat_messages WHERE at<?1').bind(at - 7 * 864e5).run();
+  if(!env.SKIP_CHAT_CLEANUP)await env.DB.prepare('DELETE FROM chat_messages WHERE at<?1').bind(at - 7 * 864e5).run();
   return { message };
 }

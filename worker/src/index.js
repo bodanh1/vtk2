@@ -1,3 +1,4 @@
+export {SocialRoom} from './social-room.js';
 import {databaseFailure} from './database-errors.js';
 // Worker của Võ Lâm Idle: phục vụ file tĩnh (binding ASSETS) và API tài khoản/lưu cloud, chat và online Công Thành Chiến.
 // Chỉ đường dẫn /api/* chạy qua Worker (assets.run_worker_first trong wrangler.jsonc).
@@ -15,6 +16,7 @@ import {presence} from "./presence.js";
 import {playerRankingSync,playerRankingList} from "./player-rankings.js";
 
 const ROUTES = {
+  "GET /api/social":()=>{throw new HttpError(503,"social_unavailable");},
   "POST /api/player-rankings": playerRankingSync,
   "GET /api/player-rankings": playerRankingList,
   "POST /api/presence": presence,
@@ -43,6 +45,7 @@ export default {
     const fn = url.pathname.startsWith("/api/cloud/") ? cloudRoute : ROUTES[req.method + " " + url.pathname];
     if (!fn) return json({ error: "not_found" }, 404);
     try {
+      if(env.SOCIAL&&(url.pathname==='/api/social'||url.pathname==='/api/presence'||url.pathname==='/api/chat'||url.pathname==='/api/chat/session'))return await env.SOCIAL.get(env.SOCIAL.idFromName('global-v1')).fetch(req);
       if (!env.DB) throw new HttpError(503, "no_db", "Chưa gắn cơ sở dữ liệu D1");
       await ensureSchema(env.DB);
       const body = req.method === "POST" ? await readJson(req) : null;

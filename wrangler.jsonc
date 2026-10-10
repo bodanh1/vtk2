@@ -18,6 +18,8 @@
       "migrations_dir": "migrations"
     }
   ],
+  "durable_objects": { "bindings": [{ "name": "SOCIAL", "class_name": "SocialRoom" }] },
+  "migrations": [{ "tag": "social-v1", "new_sqlite_classes": ["SocialRoom"] }],
   "vars": { "SERVER_ECONOMY_ENABLED": "1" },
   "observability": { "enabled": true },
   // Bản xem trước của PR (Workers Builds chạy `wrangler preview`). Binding D1 không kế thừa vào đây,

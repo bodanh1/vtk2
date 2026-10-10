@@ -32,3 +32,13 @@ Nếu muốn rollback:
 ## Bạch Kim
 
 Công thức hiện tại trong `rdata.js` là công thức cộng đồng: hai bản của cùng template Hoàng Kim, có ánh xạ Bạch Kim, chưa mặc. Không có bằng chứng công thức này lấy trực tiếp từ client. Giữ nguyên giá và tỉ lệ 25%. Đồ cũ thiếu refId được nhận diện bằng metadata legacy duy nhất; không đoán ánh xạ từ tên giống nhau. Giao diện hiển thị số Hoàng Kim, số có mẫu Bạch Kim, số loại đủ cặp và số đang mặc; chọn khác mẫu có giải thích ngay. Nhiều món khác nhau cùng môn phái vẫn không được coi là một cặp.
+
+## Tối ưu hạn mức v102
+
+- Lưu tài khoản vẫn mỗi 30 giây, hai cập nhật chính có điều kiện revision/lease trong một transaction. Không ghi request/ledger cho lần lưu thụ động; giao dịch tiền, shop và chợ vẫn giữ tính nguyên tử và chống lặp.
+- Auto nhặt gom vào lần lưu, dùng cùng lootWanted/pickUp với bộ lọc native. Chế độ thủ công và chọn nhặt trực tiếp vẫn gửi giao dịch ngay.
+- Binding SOCIAL / SocialRoom (SQLite Durable Object, migration social-v1) xử lý /api/social, chat và presence trước ensureSchema D1. WebSocket dùng acceptWebSocket/attachment để hibernate; heartbeat không ghi hàng SQL. Fallback HTTP giữ TTL 90 giây, guest/account không đếm nhiều tab thành nhiều người. Danh tính tài khoản tra D1 khi kết nối; fallback cache tối đa 60 giây.
+- Chat lưu ở SQLite của room, cache đọc 4 giây, dọn cũ mỗi giờ có gửi tin, giới hạn tốc độ vẫn nguyên tử bằng SQL. Import tối đa 50 tin D1 trong 7 ngày một lần nếu đọc được; D1 cũ giữ nguyên làm archive nếu quota chặn đọc. Phiên chat mới dùng khóa local riêng, không mang token cũ sang room.
+- Xếp hạng tự gửi mỗi 5 phút; nếu thông tin không đổi, tối đa 15 phút. Mở bảng vẫn đồng bộ ngay khi có thay đổi.
+- D1 và Durable Objects có hạn mức riêng. Không đổi gói trả phí tự động, không hứa đủ cho lượng người chơi không giới hạn. Hai cập nhật mỗi 30 giây tương đương tối thiểu 5.760 cập nhật/người/ngày nếu online đủ 24 giờ, chưa tính giao dịch/index/đăng nhập; cần theo dõi dashboard khi tăng người chơi.
+- Rollback code không được xóa migration/binding SocialRoom đã tạo, vì chat mới lưu tại đó. Giữ class và binding, có thể tắt nhánh định tuyến để dùng D1 cũ nếu có yêu cầu; không xóa namespace để tránh mất lịch sử chat.
