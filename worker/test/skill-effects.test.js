@@ -22,3 +22,5 @@ test('all missile, impact, end and casting sheets use the shared effect drawing 
   assert.equal(paths.size,202);for(const file of paths)assert.ok(fs.existsSync(file),file);
   const meteor=fx.m[fx.f[362].c];assert.ok(paths.has(meteor.fly.f));assert.ok(paths.has(meteor.hit.f));
 });
+
+test("vanished-event skills keep native chained effects without generated dark ground cracks",()=>{const source=fs.readFileSync("js/render.js","utf8");assert.equal(source.includes("crackFx"),false);assert.equal(source.includes("drawCrack"),false);assert.ok(source.includes("chainFx(a,b,atk,f,"));const c={window:{}};vm.runInNewContext(fs.readFileSync("data.js","utf8"),c);const affected=Object.values(c.window.JX.skills).filter(s=>s.attr?.skill_vanishedevent).map(s=>s.id);assert.deepEqual(affected.sort((a,b)=>a-b),[353,362]);});
