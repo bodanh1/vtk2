@@ -68,7 +68,7 @@ for(const n of ['claimLogin','claimLvMs','claimQuest','eventBuy','openChest','ta
 economyWrap('buyMask',null,()=>maskShopModal());
 economyWrap('wearMask',null,()=>{renderChar();if(document.getElementById('maskShopList'))maskShopModal();});
 economyWrap('buyTienThaoLo',null,()=>treasureShopModal());
-economyWrap('unequip',null,()=>refresh());economyWrap('sellUnmatched',null,()=>refresh());economyWrap('autoEquipAll',null,()=>refresh());
+economyWrap('unequip',null,()=>refresh());economyWrap('sellUnmatched',null,()=>refresh());economyWrap('clearInventory',null,()=>renderInv());economyWrap('autoEquipAll',null,()=>refresh());
 for(const n of ['towerStart','tkStart','siegeStart','jhDungeonStart','jhTowerStart','jhFerryStart'])economyWrap(n,null,()=>{closeModal(true);R.town=false;});
 const economyOriginalReborn=doReborn;doReborn=function(){if(!serverEconomy())return economyOriginalReborn();if(S.lvl<MAX_LEVEL||RW().stat.reborn>=10)return;if(confirm('Chuyển sinh: về cấp 1, giữ trang bị và võ công. Tiếp tục?'))economyAction('doReborn',[],()=>{closeModal(true);refresh();tamPhapModal();});};
 // Server computes gains. Browser combat continues solely for animation and input feedback.

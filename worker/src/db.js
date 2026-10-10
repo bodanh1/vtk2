@@ -85,12 +85,15 @@ const COLUMNS = [
 ];
 
 let ready = null;
+async function schemaInstalled(db){const names=SCHEMA.map(q=>/^CREATE (?:TABLE|INDEX) IF NOT EXISTS (\w+)/.exec(q)?.[1]).filter(Boolean).concat(['chars_mode_ladder','chars_ladder']);const row=await db.prepare('SELECT COUNT(*) n FROM sqlite_master WHERE name IN ('+names.map((_,i)=>'?'+(i+1)).join(',')+')').bind(...names).first();if(row.n!==names.length)return false;const mark=await db.prepare("SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97'").first();if(!mark)return false;const columns=(await db.prepare('PRAGMA table_info(chars)').all()).results.map(r=>r.name);return ['mode','power','bracket','flagged'].every(k=>columns.includes(k));}
+
+
 
 export function ensureSchema(db) {
   if (!ready) {
-    ready = db
-      .batch(SCHEMA.map((s) => db.prepare(s)))
-      .then(async () => {
+    ready = (async()=>{
+      if(await schemaInstalled(db))return;
+      await db.batch(SCHEMA.map(sql=>db.prepare(sql)));
         // Freeze existing saves and market escrow before any migration or new economy write.
         await db.batch([
           db.prepare("INSERT OR IGNORE INTO economy_backups(account_id,snapshot,previous_snapshot,revision,updated_at,market_json,created_at) SELECT account_id,snapshot,previous_snapshot,revision,COALESCE(updated_at,0),'[]',CAST(strftime('%s','now') AS INTEGER)*1000 FROM cloud_saves WHERE NOT EXISTS(SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97')"),
@@ -102,7 +105,7 @@ export function ensureSchema(db) {
         if(addedMode)await db.prepare("UPDATE chars SET mode=json_extract(snapshot,'$.mode') WHERE snapshot IS NOT NULL AND json_valid(snapshot) AND json_extract(snapshot,'$.mode') IN ('ctc','phlt','g2') AND mode<>json_extract(snapshot,'$.mode')").run();
         await db.prepare("CREATE INDEX IF NOT EXISTS chars_mode_ladder ON chars(mode,bracket,flagged,power)").run();
         await db.prepare("CREATE INDEX IF NOT EXISTS chars_ladder ON chars(bracket, flagged, power)").run();
-      })
+    })()
       .catch((e) => {
         ready = null;
         throw e;

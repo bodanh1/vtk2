@@ -105,6 +105,7 @@ function econExecute(name,args,meta){
  case 'buyGoods':{const key=String(args[0]),index=integer(1,0,1000),g=shopEntries(key)[index];if(!SHOP_TABS.some(x=>x[0]===key)||!g)throw new Error('Món hàng không tồn tại');buyGoods(g,true);break;}
  case 'sell':sell(it(0,true));break;
  case 'sellUnmatched':return sellUnmatched();
+ case 'clearInventory':return clearInventory();
  case 'equip':{const item=it(0,true);if(!reqOk(item))throw new Error('Chưa đủ điều kiện trang bị');equip(item,true);break;}
  case 'unequip':if(!SLOTS.some(x=>x[0]===args[0]))throw new Error('Ô trang bị không hợp lệ');unequip(args[0]);break;
  case 'lock':{const item=it();item.locked=!!args[1];break;}

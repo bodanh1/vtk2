@@ -1,3 +1,4 @@
+import {databaseFailure} from './database-errors.js';
 // Worker của Võ Lâm Idle: phục vụ file tĩnh (binding ASSETS) và API tài khoản/lưu cloud, chat và online Công Thành Chiến.
 // Chỉ đường dẫn /api/* chạy qua Worker (assets.run_worker_first trong wrangler.jsonc).
 import { HttpError, json, readJson, CORS } from "./http.js";
@@ -48,6 +49,7 @@ export default {
       const result=await fn(req, env, body, url, ctx);
       return result instanceof Response ? result : json(result);
     } catch (e) {
+      const failure=databaseFailure(e);if(failure){const response=json({error:failure.error,msg:failure.msg,retryAfter:failure.retryAfter},failure.status);response.headers.set('retry-after',String(failure.retryAfter));return response;}
       if (e instanceof HttpError) return json({ error: e.code, msg: e.message }, e.status);
       console.error("api", url.pathname, e && e.stack);
       return json({ error: "server", msg: "Lỗi máy chủ" }, 500);
