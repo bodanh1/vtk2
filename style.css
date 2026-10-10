@@ -318,3 +318,8 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .element-tip i{flex:none;color:#f3d35b;font-style:normal}
 .element-tip:hover,.element-tip:focus-visible{border-color:#f3d35b;background:#18271e}
 @media(max-width:600px){.element-tip{align-items:flex-start;flex-wrap:wrap}.element-tip span{flex-basis:100%;order:3}.element-tip i{margin-left:auto}}
+
+/* Repeated taps in windows are game actions, not Safari double-tap zoom.
+   manipulation retains scrolling and pinch gestures; drag handles keep touch-action:none. */
+#panel,#modal,.jxx{touch-action:manipulation}
+button,a,[role="button"],.jxp,.jxm{touch-action:manipulation}
