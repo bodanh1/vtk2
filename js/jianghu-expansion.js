@@ -113,3 +113,7 @@ const jhOldGiftBody=giftBody;giftBody=function(r){const body=jhOldGiftBody(r);re
 
 function jhOpenActivity(tab){if(!S?.fac)return;giftTab=tab;document.getElementById("jxOverflow")?.classList.add("hidden");const menu=document.getElementById("jxMenu");if(menu)menu.setAttribute("aria-expanded","false");giftModal();}
 for(const [id,tab] of [["jxTower2","tower2"],["jxDungeons","dungeons"],["jxFerry","ferry"]]){const button=document.getElementById(id);if(button)button.onclick=()=>jhOpenActivity(tab);}
+
+function jhExitActivity(){if(!S?.fac)return false;if(SV.on)svExit();else if(R.tk)tkExit(false);else if(S.siege)siegeExit(false);else if(R.tower)towerExit(false);else return false;R.moveTo=null;R.pickTarget=null;INPUT.target=null;R.corpses=[];R.fx=[];R.spawnT=.5;S.wave=1;const zone=zoneOf(Math.min(S.stage,STAGES));if(typeof onZoneChange==="function")onZoneChange(zone);R.zoneShown=null;save();refresh();jhSyncExit();return true;}
+function jhSyncExit(){const button=document.getElementById("jxActivityExit"),anchor=document.getElementById("jxMini");if(!button)return;const active=!!(S?.fac&&(SV.on||R.tk||S.siege||R.tower));button.classList.toggle("hidden",!active);if(active&&anchor){button.style.right=((parseFloat(anchor.style.right)||0)+32)+"px";button.style.top=(parseFloat(anchor.style.top)||0)+"px";}}
+const jhExitButton=document.getElementById("jxActivityExit");if(jhExitButton){jhExitButton.onclick=jhExitActivity;setInterval(jhSyncExit,250);}

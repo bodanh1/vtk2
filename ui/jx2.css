@@ -804,3 +804,5 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #jxActs #jxExtraActs .rnd,#jxActs #jxExtraActs .rnd span{width:100%}
 #jxActsToggle{grid-column:6;justify-self:center;width:22px;height:22px;margin-top:9px;border-radius:50%;font-size:15px;line-height:20px}
 #jxActs.actionsCollapsed,body.jxland #jxActs.actionsCollapsed,body.jxthumb #jxActs.actionsCollapsed{width:264px}
+
+#jxActivityExit{position:absolute;z-index:8;pointer-events:auto;width:104px;height:28px;padding:2px 4px;font-size:11px;line-height:18px;white-space:nowrap;touch-action:manipulation}
