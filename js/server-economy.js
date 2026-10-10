@@ -8,19 +8,19 @@ function economyApply(r,preserve=null){
  if(!r.patch)return;ECON.version=r.patch.version;ECON.applying=true;
  try{
   const oldRuntime=JSON.stringify([R.tower&&[R.tower.kind,R.tower.floor],R.tk?.wave,S?.siege?.layer]);
-  for(const {slot,state}of r.patch.slots){if(!state){localStorage.removeItem(slotKey(slot));continue;}const copy=JSON.parse(JSON.stringify(state));if(slot===SLOT&&S?.fac){const sound=S.snd;S=copy;if(sound)S.snd=sound;
+  for(const {slot,state}of r.patch.slots){if(!state){localStorage.removeItem(slotKey(slot));continue;}const copy=state;if(slot===SLOT&&S?.fac){const sound=S.snd;S=copy;if(sound)S.snd=sound;
     if(preserve)for(const k of ECON_SETTINGS)if(preserve[k]!==undefined)S[k]=preserve[k];
-   }localStorage.setItem(slotKey(slot),pack(slot===SLOT&&S?.fac?S:copy));sealWrite(slot,state.mode);}
-  for(const [key,state]of Object.entries(r.patch.shared||{}))if(CLOUD_SHARED.includes(key))localStorage.setItem(key,pack(state));
+   }const key=slotKey(slot),raw=pack(slot===SLOT&&S?.fac?S:copy);if(localStorage.getItem(key)!==raw){localStorage.setItem(key,raw);sealWrite(slot,state.mode);}}
+  for(const [key,state]of Object.entries(r.patch.shared||{}))if(CLOUD_SHARED.includes(key)){const raw=pack(state);if(localStorage.getItem(key)!==raw)localStorage.setItem(key,raw);}
   if(r.patch.activeSlot===SLOT){R.tower=r.patch.runtime?.tower||null;R.tk=r.patch.runtime?.tk||null;}
   const newRuntime=JSON.stringify([R.tower&&[R.tower.kind,R.tower.floor],R.tk?.wave,S?.siege?.layer]);
   if(oldRuntime!==newRuntime){R.enemies=[];R.corpses=[];R.spawnT=.5;R.stall=0;R.zoneShown=null;}
   collectionsCache=null;CLOUD.revision=r.revision;CLOUD.lastSaved=r.updatedAt;CLOUD.lastLeaseAt=Date.now();
-  if(S?.fac){save();restoreGround();invDirty=true;R.dirty=true;recalc();updateTop();}
-  cloudSaveBinding(cloudFingerprint(cloudCapture(false)));CLOUD.marketPending=!!r.marketPending;
+  if(S?.fac){restoreGround();invDirty=true;R.dirty=true;recalc();updateTop();}
+  cloudSaveBinding('');CLOUD.marketPending=!!r.marketPending;
  }finally{ECON.applying=false;}
 }
-function economyPayload(){return {clientId:cloudClientId,revision:CLOUD.revision,requestId:crypto.randomUUID(),slot:S?.fac?SLOT:null,controls:economyControls(),characters:cloudCapture(false).slots.map(s=>s?{fac:s.fac,mode:s.mode,name:s.name,sex:s.sex,cid:s.cid}:null)};}
+function economyPayload(){return {clientId:cloudClientId,revision:CLOUD.revision,requestId:crypto.randomUUID(),slot:S?.fac?SLOT:null,controls:economyControls(),characters:Array.from({length:3},(_,slot)=>slot===SLOT&&S?.fac?{fac:S.fac,mode:S.mode,name:S.name,sex:S.sex,cid:S.cid}:null)};}
 const economyOriginalCloudApi=cloudApi;
 cloudApi=async function(path,body){const r=await economyOriginalCloudApi(path,body);if(r.economyVersion!==undefined)ECON.version=r.economyVersion;return r;};
 const economyOriginalSync=cloudSync;
@@ -44,16 +44,16 @@ function economyAction(action,args=[],after){
   if(!serverEconomy()||CLOUD.paused||CLOUD.user.id!==owner||SLOT!==slot||S?.cid!==cid)return;
   // Reuse the existing lease/revision flow; no timer per monster or skill is added.
   while(CLOUD.busy){await new Promise(resolve=>setTimeout(resolve,100));if(CLOUD.paused||!serverEconomy()||CLOUD.user.id!==owner||SLOT!==slot||S?.cid!==cid)return;}
-  window.JXADMINBUSY=true;CLOUD.busy=true;let sent=false;
+  CLOUD.busy=true;let sent=false;
   try{
    if(!CLOUD.lease||Date.now()-CLOUD.lastLeaseAt>90000){const claimed=await cloudClaim();if(claimed.revision!==CLOUD.revision){const e=new Error('Có bản mới trên server');e.code='save_conflict';throw e;}}
    const payload=economyPayload();payload.action=action;payload.args=args;sent=true;
    const r=await cloudApi('economy/action',payload),current=economyControls();const preserve=Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));economyApply(r,preserve);economyPendingPoints(current,payload.controls);
-   const msg=r.result?.msg||r.notices?.at(-1);if(msg)toast(msg);else toast('Đã cập nhật trên server');
+   const msg=r.result?.msg||r.notices?.at(-1);if(msg)toast(msg);else economyNotice('Đã cập nhật');
    if(after)after(r);else refresh();
   }catch(e){if(sent&&e.code==='offline'){e.code='save_conflict';e.message+=' · Tải bản tài khoản để kiểm tra kết quả';}cloudFail(e);toast(e.message);}
-  finally{CLOUD.busy=false;window.JXADMINBUSY=false;lastT=performance.now();}
- }).catch(e=>{CLOUD.busy=false;window.JXADMINBUSY=false;toast(e.message);});
+  finally{CLOUD.busy=false;}
+ }).catch(e=>{CLOUD.busy=false;toast(e.message);});
  return true;
 }
 function economyWrap(name,encode,argsAfter){const original=window[name];if(typeof original!=='function')return;window[name]=function(...args){if(!serverEconomy()||ECON.applying)return original.apply(this,args);if(encode===false)return;const encoded=encode?encode(args):args;economyAction(name,encoded,argsAfter?()=>argsAfter(args):null);return {ok:false,n:0,gold:0,msg:'Đang xử lý trên server…'};};}
@@ -82,4 +82,6 @@ for(const name of ['towerExit','tkExit','siegeExit','jhEnd']){const original=win
 
 const economyOriginalDeleteSlot=deleteSlot;deleteSlot=function(i){if(!serverEconomy())return economyOriginalDeleteSlot(i);const state=cloudCapture(false).slots[i];if(state)economyAction('deleteCharacter',[i,state.cid],()=>{localStorage.removeItem(slotKey(i)+'_bak');localStorage.removeItem(sealKey(i));localStorage.setItem(SLOT_PTR,'menu');SAVE_LOCK=true;location.reload();});};
 
-function economyPendingPoints(current,sent){for(const [key,remaining]of [['attr','attrPts'],['sk','skPts']]){if(JSON.stringify(current[key])===JSON.stringify(sent[key]))continue;const budget=S[remaining]+Object.values(S[key]||{}).reduce((a,v)=>a+v,0),used=Object.values(current[key]||{}).reduce((a,v)=>a+v,0);if(used<=budget){S[key]=current[key];S[remaining]=budget-used;}}recalc();save();}
+function economyPendingPoints(current,sent){let changed=false;for(const [key,remaining]of [['attr','attrPts'],['sk','skPts']]){if(JSON.stringify(current[key])===JSON.stringify(sent[key]))continue;const budget=S[remaining]+Object.values(S[key]||{}).reduce((a,v)=>a+v,0),used=Object.values(current[key]||{}).reduce((a,v)=>a+v,0);if(used<=budget){S[key]=current[key];S[remaining]=budget-used;changed=true;}}if(changed){recalc();save();}}
+let economyNoticeTimer;
+function economyNotice(text){let el=document.getElementById('economyNotice');if(!el){el=document.createElement('div');el.id='economyNotice';el.setAttribute('role','status');document.body.appendChild(el);}el.textContent=text;el.classList.add('on');clearTimeout(economyNoticeTimer);economyNoticeTimer=setTimeout(()=>el.classList.remove('on'),1500);}
