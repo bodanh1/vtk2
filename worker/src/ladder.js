@@ -5,7 +5,7 @@ import { validateChar, BRACKETS, FLAG_TEXT } from "./validate.js";
 // Kiểm định rồi lưu lực chiến, bậc và cờ. Cờ giữ nguyên cho tới khi quản trị gỡ,
 // để không thể gian lận rồi xóa dấu vết bằng một lần đồng bộ sạch.
 export async function applyValidation(env, accId, state, playSec) {
-  const r = validateChar(state, playSec);
+  const r = validateChar(state, playSec,state.mode);
   const now = Date.now();
   const active = await env.DB.prepare("SELECT code FROM flags WHERE account_id=?1 AND cleared_at IS NULL").bind(accId).all();
   const have = new Set(active.results.map((x) => x.code));
@@ -15,8 +15,8 @@ export async function applyValidation(env, accId, state, playSec) {
     env.DB.prepare("INSERT INTO flags(account_id,code,detail,at) VALUES(?1,?2,?3,?4)").bind(accId, code, String(detail).slice(0, 300), now)
   );
   stmts.push(
-    env.DB.prepare("UPDATE chars SET power=?2,bracket=?3,flagged=?4 WHERE account_id=?1").bind(
-      accId, r.power, r.bracket ? r.bracket.k : null, have.size ? 1 : 0
+    env.DB.prepare("UPDATE chars SET power=?2,bracket=?3,flagged=?4,mode=?5 WHERE account_id=?1").bind(
+      accId, r.power, r.bracket ? r.bracket.k : null, have.size ? 1 : 0,state.mode
     )
   );
   await env.DB.batch(stmts);
@@ -24,26 +24,28 @@ export async function applyValidation(env, accId, state, playSec) {
 }
 
 export async function ladder(req, env, body, url) {
-  const b = url.searchParams.get("b") || "so";
+  const b = url.searchParams.get("b") || "so",mode=url.searchParams.get("mode")||"ctc";
+  if(!["ctc","phlt","g2"].includes(mode))throw new HttpError(400,"bad_mode");
   if (!BRACKETS.some((x) => x.k === b)) throw new HttpError(400, "bad_bracket");
   const rows = await env.DB.prepare(
     `SELECT a.name, c.fac, c.lvl, c.power FROM chars c JOIN accounts a ON a.id=c.account_id
-     WHERE c.bracket=?1 AND c.flagged=0 ORDER BY c.power DESC, c.lvl DESC LIMIT 100`
-  ).bind(b).all();
+     WHERE c.bracket=?1 AND c.flagged=0 AND c.mode=?2 ORDER BY c.power DESC, c.lvl DESC LIMIT 100`
+  ).bind(b,mode).all();
   return {
-    bracket: b,
+    bracket: b,mode,
     brackets: BRACKETS.map((x) => ({ k: x.k, n: x.n, lo: x.lo, hi: Number.isFinite(x.hi) ? x.hi : null })),
     rows: rows.results.map((x, i) => ({ rank: i + 1, ...x })),
   };
 }
 
 // Bảng thông báo: nhân vật bị loại khỏi bảng xếp hạng vì nghi gian lận (chỉ tên và lý do chung).
-export async function notices(req, env) {
+export async function notices(req, env,body,url=new URL(req.url)) {
+  const mode=url.searchParams.get("mode")||"ctc";if(!["ctc","phlt","g2"].includes(mode))throw new HttpError(400,"bad_mode");
   const rows = await env.DB.prepare(
     `SELECT a.name, c.lvl, f.code, MAX(f.at) AS at FROM flags f JOIN accounts a ON a.id=f.account_id
      JOIN chars c ON c.account_id=f.account_id
-     WHERE f.cleared_at IS NULL GROUP BY f.account_id, f.code ORDER BY at DESC LIMIT 200`
-  ).all();
+     WHERE f.cleared_at IS NULL AND c.mode=?1 GROUP BY f.account_id, f.code ORDER BY at DESC LIMIT 200`
+  ).bind(mode).all();
   const by = new Map();
   for (const r of rows.results) {
     const o = by.get(r.name) || { name: r.name, lvl: r.lvl, at: r.at, reasons: [] };

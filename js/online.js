@@ -120,9 +120,9 @@ function onlCardHTML() {
     const me = ONL.me, ago = ONL.lastSync ? Math.round((Date.now() - ONL.lastSync) / 60e3) + " phút trước" : "chưa";
     return `<h3>Chơi Online</h3><div class="card lootf onlcard"><div class="row">Tên online <b>${esc(acc.name)}</b></div>
       <div class="row">Giờ chơi đã đo <b>${me ? fmtHours(me.play_sec) : "…"}</b></div><div class="row">Đồng bộ gần nhất <span>${ago}</span></div>
-      ${S.mode === "ctc" && me && me.char ? `<div class="row">Bậc PvP <b>${ONL_BRACKET[me.char.bracket] || "Chưa đủ cấp 40"}</b></div><div class="row">Lực chiến (máy chủ tính) <b>${fmt(me.char.power || 0)}</b></div>` : ""}
-      ${me && me.flags && me.flags.length ? `<div class="onlflag"><b>Đang bị loại khỏi bảng xếp hạng vì nghi gian lận</b>${me.flags.map(f => `<small>${esc(f.detail || f.code)}</small>`).join("")}</div>` : ""}
-      <div class="btnrow"><button class="btn" id="onlSyncBtn">Đồng bộ ngay</button><button class="btn" id="onlCodeBtn">Mã khôi phục</button></div>
+      ${me && me.char ? `<div class="row">Bậc online <b>${ONL_BRACKET[me.char.bracket] || "Chưa đủ cấp 40"}</b></div><div class="row">Lực chiến (máy chủ tính) <b>${fmt(me.char.power || 0)}</b></div>` : ""}
+      ${me && me.flags && me.flags.length ? `<div class="onlflag"><b>Tạm ngừng xếp hạng online; dữ liệu cần kiểm tra</b>${me.flags.map(f => `<small>${esc(f.detail || f.code)}</small>`).join("")}</div>` : ""}
+      <div class="btnrow"><button class="btn" id="onlSyncBtn">Đồng bộ ngay</button><button class="btn" id="onlCodeBtn">Mã khôi phục</button><button class="btn" id="onlLadderBtn">Xếp hạng lực chiến</button><button class="btn" id="onlNoticeBtn">Thông báo kiểm định</button></div>
       <small class="dim" id="onlCode" hidden>Giữ kín mã này, nó thay cho mật khẩu: <code>${acc.cloud?"Đã liên kết tài khoản cloud; đăng nhập trên máy khác để khôi phục.":esc(acc.token)}</code></small></div>`;
   }
   if (S.lvl > ONL_REG_MAX_LVL) return `<h3>Chơi Online</h3><div class="card"><small class="dim">Nhân vật đã quá cấp ${ONL_REG_MAX_LVL}, không đăng ký bảng xếp hạng được. Có thể tiếp tục chơi và lưu bằng tài khoản cloud.</small></div>`;
@@ -132,6 +132,8 @@ function onlCardHTML() {
 function onlCardBind() {
   const b = id => document.getElementById(id);
   if (b("onlSyncBtn")) b("onlSyncBtn").onclick = async () => { if (await onlSync(false)) { toast("Đã đồng bộ"); await onlRefreshMe(); renderMore() } };
+  if(b("onlLadderBtn"))b("onlLadderBtn").onclick=()=>onlLadderModal();
+  if(b("onlNoticeBtn"))b("onlNoticeBtn").onclick=()=>onlNoticeModal();
   if (b("onlCodeBtn")) b("onlCodeBtn").onclick = () => { const c = b("onlCode"); if (c) c.hidden = !c.hidden };
   if (b("onlRegBtn")) b("onlRegBtn").onclick = async () => {
     const btn = b("onlRegBtn"); btn.disabled = true;
@@ -149,4 +151,16 @@ if (typeof renderMore === "function") {
     onlCardBind();
     if (onlGet() && !ONL.me) onlRefreshMe().then(me => { if (me && typeof curTab !== "undefined" && curTab === "more") renderMore() });
   };
+}
+
+// Danh sách chỉ tải khi mở; không thêm vòng polling.
+let onlListGeneration=0;
+async function onlLadderModal(bracket){
+ const mode=modeId(),b=bracket||ONL.me?.char?.bracket||'so',generation=++onlListGeneration;
+ modal('<h3>Xếp hạng lực chiến · '+esc(MODES[mode].n)+'</h3><div class="dtabs">'+Object.entries(ONL_BRACKET).map(([k,n])=>'<button data-onl-bracket="'+k+'" class="'+(b===k?'on':'')+'">'+n+'</button>').join('')+'</div><p class="desc">Top 100 theo lực chiến · cùng chế độ và bậc cấp.</p><div id="onlList">Đang tải…</div>',()=>document.querySelectorAll('[data-onl-bracket]').forEach(button=>button.onclick=()=>onlLadderModal(button.dataset.onlBracket)));
+ try{const data=await onlApi('/ladder?mode='+mode+'&b='+b),box=document.getElementById('onlList');if(!box||generation!==onlListGeneration)return;box.innerHTML=data.rows.length?'<div class="rankingTable"><table><thead><tr><th>Hạng</th><th>Nhân vật</th><th>Phái</th><th>Cấp</th><th>Lực chiến</th></tr></thead><tbody>'+data.rows.map(r=>'<tr><td>'+r.rank+'</td><td>'+esc(r.name)+'</td><td>'+esc(FAC[r.fac]?.n||r.fac)+'</td><td>'+r.lvl+'</td><td>'+fmt(r.power)+'</td></tr>').join('')+'</tbody></table></div>':'Chưa có nhân vật online đủ cấp ở bậc này.';}catch(e){const box=document.getElementById('onlList');if(box&&generation===onlListGeneration)box.textContent=e.msg||'Chưa tải được xếp hạng';}
+}
+async function onlNoticeModal(){
+ const mode=modeId(),generation=++onlListGeneration;modal('<h3>Thông báo kiểm định · '+esc(MODES[mode].n)+'</h3><p class="desc">Nhân vật tạm ngừng xếp hạng online. Chi tiết tài khoản của bạn nằm trong Hệ thống → Chơi Online.</p><div id="onlList">Đang tải…</div>');
+ try{const data=await onlApi('/notices?mode='+mode),box=document.getElementById('onlList');if(!box||generation!==onlListGeneration)return;box.innerHTML=data.rows.length?data.rows.map(r=>'<div class="card"><b>'+esc(r.name)+'</b> · cấp '+r.lvl+'<small class="dim">'+r.reasons.map(esc).join(' · ')+'</small></div>').join(''):'Không có thông báo kiểm định ở chế độ này.';}catch(e){const box=document.getElementById('onlList');if(box&&generation===onlListGeneration)box.textContent=e.msg||'Chưa tải được thông báo';}
 }

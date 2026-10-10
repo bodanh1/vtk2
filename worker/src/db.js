@@ -34,6 +34,7 @@ export const SCHEMA = [
   `CREATE UNIQUE INDEX IF NOT EXISTS accounts_name ON accounts(name COLLATE NOCASE)`,
   `CREATE TABLE IF NOT EXISTS chars(
     account_id TEXT PRIMARY KEY,
+    mode TEXT NOT NULL DEFAULT 'ctc',
     fac TEXT,
     sex INTEGER,
     lvl INTEGER NOT NULL DEFAULT 1,
@@ -68,6 +69,7 @@ export const SCHEMA = [
 
 // Cột thêm sau lần phát hành đầu: ALTER chạy riêng, bỏ qua lỗi "duplicate column" khi đã có.
 const COLUMNS = [
+  "ALTER TABLE chars ADD COLUMN mode TEXT NOT NULL DEFAULT 'ctc'",
   "ALTER TABLE chars ADD COLUMN power INTEGER NOT NULL DEFAULT 0",
   "ALTER TABLE chars ADD COLUMN bracket TEXT",
   "ALTER TABLE chars ADD COLUMN flagged INTEGER NOT NULL DEFAULT 0",
@@ -80,10 +82,10 @@ export function ensureSchema(db) {
     ready = db
       .batch(SCHEMA.map((s) => db.prepare(s)))
       .then(async () => {
-        for (const sql of COLUMNS)
-          await db.prepare(sql).run().catch((e) => {
-            if (!/duplicate column/i.test(String(e && e.message))) throw e;
-          });
+        let addedMode=false;
+        for(const sql of COLUMNS){try{await db.prepare(sql).run();if(sql===COLUMNS[0])addedMode=true;}catch(e){if(!/duplicate column/i.test(String(e&&e.message)))throw e;}}
+        if(addedMode)await db.prepare("UPDATE chars SET mode=json_extract(snapshot,'$.mode') WHERE snapshot IS NOT NULL AND json_valid(snapshot) AND json_extract(snapshot,'$.mode') IN ('ctc','phlt','g2') AND mode<>json_extract(snapshot,'$.mode')").run();
+        await db.prepare("CREATE INDEX IF NOT EXISTS chars_mode_ladder ON chars(mode,bracket,flagged,power)").run();
         await db.prepare("CREATE INDEX IF NOT EXISTS chars_ladder ON chars(bracket, flagged, power)").run();
       })
       .catch((e) => {

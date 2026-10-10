@@ -93,14 +93,14 @@ export async function register(req, env, body) {
         "INSERT INTO accounts(id,token_hash,name,created_at,ip_hash,last_hb) VALUES(?1,?2,?3,?4,?5,?4)"
       ).bind(id, await sha256Hex(token), name, now, ih),
       env.DB.prepare(
-        "INSERT INTO chars(account_id,fac,sex,lvl,xp,snapshot,updated_at,sync_n) VALUES(?1,?2,?3,?4,?5,?6,?7,1)"
-      ).bind(id, String(state.fac), state.sex ? 1 : 0, Math.floor(state.lvl), +state.xp || 0, JSON.stringify(state), now),
+        "INSERT INTO chars(account_id,fac,sex,lvl,xp,snapshot,updated_at,sync_n,mode) VALUES(?1,?2,?3,?4,?5,?6,?7,1,?8)"
+      ).bind(id, String(state.fac), state.sex ? 1 : 0, Math.floor(state.lvl), +state.xp || 0, JSON.stringify(state), now,state.mode),
     ]);
   } catch (e) {
     if (/UNIQUE/i.test(String(e && e.message))) throw new HttpError(409, "name_taken", "Tên đã có người dùng");
     throw e;
   }
-  const v = await onlineValidation(env, id, state, 0);
+  const v = await applyValidation(env, id, state, 0);
   return { id, token, name, play_sec: 0, ...v };
 }
 
@@ -145,23 +145,13 @@ export async function sync(req, env, body) {
   )
     .bind(acc.id, String(state.fac), state.sex ? 1 : 0, Math.floor(state.lvl), +state.xp || 0, JSON.stringify(state), now)
     .run();
-  const v = await onlineValidation(env, acc.id, state, +acc.play_sec || 0);
+  const v = await applyValidation(env, acc.id, state, +acc.play_sec || 0);
   return { ok: true, lvl: Math.floor(state.lvl), play_sec: Math.floor(acc.play_sec), ...v };
 }
 
 export async function me(req, env) {
   const acc = await auth(req, env);
-  const ch = await env.DB.prepare("SELECT fac,lvl,updated_at,power,bracket,flagged FROM chars WHERE account_id=?1").bind(acc.id).first();
+  const ch = await env.DB.prepare("SELECT mode,fac,lvl,updated_at,power,bracket,flagged FROM chars WHERE account_id=?1").bind(acc.id).first();
   const fl = await env.DB.prepare("SELECT code,detail,at FROM flags WHERE account_id=?1 AND cleared_at IS NULL ORDER BY at").bind(acc.id).all();
   return { id: acc.id, name: acc.name, created_at: acc.created_at, play_sec: Math.floor(acc.play_sec), char: ch || null, flags: fl.results };
-}
-
-// Các chế độ có đồ Hoàng Kim/Bạch Kim không dùng trần đồ và ngưỡng giờ của PvP CTC.
-async function onlineValidation(env,id,state,playSec){
- if(state.mode==='ctc')return applyValidation(env,id,state,playSec);
- const previous=G.getS();let power;
- try{G.setS(Object.assign(G.newSave(),structuredClone(state)));const p=G.calc();power=Math.round(Math.sqrt(Math.max(1,p.life)*Math.max(1,p.main?.dps||0))*10);if(!Number.isFinite(power))throw new Error('power');}
- catch(e){throw new HttpError(400,'bad_character','Không tính được chỉ số nhân vật');}finally{G.setS(previous);}
- await env.DB.prepare('UPDATE chars SET power=?2,bracket=NULL,flagged=0 WHERE account_id=?1').bind(id,power).run();
- return {power,bracket:null,flagged:false,flags:[]};
 }

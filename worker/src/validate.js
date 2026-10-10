@@ -1,6 +1,7 @@
-// Kiểm định nhân vật Công Thành Chiến bằng chính code của game (worker/gen/game.js).
+// Kiểm định nhân vật theo từng chế độ bằng chính code của game (worker/gen/game.js).
 // Máy chủ không tin chỉ số do client gửi: tự tính lại bằng calc() và soi từng món trang bị.
 import { GAME as G } from "../gen/game.js";
+import {ADMIN_REFERENCE} from "./admin-reference-data.js";
 
 export const BRACKETS = [
   { k: "so", n: "Sơ cấp", lo: 40, hi: 79 },
@@ -40,27 +41,28 @@ for (const a of G.J.affix) {
 const LINE_SCALE_MAX = 1.18; // lineScale() trong loot.js tối đa 1 + 0.18
 const MAG_MAX = 6;
 
-function checkItem(it, slot, flags) {
-  const where = `${slot}: ${String(it && it.n || "?").slice(0, 40)}`;
-  if (!it || typeof it !== "object") return flags.push(["item_bad", where]);
-  if (!G.modeItemOk(it, "ctc")) flags.push(["item_mode", `${where} vượt trần đồ Công Thành Chiến`]);
-  const group = G.J.items[it.d];
-  const row = group && group.list.find((r) => r.k === it.k && r.lvl === it.lvl);
-  if (!row) return flags.push(["item_base", `${where} không có trong dữ liệu game`]);
-  for (const [id, , mx] of it.base || []) {
-    const rb = row.base.find((b) => b[0] === id);
-    if (!rb) flags.push(["item_base", `${where} có chỉ số gốc lạ (${id})`]);
-    else if (Math.abs(mx) > Math.abs(rb[2]) + 0.5) flags.push(["item_base", `${where} chỉ số gốc ${id} = ${mx} > ${rb[2]}`]);
-  }
-  const mag = Array.isArray(it.mag) ? it.mag : [];
-  if (mag.length > MAG_MAX) flags.push(["item_affix", `${where} có ${mag.length} dòng thuộc tính`]);
-  for (const m of mag) {
-    const cap = AFFIX_MAX.get(m && m.a);
-    const v = Math.abs(+(m && m.p && m.p[0]) || 0);
-    if (cap === undefined) flags.push(["item_affix", `${where} có thuộc tính lạ (${m && m.a})`]);
-    else if (v > cap * LINE_SCALE_MAX + 1) flags.push(["item_affix", `${where} thuộc tính ${m.a} = ${v} > ${Math.round(cap * LINE_SCALE_MAX)}`]);
-  }
-  if ((it.enh | 0) > G.ENH_MAX) flags.push(["item_enh", `${where} cường hóa +${it.enh} > +${G.ENH_MAX}`]);
+const SET_BY_ID=new Map();for(const kind of ['gold','platina'])G.J.sets[kind].forEach((row,i)=>{const id=ADMIN_REFERENCE.setIds[kind][i];if(id)SET_BY_ID.set(id,{kind,row});});
+const NORMAL_MAX=new Map();for(const row of G.J.affix)for(let i=0;i<row.p.length;i++)NORMAL_MAX.set(row.a+':'+i,Math.max(NORMAL_MAX.get(row.a+':'+i)||0,...row.p[i].map(Math.abs)));
+const PURPLE_MAX=new Map();for(const row of G.J.affixLevel)for(let i=0;i<row.p.length;i++){const [lo,hi]=row.p[i];PURPLE_MAX.set(row.a+':'+i,Math.max(PURPLE_MAX.get(row.a+':'+i)||0,Math.abs(lo),Math.abs(hi)));}
+function baseFits(it,row){const seen=new Set();return Array.isArray(it.base)&&it.base.every(line=>{if(!Array.isArray(line)||seen.has(line[0]))return false;seen.add(line[0]);const rb=row.base.find(b=>b[0]===line[0]);return rb&&line.slice(1).every(v=>Number.isFinite(v)&&Math.abs(v)<=Math.max(Math.abs(rb[1]),Math.abs(rb[2]))+.5);});}
+function setLinesFit(lines,indices){if(!Array.isArray(lines)||lines.length>indices.length)return false;const allowed=indices.map(i=>G.J.ge[i]).filter(Boolean),used=new Set();return lines.every(m=>{const i=allowed.findIndex((r,n)=>!used.has(n)&&r.a===m.a&&Array.isArray(m.p)&&m.p.every((v,j)=>Number.isFinite(v)&&r.p[j]&&Math.abs(v)<=Math.max(...r.p[j].map(Math.abs))+.5));if(i<0)return false;used.add(i);return true;});}
+function checkItem(it,slot,flags,mode){
+ const where=slot+': '+String(it?.n||'?').slice(0,40);
+ if(!it||typeof it!=='object')return flags.push(['item_bad',where]);
+ if(!G.modeItemOk(it,mode))flags.push(['item_mode',where+' vượt trần đồ '+G.MODES[mode].n]);
+ if(!Number.isInteger(it.enh||0)||(it.enh||0)<0||(it.enh||0)>G.ENH_MAX||!Number.isInteger(it.plv||0)||(it.plv||0)<0||(it.plv||0)>10||it.plv&&it.set?.kind!=='platina')flags.push(['item_enh',where+' vượt giới hạn cường hóa']);
+ if(it.set){
+  const kind=it.set.kind,found=it.refId?SET_BY_ID.get(it.refId):null;
+  const rows=found?(found.kind===kind?[found.row]:[]):(G.J.sets[kind]||[]);
+  const matches=rows.filter(r=>r.d===it.d&&r.k===it.k&&r.lvl===it.lvl&&r.s===it.s&&r.grp===it.set.grp&&r.sid===it.set.sid);
+  if(!matches.length||!matches.some(r=>baseFits(it,r)&&(r.n1||99)===it.set.n1&&(r.n2||99)===it.set.n2))flags.push(['item_base',where+' không khớp mẫu đồ bộ']);
+  if(!matches.some(r=>setLinesFit(it.mag||[],r.mag)&&setLinesFit(it.ext||[],r.ext)))flags.push(['item_affix',where+' thuộc tính không khớp đồ bộ']);
+  return;
+ }
+ const rows=(G.J.items[it.d]?.list||[]).filter(r=>r.k===it.k&&r.lvl===it.lvl&&(!Number.isInteger(it.p)||r.p===it.p));
+ if(!rows.length||!rows.some(r=>baseFits(it,r)))flags.push(['item_base',where+' không khớp chỉ số gốc']);
+ const mag=Array.isArray(it.mag)?it.mag:[];if(mag.length>MAG_MAX)flags.push(['item_affix',where+' quá 6 dòng']);
+ for(const m of mag){if(!m||!Array.isArray(m.p)||m.p.some((v,i)=>{const cap=it.vio?PURPLE_MAX.get(m.a+':'+i):i===0?AFFIX_MAX.get(m.a):NORMAL_MAX.get(m.a+':'+i);return !Number.isFinite(v)||cap===undefined||Math.abs(v)>cap*(i===0&&!it.vio?LINE_SCALE_MAX:1)+1;}))flags.push(['item_affix',where+' thuộc tính ngoài giới hạn']);}
 }
 
 /* ---- Toàn bộ nhân vật ---- */
@@ -81,8 +83,9 @@ export function attrBudget(state, playSec) {
 // Trả về { flags: [[code, detail]], power, bracket, P } . playSec: giờ chơi máy chủ đã đo (null với khách).
 export function validateChar(state, playSec, mode="ctc") {
   const flags = [];
-  const lvl = Math.floor(state.lvl);
-  for (const [slot, it] of Object.entries(state.eq || {})) if (it) checkItem(it, slot, flags);
+  mode=G.isMode(mode)?mode:'ctc';
+  const lvl = Math.floor(state.lvl),reborn=Math.max(0,Math.min(10,Math.floor(state.rw?.stat?.reborn||0)));
+  for (const [slot, it] of Object.entries(state.eq || {})) if (it) checkItem(it, slot, flags,mode);
 
   const attr = state.attr || {};
   const attrUsed = ["str", "dex", "vit", "eng"].reduce((s, k) => s + Math.max(0, +attr[k] || 0), 0) + Math.max(0, +state.attrPts || 0);
@@ -96,14 +99,15 @@ export function validateChar(state, playSec, mode="ctc") {
     if (!sk) flags.push(["skill", `Kỹ năng lạ (${id})`]);
     else if (lv > (sk.max || 20) + 5) flags.push(["skill", `${sk.n} cấp ${lv} > ${sk.max}`]);
   }
-  const skMax = (lvl - 1) * G.SKILL_PTS_PER_LEVEL + 1 + SKILL_SLACK;
+  const skMax = ((lvl - 1)+reborn*(G.MAX_LEVEL-1)) * G.SKILL_PTS_PER_LEVEL + 1 + SKILL_SLACK;
   if (skUsed > skMax) flags.push(["skill_points", `Điểm kỹ năng ${skUsed} > ${skMax}`]);
 
-  if (playSec != null && lvl > levelCapForTime(playSec))
-    flags.push(["level_time", `Cấp ${lvl} sau ${(playSec / 3600).toFixed(1)} giờ chơi (tối đa ${levelCapForTime(playSec)})`]);
+  const timeMultiplier=Math.max(1,G.MODES[mode].expMul)*(1+.2*reborn)*(mode==='g2'?2:1);
+  if (playSec != null && !G.MODES[mode].admin && lvl > levelCapForTime(playSec*timeMultiplier))
+    flags.push(["level_time", `Cấp ${lvl} sau ${(playSec / 3600).toFixed(1)} giờ chơi (tối đa ${levelCapForTime(playSec*timeMultiplier)})`]);
 
   // Chỉ số do máy chủ tự tính.
-  let P = null, power = 0;
+  let P = null, power = 0;const previous=G.getS();
   try {
     // Bổ sung trường thiếu bằng giá trị mặc định (migrate() của game cần cả code giao diện).
     const s = Object.assign(G.newSave(), JSON.parse(JSON.stringify(state)));
@@ -112,9 +116,10 @@ export function validateChar(state, playSec, mode="ctc") {
     P = G.calc();
     const dps = (P.main && P.main.dps) || 0;
     power = Math.round(Math.sqrt(Math.max(1, P.life) * Math.max(1, dps)) * 10);
+    if(!Number.isFinite(power))throw new Error("Invalid power");
   } catch (e) {
-    flags.push(["calc", "Không tính được chỉ số nhân vật"]);
-  }
+    flags.push(["calc", "Không tính được chỉ số nhân vật"]);power=0;
+  }finally{G.setS(previous);}
   return { flags, power, bracket: bracketOf(lvl), P };
 }
 
