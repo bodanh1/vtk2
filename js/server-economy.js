@@ -5,21 +5,23 @@ function serverEconomy(){if(CLOUD.economyVersion===1||CLOUD.meta?.economyVersion
 const ECON_SETTINGS=['speed','diff','push','stage','autoEquip','autoJunk','autoBuy','autoPts','autoSk','autoForge','lootF','lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt','autoMovePaused','idleGoal','forgeLoot'];
 function economyControls(){const c={};if(!S?.fac)return c;for(const k of ECON_SETTINGS)if(S[k]!==undefined)c[k]=JSON.parse(JSON.stringify(S[k]));c.attr=S.attr;c.sk=S.sk;c.locks=[...S.inv,...Object.values(S.eq)].filter(Boolean).map(it=>[it.uid,!!it.locked]);c.running=!R.town&&!S.autoMovePaused;return c;}
 function economyPreserveLocks(current,sent,preserve){const prior=new Map(sent.locks||[]);const changed=(current.locks||[]).filter(([id,locked])=>prior.has(id)&&prior.get(id)!==locked);return changed.length?{...preserve,locks:changed}:preserve;}
+function economyCache(fn){try{fn();}catch(e){if(!['QuotaExceededError','SecurityError','NS_ERROR_DOM_QUOTA_REACHED'].includes(e.name))throw e;CLOUD.cacheError=true;}}
+function economySavedStatus(text){cloudStatus(CLOUD.cacheError?text+' · Bộ nhớ máy đầy hoặc bị chặn; dữ liệu tài khoản đã lưu trên server':text);}
 function economyApply(r,preserve=null){
- if(!r.patch)return;ECON.version=r.patch.version;ECON.applying=true;
+ if(!r.patch)return;ECON.version=r.patch.version;ECON.applying=true;CLOUD.cacheError=false;
  try{
   const oldRuntime=JSON.stringify([R.tower&&[R.tower.kind,R.tower.floor],R.tk?.wave,S?.siege?.layer]);
-  for(const {slot,state}of r.patch.slots){if(!state){localStorage.removeItem(slotKey(slot));continue;}const copy=state;if(slot===SLOT&&S?.fac){const sound=S.snd;S=copy;if(sound)S.snd=sound;
+  for(const {slot,state}of r.patch.slots){if(!state){economyCache(()=>localStorage.removeItem(slotKey(slot)));continue;}const copy=state;if(slot===SLOT&&S?.fac){const sound=S.snd;S=copy;if(sound)S.snd=sound;
     if(preserve)for(const k of ECON_SETTINGS)if(preserve[k]!==undefined)S[k]=preserve[k];
     if(preserve?.locks)for(const [id,locked]of preserve.locks){const it=S.inv.find(it=>it.uid===id)||Object.values(S.eq).find(it=>it?.uid===id);if(it)it.locked=locked;}
-   }const key=slotKey(slot),raw=pack(slot===SLOT&&S?.fac?S:copy);if(localStorage.getItem(key)!==raw){localStorage.setItem(key,raw);sealWrite(slot,state.mode);}}
-  for(const [key,state]of Object.entries(r.patch.shared||{}))if(CLOUD_SHARED.includes(key)){const raw=pack(state);if(localStorage.getItem(key)!==raw)localStorage.setItem(key,raw);}
+   }const key=slotKey(slot),raw=pack(slot===SLOT&&S?.fac?S:copy);economyCache(()=>{if(localStorage.getItem(key)!==raw){localStorage.setItem(key,raw);sealWrite(slot,state.mode);}});}
+  for(const [key,state]of Object.entries(r.patch.shared||{}))if(CLOUD_SHARED.includes(key)){const raw=pack(state);economyCache(()=>{if(localStorage.getItem(key)!==raw)localStorage.setItem(key,raw);});}
   if(r.patch.activeSlot===SLOT){R.tower=r.patch.runtime?.tower||null;R.tk=r.patch.runtime?.tk||null;}
   const newRuntime=JSON.stringify([R.tower&&[R.tower.kind,R.tower.floor],R.tk?.wave,S?.siege?.layer]);
   if(oldRuntime!==newRuntime){R.enemies=[];R.corpses=[];R.spawnT=.5;R.stall=0;R.zoneShown=null;}
   collectionsCache=null;CLOUD.revision=r.revision;CLOUD.lastSaved=r.updatedAt;CLOUD.lastLeaseAt=Date.now();
   if(S?.fac){restoreGround();invDirty=true;R.dirty=true;recalc();updateTop();if(r.reward?.xp>0&&typeof log==='function')log('Luyện công: +'+Math.floor(r.reward.xp).toLocaleString('vi-VN')+' EXP (server)');}
-  cloudSaveBinding('');CLOUD.marketPending=!!r.marketPending;
+  economyCache(()=>cloudSaveBinding(''));CLOUD.marketPending=!!r.marketPending;if(CLOUD.cacheError)economySavedStatus('Đã lưu trên server');
  }finally{ECON.applying=false;}
 }
 function economyPayload(){return {clientId:cloudClientId,revision:CLOUD.revision,requestId:crypto.randomUUID(),slot:S?.fac?SLOT:null,controls:economyControls(),characters:Array.from({length:3},(_,slot)=>slot===SLOT&&S?.fac?{fac:S.fac,mode:S.mode,name:S.name,sex:S.sex,cid:S.cid}:null)};}
@@ -31,7 +33,7 @@ async function economyRecoverCheckpoint(){
  const claimed=await cloudClaim(),remote=await cloudApi('load');
  if(remote.checkpoint&&remote.bundle)remote.patch={...remote.checkpoint,slots:remote.bundle.slots.map((state,slot)=>({slot,state})),shared:remote.bundle.shared};
  if(CLOUD.user?.id!==owner||SLOT!==slot||S?.cid!==cid||remote.revision!==claimed.revision||remote.patch?.slots.find(x=>x.slot===slot)?.state?.cid!==cid)throw Object.assign(new Error('Tiến trình đã đổi; chọn lại nhân vật trên tài khoản'),{code:'save_conflict'});
- economyApply(remote);CLOUD.paused=false;CLOUD.pauseReason=null;closeModal();refresh();cloudStatus('Đã nối lại đồng bộ · EXP do server xác nhận');return true;
+ economyApply(remote);CLOUD.paused=false;CLOUD.pauseReason=null;closeModal();refresh();economySavedStatus('Đã nối lại đồng bộ · EXP do server xác nhận');return true;
 }
 const economyOriginalSync=cloudSync;
 cloudSync=async function(force=false){
@@ -46,7 +48,7 @@ cloudSync=async function(force=false){
   const r=await cloudApi('save',payload),current=economyControls();
   // Preserve cosmetic/filter changes made while waiting. Allocations are confirmed by the next save.
   const preserve=JSON.stringify(current)===sentControls?null:Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));
-  economyApply(r,economyPreserveLocks(current,payload.controls,preserve));if(preserve&&S?.fac)economyPendingPoints(current,payload.controls);cloudStatus('Đã lưu · tiền và đồ do server quản lý');return true;
+  economyApply(r,economyPreserveLocks(current,payload.controls,preserve));if(preserve&&S?.fac)economyPendingPoints(current,payload.controls);economySavedStatus('Đã lưu · tiền và đồ do server quản lý');return true;
  }catch(e){if(e.code==='save_conflict'){try{return await economyRecoverCheckpoint()}catch(recovery){e=recovery}}cloudFail(e);toast('Chưa đồng bộ EXP: '+e.message);return false;}finally{CLOUD.busy=false;}
 };
 function economyAction(action,args=[],after){

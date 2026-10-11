@@ -9,3 +9,30 @@ test('passive conflict recovers the trusted checkpoint without replaying a trans
 test('checkpoint recovery refuses another character and cannot take over another device',async()=>{const {context:c}=setup();let claimedArgs;c.cloudClaim=async(...args)=>{claimedArgs=args;return {revision:2}};c.cloudApi=async()=>({revision:2,patch:{slots:[{slot:0,state:{cid:'another-char',xp:999}}]}});await assert.rejects(c.economyRecoverCheckpoint(),e=>e.code==='save_conflict');assert.equal(c.S.cid,'char');assert.deepEqual(claimedArgs,[]);c.cloudClaim=async()=>{throw Object.assign(Error('another device'),{code:'device_busy'})};await assert.rejects(c.economyRecoverCheckpoint(),e=>e.code==='device_busy');assert.equal(c.CLOUD.revision,1);});
 test('already paused stale checkpoint reconnects without submitting an economic action',async()=>{const{context:c}=setup();c.CLOUD.paused=true;c.CLOUD.pauseReason='save_conflict';let requests=[];c.cloudClaim=async()=>({revision:2});c.cloudApi=async path=>{requests.push(path);return {revision:2,updatedAt:Date.now(),checkpoint:{version:1,activeSlot:0,runtime:null},bundle:{slots:[structuredClone(c.S),null,null],shared:{}}}};assert.equal(await c.cloudSync(true),true);assert.equal(c.CLOUD.paused,false);assert.deepEqual(requests,['load']);c.CLOUD.paused=true;c.CLOUD.pauseReason='device_busy';assert.equal(await c.cloudSync(true),false);assert.deepEqual(requests,['load']);});
 test('transaction conflict recovers checkpoint once and never replays the transaction',async()=>{const{context:c}=setup();let actions=0,loads=0;c.cloudClaim=async()=>({revision:2});c.cloudApi=async path=>{if(path==='economy/action'){actions++;throw Object.assign(Error('stale'),{code:'save_conflict'})}assert.equal(path,'load');loads++;const state=structuredClone(c.S);state.knb=98;return {revision:2,updatedAt:Date.now(),checkpoint:{version:1,activeSlot:0,runtime:null},bundle:{slots:[state,null,null],shared:{}}}};c.economyAction('buyTienThaoLo');await vm.runInContext('ECON.chain',c);assert.equal(actions,1);assert.equal(loads,1);assert.equal(c.CLOUD.paused,false);assert.equal(c.S.knb,98);});
+
+test('full local cache cannot reject committed XP or leave the next save on an old revision',async()=>{
+ const {context:c,counts}=setup();let calls=0,status='';
+ c.localStorage.setItem=()=>{throw Object.assign(Error('The quota has been exceeded'),{name:'QuotaExceededError'})};
+ c.cloudSaveBinding=()=>c.localStorage.setItem('binding','saved');c.cloudStatus=s=>status=s;
+ c.cloudApi=async(path,payload)=>{assert.equal(path,'save');assert.equal(payload.revision,1+calls);calls++;const state=structuredClone(c.S);state.xp=calls*123;return {revision:1+calls,updatedAt:Date.now(),patch:{version:1,activeSlot:0,slots:[{slot:0,state}],shared:{jxidle_guild:{lv:1}}}}};
+ assert.equal(await c.cloudSync(),true);assert.equal(c.S.xp,123);assert.equal(c.CLOUD.revision,2);assert.equal(c.CLOUD.cacheError,true);assert.match(status,/đã lưu trên server/);
+ assert.equal(await c.cloudSync(),true);assert.equal(c.S.xp,246);assert.equal(c.CLOUD.revision,3);assert.equal(counts.recalc,2);assert.equal(c.CLOUD.busy,false);
+});
+test('blocked binding storage is reported separately and clears after storage recovers',()=>{
+ const {context:c}=setup();const state=structuredClone(c.S);state.xp=99;c.response={revision:2,updatedAt:Date.now(),patch:{version:1,slots:[{slot:0,state}],shared:{}}};
+ c.cloudSaveBinding=()=>{throw Object.assign(Error('Access denied'),{name:'SecurityError'})};
+ vm.runInContext('economyApply(response)',c);assert.equal(c.S.xp,99);assert.equal(c.CLOUD.revision,2);assert.equal(c.CLOUD.cacheError,true);
+ c.cloudSaveBinding=()=>{};vm.runInContext('economyApply(response)',c);assert.equal(c.CLOUD.cacheError,false);
+ c.recalc=()=>{throw Error('unrelated calculation error')};assert.throws(()=>vm.runInContext('economyApply(response)',c),/unrelated calculation error/);
+});
+test('browser without randomUUID sends both XP saves and economic actions with unique valid IDs',async()=>{
+ const {context:c}=setup();c.crypto={getRandomValues:a=>crypto.getRandomValues(a)};c.Uint8Array=Uint8Array;
+ assert.throws(()=>vm.runInContext('economyPayload()',c),/randomUUID/);
+ vm.runInContext(fs.readFileSync(new URL('../../js/runtime-compat.js',import.meta.url),'utf8'),c);
+ const ids=[];c.cloudApi=async(path,payload)=>{ids.push(payload.requestId);const state=structuredClone(c.S);state.xp=50;return {revision:c.CLOUD.revision+1,updatedAt:Date.now(),patch:{version:1,activeSlot:0,slots:[{slot:0,state}],shared:{}}}};
+ assert.equal(await c.cloudSync(),true);c.economyAction('buyTienThaoLo',[],()=>{});await vm.runInContext('ECON.chain',c);
+ assert.equal(c.S.xp,50);assert.equal(c.CLOUD.revision,3);assert.equal(ids.length,2);assert.notEqual(ids[0],ids[1]);
+ for(const id of ids)assert.match(id,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+ const native=c.crypto.randomUUID;vm.runInContext(fs.readFileSync(new URL('../../js/runtime-compat.js',import.meta.url),'utf8'),c);assert.equal(c.crypto.randomUUID,native);
+ const html=fs.readFileSync(new URL('../../index.html',import.meta.url),'utf8');assert.ok(html.indexOf('js/runtime-compat.js')<html.indexOf('js/player-presence.js'));
+});
