@@ -11,7 +11,7 @@ test('Tang Mon Tu Tien can mount through the actual UI and use native mounted at
  for(const id of [58,302]){assert.equal(c.prepareSkillAttack(s,{id}),true);assert.equal(s.mounted,true)}
  assert.equal(c.prepareSkillAttack(s,{id:54}),true);assert.equal(s.mounted,false);
  button.onclick();assert.equal(s.mounted,true);button.onclick();assert.equal(s.mounted,false);
- for(const code of [100,101]){s.eq.weapon=weapon(code);s.mounted=true;assert.equal(c.prepareSkillAttack(s,{id:302}),false);assert.equal(s.mounted,true)}
+ for(const code of [100,101,-1]){s.eq.weapon=weapon(code);s.mounted=true;assert.equal(c.prepareSkillAttack(s,{id:302}),false);assert.equal(s.mounted,false);button.onclick();assert.equal(s.mounted,false);s.mounted=true;c.refreshMountButton();assert.equal(s.mounted,false)}
  s.mounted=false;delete s.eq.horse;button.onclick();assert.equal(s.mounted,false);
 });
 test('wrong weapon and unknown skill cannot be cast; horse-only semantics require mounted state',()=>{const s=state('shaolin',3);assert.equal(context.prepareSkillAttack(s,{id:19}),false);assert.equal(s.mounted,true);assert.equal(context.prepareSkillAttack(s,{id:999999}),false);const previous=context.window.JMOUNTSKILL[19];context.window.JMOUNTSKILL[19]=[2,1];s.eq.weapon=weapon(1);s.mounted=false;assert.equal(context.prepareSkillAttack(s,{id:19}),false);s.mounted=true;assert.equal(context.prepareSkillAttack(s,{id:19}),true);delete s.eq.horse;assert.equal(context.prepareSkillAttack(s,{id:19}),false);context.window.JMOUNTSKILL[19]=previous;});

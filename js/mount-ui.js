@@ -3,6 +3,7 @@ function toggleMount(){
   if(!S||!S.fac)return;
   if(S.mounted){S.mounted=false;toast('Đã xuống ngựa')}
   else{
+    if(!mountFactionAllowed(S)){toast('Đường Môn chỉ được cưỡi ngựa khi cầm Tụ Tiễn');return}
     if(!mountEquipped(S)){toast('Trang bị một con ngựa trong Hành trang trước');return}
     if(typeof reqOk==='function'&&!reqOk(S.eq.horse)){toast('Chưa đủ điều kiện cưỡi ngựa này');return}
     if(R.deadT>0||R.life<=0){toast('Chờ hồi sinh để lên ngựa');return}
@@ -13,7 +14,7 @@ function toggleMount(){
 }
 function refreshMountButton(){
   if(typeof S==='undefined'||!S)return;
-  if(S.mounted&&(!mountEquipped(S)||!reqOk(S.eq.horse)||R.deadT>0))S.mounted=false;
+  if(S.mounted&&(!mountFactionAllowed(S)||!mountEquipped(S)||!reqOk(S.eq.horse)||R.deadT>0))S.mounted=false;
   if(S.mounted&&typeof clientRideWarm==='function')clientRideWarm(S);
   const b=document.getElementById('jxMount');if(!b)return;
   b.classList.toggle('on',!!S.mounted);b.setAttribute('aria-pressed',String(!!S.mounted));
