@@ -61,6 +61,7 @@ function econFarm(seconds,meta,offline){
  const effective=seconds*speed*(offline?.75:1),work=(meta.fraction||0)+effective*kps,kills=Math.floor(work);meta.fraction=work-kills;
  modeClock(effective);ytTick('train',effective);
  if(!kills)return {kills:0};
+ const xpBefore=S.xp,levelBefore=S.lvl;
  const lvDiff=L-S.lvl,mult=lvDiff<-10?.2:lvDiff<-5?.6:1;
  const phase=meta.killPhase||0,bosses=bossStage?Math.floor((phase+kills)/24)-Math.floor(phase/24):0,elites=Math.max(0,Math.floor((phase+kills)/6)-Math.floor(phase/6)-bosses),normals=kills-elites-bosses;meta.killPhase=(phase+kills)%24;
  gainXp(expFor(L)*(normals+elites*CLS.elite.xp+bosses*CLS.boss.xp*ctcBossXp({cls:'boss'}))*mult*diffOf().rew*(typeof tienThaoMul==='function'?tienThaoMul():S.tienThaoUntil>gameNow()?2:1));
@@ -79,7 +80,7 @@ function econFarm(seconds,meta,offline){
  autoEquipAll();sweepJunk();autoBuyWeapon();autoForge();
  const waves=Math.floor(((meta.waveKills||0)+kills)/24);meta.waveKills=((meta.waveKills||0)+kills)%24;
  if(S.push&&waves){const target=Math.min(STAGE_CAP,S.stage+waves);while(S.stage<target&&stageLevel(S.stage+1)<=S.lvl+STAGE_GATE){S.stage++;S.maxStage=Math.max(S.maxStage,S.stage);questTick('stages');}}
- achCheck();return {kills,gold};
+ achCheck();let xp=S.xp-xpBefore;for(let level=levelBefore;level<S.lvl;level++)xp+=expNeed(level);return {kills,gold,xp};
 }
 function econActivity(seconds,meta){
  if(!(R.tower||R.tk||S.siege))return;

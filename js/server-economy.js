@@ -18,13 +18,21 @@ function economyApply(r,preserve=null){
   const newRuntime=JSON.stringify([R.tower&&[R.tower.kind,R.tower.floor],R.tk?.wave,S?.siege?.layer]);
   if(oldRuntime!==newRuntime){R.enemies=[];R.corpses=[];R.spawnT=.5;R.stall=0;R.zoneShown=null;}
   collectionsCache=null;CLOUD.revision=r.revision;CLOUD.lastSaved=r.updatedAt;CLOUD.lastLeaseAt=Date.now();
-  if(S?.fac){restoreGround();invDirty=true;R.dirty=true;recalc();updateTop();}
+  if(S?.fac){restoreGround();invDirty=true;R.dirty=true;recalc();updateTop();if(r.reward?.xp>0&&typeof log==='function')log('Luyện công: +'+Math.floor(r.reward.xp).toLocaleString('vi-VN')+' EXP (server)');}
   cloudSaveBinding('');CLOUD.marketPending=!!r.marketPending;
  }finally{ECON.applying=false;}
 }
 function economyPayload(){return {clientId:cloudClientId,revision:CLOUD.revision,requestId:crypto.randomUUID(),slot:S?.fac?SLOT:null,controls:economyControls(),characters:Array.from({length:3},(_,slot)=>slot===SLOT&&S?.fac?{fac:S.fac,mode:S.mode,name:S.name,sex:S.sex,cid:S.cid}:null)};}
 const economyOriginalCloudApi=cloudApi;
 cloudApi=async function(path,body){const r=await economyOriginalCloudApi(path,body);if(r.economyVersion!==undefined)ECON.version=r.economyVersion;return r;};
+async function economyRecoverCheckpoint(){
+ const owner=CLOUD.user?.id,slot=SLOT,cid=S?.cid;
+ // No takeover or action replay: only this device's trusted latest checkpoint.
+ const claimed=await cloudClaim(),remote=await cloudApi('load');
+ if(remote.checkpoint&&remote.bundle)remote.patch={...remote.checkpoint,slots:remote.bundle.slots.map((state,slot)=>({slot,state})),shared:remote.bundle.shared};
+ if(CLOUD.user?.id!==owner||SLOT!==slot||S?.cid!==cid||remote.revision!==claimed.revision||remote.patch?.slots.find(x=>x.slot===slot)?.state?.cid!==cid)throw Object.assign(new Error('Tiến trình đã đổi; chọn lại nhân vật trên tài khoản'),{code:'save_conflict'});
+ economyApply(remote);CLOUD.paused=false;cloudStatus('Đã nối lại đồng bộ · EXP do server xác nhận');return true;
+}
 const economyOriginalSync=cloudSync;
 cloudSync=async function(force=false){
  if(!serverEconomy())return economyOriginalSync(force);
@@ -37,7 +45,7 @@ cloudSync=async function(force=false){
   // Preserve cosmetic/filter changes made while waiting. Allocations are confirmed by the next save.
   const preserve=JSON.stringify(current)===sentControls?null:Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));
   economyApply(r,economyPreserveLocks(current,payload.controls,preserve));if(preserve&&S?.fac)economyPendingPoints(current,payload.controls);cloudStatus('Đã lưu · tiền và đồ do server quản lý');return true;
- }catch(e){cloudFail(e);return false;}finally{CLOUD.busy=false;}
+ }catch(e){if(e.code==='save_conflict'){try{return await economyRecoverCheckpoint()}catch(recovery){e=recovery}}cloudFail(e);toast('Chưa đồng bộ EXP: '+e.message);return false;}finally{CLOUD.busy=false;}
 };
 function economyAction(action,args=[],after){
  if(!serverEconomy())return false;

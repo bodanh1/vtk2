@@ -49,3 +49,9 @@ Công thức hiện tại trong `rdata.js` là công thức cộng đồng: hai 
 - Browser automatic junk sweeps are disabled for authoritative accounts. In-flight lock changes survive responses for items still owned.
 - Account selection no longer parses local slots when a cloud save exists. Raw local archives preserve malformed bytes without allowing them to replace trusted server data. Storage write failure still blocks installation and keeps the old data.
 - No schema changes, polling, extra database writes, or added asset downloads.
+
+### v105: XP visibility and passive checkpoint recovery
+- Passive saves with stale revisions recover the trusted current checkpoint only after a non-takeover device claim. Account, character, slot and revision must still match; transactions are never replayed.
+- Failed synchronization explicitly reports that EXP has not synchronized. Farming responses include the actual XP gain, including level transitions, and the browser logs it once per checkpoint. HUD XP uses two decimals.
+- Cloud load adds only checkpoint runtime metadata, reusing its existing bundle rather than sending items twice. Recovery adds requests only on conflicts.
+- Public ranking investigation: Nhóc, g2, Tian Ren, level 92. Native reproduction at level 92 receives XP; a private character's map/lease state is not inferred from ranking data.
