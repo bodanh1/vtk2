@@ -12,7 +12,7 @@ const OUT = path.join(ROOT, "worker/gen/game.js");
 
 // Đúng thứ tự trong index.html. Chỉ những file calc() và kiểm định cần.
 const FILES = [
-  "js/game-clock.js", "data.js", "world.js", "js/ge_patch.js", "js/core.js", "js/modes.js", "js/mount-skill-data.js", "js/mount-rules.js", "js/stats.js", "js/loot.js",
+  "js/game-clock.js", "data.js", "world.js", "js/ge_patch.js", "js/core.js", "js/modes.js", "js/mount-skill-data.js", "js/mount-rules.js", "js/stats.js", "js/equipment-requirements.js", "js/loot.js",
   "js/sets.js", "js/combat.js", "js/save.js", "js/rewards.js", "js/depth.js", "rdata.js", "ref.js", "js/mask-data.js", "js/gear_policy.js", "js/recipes.js", "js/builds.js", "js/ui.js", "js/shop.js", "js/forge.js", "js/auto.js", "js/activities.js", "js/modes_play.js", "js/horse-shop-data.js", "js/siege.js", "js/jianghu-expansion.js", "js/idle-systems.js",
 ];
 // File chỉ chứa một object dữ liệu lớn: nhúng dạng chuỗi JSON (JSON.parse nhanh hơn literal JS).
@@ -21,7 +21,7 @@ const DATA = { "data.js": "JX", "world.js": "JW", "ref.js":"REF", "js/mask-data.
 // Những gì module trả về cho máy chủ.
 const EXPORTS = [
   "calc", "newSave", "makeItem", "modeItemOk", "itemPower", "baseRow", "lineScale", "reqOk", "isMode",
-  "expNeed", "xpSlow", "J", "FAC", "SK", "MAX_LEVEL", "PTS_PER_LEVEL", "SKILL_PTS_PER_LEVEL", "ENH_MAX",
+  "expNeed", "xpSlow", "reqProblems", "reqDeficit", "equipmentRequirementAttrs", "preferredWeaponCode", "preferredWeaponItem", "J", "FAC", "SK", "MAX_LEVEL", "PTS_PER_LEVEL", "SKILL_PTS_PER_LEVEL", "ENH_MAX",
   "LV_MS", "ACH", "LOGIN30", "MODES", "makeSetItem", "dexSet", "setTemplateValues", "DEAD_AFFIX", "INV_MAX",
 ];
 

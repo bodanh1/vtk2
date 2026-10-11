@@ -112,7 +112,7 @@ function econExecute(name,args,meta){
  case 'discardItem':{const item=it(0,true);if(item.locked)throw new Error('Mở khóa món đồ trước khi vứt');return discardItem(item);}
  case 'sellUnmatched':return sellUnmatched();
  case 'clearInventory':return clearInventory();
- case 'equip':{const item=it(0,true);if(!reqOk(item))throw new Error('Chưa đủ điều kiện trang bị');equip(item,true);break;}
+ case 'equip':{const item=it(0);if(!S.inv.includes(item)&&!Object.values(S.eq).includes(item))throw new Error('Món đồ không còn trong hành trang');if(!reqOk(item))throw new Error('Chưa mặc được: '+reqProblems(item).join('; '));if(!Object.values(S.eq).includes(item))equip(item,false);if(!Object.values(S.eq).includes(item))throw new Error('Không tìm được ô trang bị phù hợp');return {ok:true,msg:'Đã trang bị '+item.n};}
  case 'unequip':if(!SLOTS.some(x=>x[0]===args[0]))throw new Error('Ô trang bị không hợp lệ');unequip(args[0]);break;
  case 'lock':{const item=it();item.locked=!!args[1];break;}
  case 'autoEquipAll':autoEquipAll(true);break;
