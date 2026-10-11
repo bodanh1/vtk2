@@ -9,7 +9,7 @@ function clientActivityBoss(enemy,run){
  enemy.clientAnimKey=boss.key;enemy.animKey=boss.key;return enemy;
 }
 function clientBuffList(){
- if(R.clientBuffs)return R.clientBuffs;
+ if(R.clientBuffs&&R.clientBuffFac===S.fac&&R.clientBuffSkills===S.sk)return R.clientBuffs;R.clientBuffFac=S.fac;R.clientBuffSkills=S.sk;
  const grouped={Foot:[],Body:[],Head:[]},wc=weaponCode(S.eq);
  for(const id of FAC[S.fac]?.skills||[]){const s=SK[id],fx=CLIENT_ACTIVITY.buffs[id];
   if(!fx||!S.sk[id]||!s||isAttack(s)||isCurse(s))continue;
