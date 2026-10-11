@@ -6,11 +6,12 @@ const engine=G.economyEngine,DAY=86400000,MAX_OFFLINE=8*3600,DAY_OFFLINE=12*3600
 const fail=(code,msg,status=400)=>{throw new HttpError(status,code,msg);};
 const stmt=(db,q,...args)=>db.prepare(q).bind(...args);
 export const economyEnabled=env=>env.SERVER_ECONOMY_ENABLED==='1';
-export async function economyMeta(db,id){const row=await stmt(db,'SELECT meta_json FROM economy_states WHERE account_id=?1',id).first();return row?JSON.parse(row.meta_json):null;}
+export async function economyMeta(db,id,env){if(env&&!economyEnabled(env))return null;const row=await stmt(db,'SELECT meta_json FROM economy_states WHERE account_id=?1',id).first();return row?JSON.parse(row.meta_json):null;}
 export function economyPatch(bundle,meta){return {slots:bundle.slots.map((state,slot)=>({slot,state})),shared:bundle.shared,activeSlot:meta.activeSlot,runtime:meta.runtime||null,version:1};}
 function identify(bundle){for(const s of bundle.slots)if(s){checkStateSecurity(s);const items=[...(s.inv||[]),...(s.forgeVault||[]),...(s.stable||[]),...Object.values(s.eq||{}),...(s.ground||[]).map(r=>r.it)].filter(Boolean);for(const it of items)if(!it.eid)it.eid=crypto.randomUUID();}for(const [key,st]of Object.entries(bundle.shared||{}))if(key.startsWith('jxidle_stash')){checkStateSecurity(st);for(const it of st.items||[])if(!it.eid)it.eid=crypto.randomUUID();}}
 export async function ensureEconomy(env,acc){
- let meta=await economyMeta(env.DB,acc.id);if(meta||!economyEnabled(env))return meta;
+ if(!economyEnabled(env))return null;
+ let meta=await economyMeta(env.DB,acc.id);if(meta)return meta;
  const row=await stmt(env.DB,'SELECT * FROM cloud_saves WHERE account_id=?1',acc.id).first(),now=Date.now();
  if(!row)fail('no_save','Chưa có tài khoản lưu');
  // This is a one-time baseline, read from D1. A client upload cannot choose it.

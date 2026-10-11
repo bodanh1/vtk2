@@ -53,3 +53,27 @@ test('equip succeeds if elapsed automation has already equipped the requested ow
  await route(env,'save',{clientId:device,revision:1,bundle:b},a.cookie);env.SERVER_ECONOMY_ENABLED='1';await route(env,'me',{},a.cookie,'GET');const meta=JSON.parse(sql.prepare('SELECT meta_json FROM economy_states').get().meta_json);meta.running=true;meta.settledAt=Date.now()-30000;sql.prepare('UPDATE economy_states SET meta_json=?').run(JSON.stringify(meta));
  const r=await route(env,'economy/action',body(2,{action:'equip',args:[item.uid]}),a.cookie);assert.equal(r.data.result.ok,true);const after=saved(sql,a.data.user.id).slots[0];assert.equal(after.eq.weapon.uid,item.uid);assert.ok(!after.inv.some(it=>it.uid===item.uid));sql.close();
 });
+
+test('turning server economy off restores snapshot saves even for already migrated accounts',async()=>{
+ const {env,sql}=setup(),a=await legacy(env,'rollbackaccount');env.SERVER_ECONOMY_ENABLED='1';await route(env,'me',{},a.cookie,'GET');
+ const b=saved(sql,a.data.user.id);b.slots[0].last=Date.now()-86400000;b.slots[0].xp=321;sql.prepare('UPDATE cloud_saves SET snapshot=? WHERE account_id=?').run(JSON.stringify(b),a.data.user.id);
+ const meta=sql.prepare('SELECT meta_json FROM economy_states').get().meta_json;env.SERVER_ECONOMY_ENABLED='0';
+ const me=await route(env,'me',{},a.cookie,'GET'),load=await route(env,'load',{},a.cookie,'GET');assert.equal(me.data.economyVersion,0);assert.equal(load.data.economyVersion,0);assert.equal(load.data.checkpoint,undefined);assert.equal(load.data.bundle.slots[0].xp,321);assert.equal(load.data.bundle.slots[0].last,me.data.updatedAt);
+ await assert.rejects(route(env,'save',body(1),a.cookie),e=>e.code==='economy_refresh');await assert.rejects(route(env,'economy/action',body(1,{action:'buyTienThaoLo'}),a.cookie),e=>e.code==='economy_refresh');
+ const incoming=load.data.bundle;incoming.slots[0].xp+=123;incoming.slots[0].gold+=456;incoming.slots[0].last=Date.now()-12345;
+ const response=await route(env,'save',body(1,{bundle:incoming}),a.cookie);assert.equal(response.data.patch,undefined);assert.equal(response.data.revision,2);const after=saved(sql,a.data.user.id);assert.equal(after.slots[0].xp,444);assert.equal(after.slots[0].gold,b.slots[0].gold+456);assert.equal(after.slots[0].last,incoming.slots[0].last);
+ const again=await route(env,'load',{},a.cookie,'GET');assert.equal(again.data.bundle.slots[0].last,incoming.slots[0].last);assert.equal(sql.prepare('SELECT meta_json FROM economy_states').get().meta_json,meta);assert.equal(sql.prepare('SELECT COUNT(*) n FROM economy_backups').get().n,1);sql.close();
+});
+test('existing secure market listings remain visible and tradable after local economy rollback',async()=>{
+ const {env,sql}=setup(),seller=await legacy(env,'rollbackseller'),buyer=await legacy(env,'rollbackbuyer');const bundle=saved(sql,seller.data.user.id);G.setS(bundle.slots[0]);const item=G.makeItem(0,1,1,0);bundle.slots[0].inv=[item];await route(env,'save',{clientId:device,revision:1,bundle},seller.cookie);
+ env.SERVER_ECONOMY_ENABLED='1';await route(env,'me',{},seller.cookie,'GET');await route(env,'market/post',body(2,{uid:item.uid,currency:'knb',price:5}),seller.cookie);const listing=sql.prepare('SELECT id FROM market_listings').get().id;
+ env.SERVER_ECONOMY_ENABLED='0';const listed=await route(env,'market/list?mode=g2',{},buyer.cookie,'GET');assert.ok(listed.data.rows.some(r=>r.id===listing));
+ const buyerBundle=saved(sql,buyer.data.user.id);const buy=body(1,{id:listing,bundle:buyerBundle});const bought=await route(env,'market/buy',buy,buyer.cookie);assert.equal(bought.data.patch,undefined);assert.equal(bought.data.changes.knb,195);assert.equal(bought.data.changes.inv.at(-1).n,item.n);
+ const sellerBundle=saved(sql,seller.data.user.id);await route(env,'market/collect',body(3,{bundle:sellerBundle}),seller.cookie);assert.equal(saved(sql,seller.data.user.id).slots[0].knb,205);assert.equal(saved(sql,buyer.data.user.id).slots[0].inv.length,1);await route(env,'market/buy',buy,buyer.cookie);assert.equal(saved(sql,buyer.data.user.id).slots[0].inv.length,1);sql.close();
+});
+test('migrated online links survive rollback and online sync uses locally computed progress',async()=>{
+ const {env,sql}=setup(),a=await legacy(env,'rollbackonline','ctc');env.SERVER_ECONOMY_ENABLED='1';await route(env,'me',{},a.cookie,'GET');const b=saved(sql,a.data.user.id);b.slots[0].lvl=20;sql.prepare('UPDATE cloud_saves SET snapshot=? WHERE account_id=?').run(JSON.stringify(b),a.data.user.id);
+ const {register,sync,auth}=await import('../src/account.js');const req=new Request('https://game.example/api/register',{method:'POST',headers:{origin:'https://game.example',cookie:a.cookie}});const pvp=await register(req,env,{name:'Rollback Online',save:b.slots[0]});await route(env,'link-pvp',{links:[{slot:0,token:pvp.token}]},a.cookie);
+ env.SERVER_ECONOMY_ENABLED='0';const load=await route(env,'load',{},a.cookie,'GET');assert.equal(load.data.bundle.slots[0].online.id,pvp.id);
+ const linked=new Request('https://game.example/api/sync',{method:'POST',headers:{origin:'https://game.example',cookie:a.cookie,'x-cloud-slot':'0','x-cloud-device':device}});assert.equal((await auth(linked,env)).id,pvp.id);const state=structuredClone(b.slots[0]);state.lvl=21;state.xp=123;await sync(linked,env,{save:state});assert.equal(sql.prepare('SELECT lvl FROM chars WHERE account_id=?').get(pvp.id).lvl,21);sql.close();
+});

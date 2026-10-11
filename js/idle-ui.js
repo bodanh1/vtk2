@@ -18,5 +18,5 @@
  if($('idleDungeons'))$('idleDungeons').onclick=()=>jhOpenActivity('dungeons');if($('idlePet'))$('idlePet').onclick=()=>{giftTab='pet';giftModal();};if($('idleForgeOptions'))$('idleForgeOptions').onclick=()=>htModal();if($('idleSaver'))$('idleSaver').onchange=()=>setUiPref({saver:$('idleSaver').checked});if($('idleLowFx'))$('idleLowFx').onchange=()=>{S.lowFx=$('idleLowFx').checked;controls();};
  });const box=document.querySelector('#modal .mbox');if(box)box.scrollTop=scroll;};
  const menu=$('jxOverflow');if(menu)for(const [id,label,tab]of [['jxIdleAuto','Auto mục tiêu','auto'],['jxForgeVault','Kho Rèn','forge'],['jxStable','Mã Trường','stable'],['jxWeeklyBoss','Boss tuần','weekly'],['jxPerformance','Hiệu năng','performance']]){const b=document.createElement('button');b.className='rbtn';b.id=id;b.dataset.ic='gift';b.setAttribute('aria-label',label);b.title=label;b.innerHTML='<i></i><span class="sk">'+label+'</span>';b.onclick=()=>idleMenu(tab);menu.appendChild(b);}
- setInterval(()=>{if(!S?.fac||document.hidden||SAVE_LOCK||typeof cloudEntryPending!=='undefined'&&cloudEntryPending||typeof CLOUD!=='undefined'&&CLOUD.user||R.deadT>0)return;idlePlan();},1000);
+ setInterval(()=>{if(!S?.fac||document.hidden||SAVE_LOCK||typeof cloudEntryPending!=='undefined'&&cloudEntryPending||secure()||R.deadT>0)return;idlePlan();},1000);
 })();

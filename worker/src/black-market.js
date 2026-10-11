@@ -1,4 +1,4 @@
-import {economyMeta,settleEconomy,economyPatch,prepareInventory} from './economy.js';
+import {economyEnabled,economyMeta,settleEconomy,economyPatch,prepareInventory} from './economy.js';
 import {HttpError,randomToken} from './http.js';
 import {rateLimit} from './db.js';
 import {GAME as G} from '../gen/game.js';
@@ -13,13 +13,13 @@ export async function marketSaveCheck(db,id,bundle){
 }
 function receive(s,item){if(s.inv.length>=G.INV_MAX)fail('inventory_full','Hành trang đầy; dọn một ô trước');const ids=[...s.inv,...(s.forgeVault||[]),...(s.stable||[]),...Object.values(s.eq||{}),...(s.ground||[]).map(r=>r.it)].filter(Boolean).map(it=>Number(it.uid)||0);s.uid=Math.max(Number(s.uid)||1,...ids.map(n=>n+1));const copy=structuredClone(item);copy.uid=s.uid++;copy.locked=true;s.inv.push(copy);}
 export async function marketRoute(env,acc,body,url,method,cleanBundle){
- const db=env.DB,path=url.pathname.slice('/api/cloud/market/'.length),now=Date.now(),meta=await economyMeta(db,acc.id),secure=!!meta;
+ const db=env.DB,path=url.pathname.slice('/api/cloud/market/'.length),now=Date.now(),meta=await economyMeta(db,acc.id,env),secure=!!meta;
  if(method==='GET'&&path==='list'){
   const mode=url.searchParams.get('mode');if(!Object.hasOwn(G.MODES,mode))fail('market_mode','Chế độ không hợp lệ');
   const page=Math.min(10000,Math.max(0,Number(url.searchParams.get('page'))|0)),mine=url.searchParams.get('mine')==='1',q=(url.searchParams.get('q')||'').slice(0,60);
   const where=mine?'seller=?1 AND mode=?2 AND (status=\'active\' OR status=\'sold\' AND claimed=0)':'mode=?2 AND status=\'active\' AND expires_at>?3';
   const params=[acc.id,mode,now,'%'+q+'%'],bind=v=>'?'+params.push(v);
-  let predicate=where+' AND (?3>=0) AND (?1 IS NOT NULL) AND (name LIKE ?4 OR seller_name LIKE ?4) AND EXISTS(SELECT 1 FROM economy_states es WHERE es.account_id=market_listings.seller)='+Number(secure);
+  let predicate=where+' AND (?3>=0) AND (?1 IS NOT NULL) AND (name LIKE ?4 OR seller_name LIKE ?4)';if(economyEnabled(env))predicate+=' AND EXISTS(SELECT 1 FROM economy_states es WHERE es.account_id=market_listings.seller)='+Number(secure);
   const currency=url.searchParams.get('currency'),kind=url.searchParams.get('kind'),rar=url.searchParams.get('rar'),sort=url.searchParams.get('sort');
   if(['knb','gold'].includes(currency))predicate+=' AND currency='+bind(currency);
   if(kind!==null&&/^([0-9]|10)$/.test(kind))predicate+=" AND json_extract(item_json,'$.d')="+bind(+kind);
@@ -66,7 +66,7 @@ export async function marketRoute(env,acc,body,url,method,cleanBundle){
   const listing=await stmt(db,'SELECT * FROM market_listings WHERE id=?1',String(body.id||'')).first();if(!listing||listing.status!=='active')fail('market_unavailable','Món đồ đã bán hoặc đã trả lại',409);
   guard="EXISTS(SELECT 1 FROM market_listings WHERE id=?5 AND status='active')";args=[listing.id];
   if(path==='buy'){
-   if(!!await economyMeta(db,listing.seller)!==secure)fail('market_economy','Tài khoản chưa cùng cơ chế kinh tế; người bán cần tải lại game',409);
+   if(!!await economyMeta(db,listing.seller,env)!==secure)fail('market_economy','Tài khoản chưa cùng cơ chế kinh tế; người bán cần tải lại game',409);
    if(listing.expires_at<=now)fail('market_expired','Tin bán đã hết 3 ngày');if(listing.seller===acc.id)fail('market_self','Không thể mua đồ của chính mình');if(listing.mode!==s.mode)fail('market_mode','Chỉ giao dịch trong cùng chế độ');
    const cost=listing.price*(listing.currency==='gold'?10000:1),balance=s[listing.currency]||0;if(!Number.isFinite(balance)||balance<cost)fail('market_funds','Không đủ '+(listing.currency==='gold'?'tiền vạn':'Kim Nguyên Bảo'));
    receive(s,JSON.parse(listing.item_json));s[listing.currency]=balance-cost;

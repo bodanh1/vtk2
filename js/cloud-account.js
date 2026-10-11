@@ -39,6 +39,14 @@ if(!force&&binding?.fingerprint===fingerprint){const hb=await cloudApi('heartbea
 cloudStatus('Đang đồng bộ…');const r=await cloudApi('save',{clientId:cloudClientId,revision:CLOUD.revision,bundle});CLOUD.revision=r.revision;CLOUD.marketPending=r.marketPending;CLOUD.lastSaved=r.updatedAt;CLOUD.lastLeaseAt=Date.now();cloudSaveBinding(fingerprint);cloudStatus('Đã lưu · '+new Date(r.updatedAt).toLocaleTimeString('vi-VN'));await cloudLinkPvp();return true;
 }catch(e){cloudFail(e);return false;}finally{CLOUD.busy=false;}}
 async function cloudBootstrap(){const generation=cloudAuthGeneration;try{const r=await cloudApi('me');if(generation!==cloudAuthGeneration)return;CLOUD.user=r.user;CLOUD.meta=r;const binding=cloudLocal(CLOUD_BINDING),root=localStorage.getItem(CLOUD_OWNER);CLOUD.ready=!CLOUD.detachedBundle&&root===r.user.id&&binding?.id===r.user.id;CLOUD.revision=binding?.id===r.user.id?binding.revision:0;CLOUD.lastSaved=binding?.lastSaved||0;
+if(CLOUD.ready&&binding?.economyVersion===1&&r.economyVersion===0){
+ CLOUD.busy=true;try{
+ const owner=CLOUD.user.id,claimed=await cloudClaim(),remote=await cloudApi('load');
+ if(generation!==cloudAuthGeneration||CLOUD.user?.id!==owner)return;
+ if(remote.revision!==claimed.revision)throw Object.assign(new Error('Tiến trình vừa thay đổi; chọn bản tài khoản để tiếp tục'),{code:'save_conflict'});
+ CLOUD.revision=remote.revision;CLOUD.lastSaved=remote.updatedAt||0;cloudInstall(remote.bundle,S?.fac?SLOT:null);return;
+ }finally{CLOUD.busy=false;}
+}
 if(CLOUD.ready){if(r.revision!==CLOUD.revision){CLOUD.paused=true;CLOUD.pauseReason='save_conflict';cloudStatus('Có bản mới trên máy chủ · hãy chọn tiến trình');}else{CLOUD.paused=false;await cloudSync();}}else cloudStatus('Đã đăng nhập · chọn dữ liệu để chơi');
 }catch(e){if(generation!==cloudAuthGeneration)return;if(e.code==='cloud_login'){CLOUD.user=null;CLOUD.ready=false;cloudStatus('Chưa đăng nhập');}else cloudFail(e);}cloudInjectButtons();}
 function cloudInstall(bundle,slot,previous=false){if(!bundle||bundle.v!==1||bundle.slots?.length!==3)throw new Error('Bản lưu cloud không hợp lệ');cloudArchive();const old=cloudRootKeys().concat([CLOUD_OWNER,CLOUD_BINDING,'jxidle_cloud_tab']).reduce((out,k)=>(out[k]=localStorage.getItem(k),out),{});cloudPut('jxidle_cloud_install_journal',{raw:old});const settings=bundle.slots.map((_,i)=>{try{return unpack(localStorage.getItem(slotKey(i))||'{}').state?.snd}catch(e){return null}});SAVE_LOCK=true;
