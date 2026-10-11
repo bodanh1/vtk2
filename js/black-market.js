@@ -2,7 +2,7 @@
 (function(){
  const M={page:0,mine:false,rows:[],generation:0,busy:false},$=id=>document.getElementById(id);
  function close(){if(M.busy)return;$('blackMarketPanel').hidden=true;$('app').inert=false;}
- const price=r=>r.price.toLocaleString('vi-VN')+(r.currency==='knb'?' KNB':' vạn');
+ const price=r=>r.currency==='knb'?r.price.toLocaleString('vi-VN')+' KNB':fmtMoney(r.price*10000);
  const error=e=>{if(['save_conflict','device_changed','cloud_login','market_restore'].includes(e.code))cloudFail(e);if($('marketError'))$('marketError').textContent=e.message;};
  async function transaction(action,extra={},automatic=false){
   if(!CLOUD.user||!CLOUD.ready||CLOUD.paused||SAVE_LOCK||ADMV.sandbox){if(!automatic)toast('Đăng nhập và chọn tiến trình tài khoản trước khi giao dịch');return false;}
@@ -33,7 +33,7 @@
  function inventory(){
   const rows=S.inv.filter(it=>!it.locked);$('marketPost').innerHTML=`<h4>Đăng đồ · thời hạn 3 ngày</h4><small>Đồ được giữ trên chợ ngay khi đăng. Bỏ khóa bảo vệ trong hành trang để chọn đồ.</small><select id="marketItemSelect" aria-label="Đồ đăng bán"><option value="">Chọn vật phẩm trong hành trang</option>${rows.map(it=>`<option value="${it.uid}">${esc(it.n)} · cấp ${it.lvl} · +${it.enh||0}</option>`).join('')}</select><div id="marketPreview"></div><div class="btnrow"><select id="marketCurrency" aria-label="Tiền bán"><option value="knb">Kim Nguyên Bảo</option><option value="gold">Tiền vạn</option></select><input id="marketPrice" type="number" min="1" max="1000000000" step="1" value="5" aria-label="Giá bán"><button class="btn" id="marketPublish">Đăng bán</button></div>`;
   $('marketItemSelect').onchange=()=>{const it=S.inv.find(it=>it.uid===Number($('marketItemSelect').value));$('marketPreview').innerHTML=it?itemHTML(it):'';};
-  $('marketPublish').onclick=async()=>{const uid=Number($('marketItemSelect').value),p=Number($('marketPrice').value),currency=$('marketCurrency').value,it=S.inv.find(it=>it.uid===uid);if(!it||!Number.isSafeInteger(p)||p<1||p>1000000000){toast('Chọn đồ và nhập giá nguyên từ 1 đến 1 tỷ');return;}if(!confirm('Đăng '+it.n+' giá '+p.toLocaleString('vi-VN')+(currency==='knb'?' KNB':' vạn')+' trong 3 ngày?'))return;if(await transaction('post',{uid,price:p,currency})){inventory();load();}};
+  $('marketPublish').onclick=async()=>{const uid=Number($('marketItemSelect').value),p=Number($('marketPrice').value),currency=$('marketCurrency').value,it=S.inv.find(it=>it.uid===uid);if(!it||!Number.isSafeInteger(p)||p<1||p>1000000000){toast('Chọn đồ và nhập giá nguyên từ 1 đến 1 tỷ');return;}if(!confirm('Đăng '+it.n+' giá '+(currency==='knb'?p.toLocaleString('vi-VN')+' KNB':fmtMoney(p*10000))+' trong 3 ngày?'))return;if(await transaction('post',{uid,price:p,currency})){inventory();load();}};
  }
  function open(){
   $('jxOverflow').classList.add('hidden');$('jxMenu').setAttribute('aria-expanded','false');
