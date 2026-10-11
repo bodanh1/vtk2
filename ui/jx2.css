@@ -828,8 +828,7 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #jxPerformance i{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23efd481%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%203v18h19%20M7%2017v-6h3v6Z%20M13%2017V7h3v10Z%20M19%2017V3h3v14Z%22%2F%3E%3C%2Fsvg%3E") center/20px 20px no-repeat}
 #jxOverflow #jxToday i{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23efd481%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%2218%22%20height%3D%2217%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%202v6%20M17%202v6%20M3%2010h18%20M7%2016l3%203%207-6%22%2F%3E%3C%2Fsvg%3E") center/20px 20px no-repeat}
 
-/* Real close controls in the window footer, including Safari touch screens. */
-.windowClose{position:absolute;left:50%;bottom:-28px;transform:translateX(-50%);width:100px;height:28px;padding:0;border:0;background:transparent;color:var(--jx-ink);font:700 13px var(--font);text-shadow:0 0 2px var(--jx-glow);z-index:5;touch-action:manipulation;cursor:pointer}
-.windowClose:hover,.windowClose:active{color:#5b2407;background:#f4d77a33}
-#modal[data-locked="1"] .windowClose,#panel:has(.inventoryMenu)>.windowClose{display:none}
-@media(pointer:coarse){.windowClose::before{content:"";position:absolute;inset:-8px 0}}
+/* Visible upper-right close buttons with a wide touch target. */
+#jxPX,#mClose{right:0;top:-34px;width:36px;height:32px;padding:0;border:1px solid #827653;border-radius:3px;background:linear-gradient(#3e4332,#1c2519);color:#f7df9d;font:700 24px/28px Arial,sans-serif;text-shadow:0 1px 1px #000;z-index:6;touch-action:manipulation;cursor:pointer}
+#jxPX:hover,#mClose:hover{background:#49543a}
+#jxPX:active,#mClose:active{background:#1b2617}
