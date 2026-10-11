@@ -5,7 +5,7 @@ import { ADMIN_REFERENCE as REF } from './admin-reference-data.js';
 export const isAccountAdmin = account => account?.username === 'danh';
 export function requireAccountAdmin(account) { if (!isAccountAdmin(account)) throw new HttpError(403,'admin_only','Chỉ tài khoản admin được dùng chức năng này'); }
 const GROUPS={gear:'Trang bị',mount:'Thú cưỡi',gold:'Hoàng Kim',platina:'Bạch Kim',material:'Nguyên liệu',potion:'Thuốc',other:'Tiền / Bảo vật'};
-const SLOTS=['Vũ khí','Ám khí','Áo giáp','Nhẫn','Dây chuyền','Giày','Đai lưng','Mũ','Hộ uyển','Ngọc bội','Thú cưỡi'];
+const SLOTS=['Vũ khí (tất cả)','Ám khí / Tụ Tiễn','Áo giáp','Nhẫn','Dây chuyền','Giày','Đai lưng','Mũ','Hộ uyển','Ngọc bội','Thú cưỡi'];
 const fold=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
 let catalogue;
 function allEntries(){
@@ -24,7 +24,7 @@ function allEntries(){
 export function adminCatalogue(params){
   const group=params.get('group')||'gear',mode=G.MODES[params.get('mode')]||G.MODES.g2;if(!Object.hasOwn(GROUPS,group))throw new HttpError(400,'bad_group');
   const q=fold((params.get('q')||'').slice(0,80)),d=params.get('d'),fac=params.get('fac');
-  const filtered=allEntries().filter(r=>r.group===group&&(!q||fold(r.n).includes(q))&&(d===null||d===''||r.d===+d)&&(fac===null||fac===''||r.fac<0||r.fac===+fac));
+  const filtered=allEntries().filter(r=>r.group===group&&(!q||fold(r.n).includes(q))&&(d===null||d===''||r.d===+d||d==='0'&&r.d===1)&&(fac===null||fac===''||r.fac<0||r.fac===+fac));
   const page=Math.max(0,Math.min(1000,parseInt(params.get('page')||'0',10)||0)),size=40;
   return{groups:GROUPS,slots:SLOTS,total:filtered.length,page,pages:Math.ceil(filtered.length/size),rows:filtered.slice(page*size,(page+1)*size).map(r=>({...r,available:!(r.group==='gold'&&!mode.hk||r.group==='platina'&&!mode.platina)}))};
 }
