@@ -1,7 +1,6 @@
 "use strict";
 function toggleMount(){
   if(!S||!S.fac)return;
-  if(S.fac==='tangmen'){toast('Đường Môn tạm chưa hỗ trợ cưỡi ngựa');return}
   if(S.mounted){S.mounted=false;toast('Đã xuống ngựa')}
   else{
     if(!mountEquipped(S)){toast('Trang bị một con ngựa trong Hành trang trước');return}
