@@ -24,6 +24,14 @@ export async function ensureEconomy(env,acc){
  return meta;
 }
 function summary(bundle){return bundle.slots.map(s=>s?{gold:s.gold||0,knb:s.knb||0}:null);}
+export function prepareInventory(bundle,meta,body){
+ // Apply only inventory safety; elapsed stage/speed belong to the previous checkpoint.
+ const slot=body.slot??body.activeSlot,state=slot===meta.activeSlot&&bundle.slots[slot],c=body.controls;
+ if(!state||!c||typeof c!=='object')return;
+ if(typeof c.autoJunk==='boolean')state.autoJunk=c.autoJunk;
+ for(const key of ['lootF','filter','lootPolicy'])if(c[key]&&typeof c[key]==='object'&&!Array.isArray(c[key])&&JSON.stringify(c[key]).length<=5000)state[key]=structuredClone(c[key]);
+ if(Array.isArray(c.locks))for(const pair of c.locks.slice(0,120)){if(!Array.isArray(pair)||!Number.isSafeInteger(pair[0])||typeof pair[1]!=='boolean')continue;const it=state.inv.find(it=>it.uid===pair[0])||Object.values(state.eq).find(it=>it?.uid===pair[0]);if(it)it.locked=pair[1];}
+}
 export function settleEconomy(bundle,meta,now){
  const slot=meta.activeSlot,state=Number.isInteger(slot)&&bundle.slots[slot];let reward=null;
  const gap=Math.max(0,(now-meta.settledAt)/1000);meta.settledAt=Math.max(meta.settledAt,now);
@@ -55,6 +63,7 @@ export async function economyCommit(env,acc,body,type='sync'){
  if(type==='sync'){const hour=Math.floor(now/3600000);if(meta.syncHour!==hour){meta.syncHour=hour;meta.syncCount=0;}if((meta.syncCount||0)>=240)fail('cloud_rate','Thao tác quá nhanh; thử lại sau',429);meta.syncCount=(meta.syncCount||0)+1;}
  let result,reward,notices=[];
  try{
+  prepareInventory(bundle,meta,body);
   reward=settleEconomy(bundle,meta,now);
   // Only fac/name/sex/mode are used for a new character. Uploaded money/items/levels are discarded.
   hydrateEmpty(bundle,body.characters||body.bundle?.slots);

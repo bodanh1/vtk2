@@ -141,7 +141,7 @@ function econExecute(name,args,meta){
  case 'ytClaim':ytClaim();break;
  case 'tkBuy':integer(0,0,TK_SHOP.length-1);call(tkBuy);break;
  case 'siegeBuy':integer(0,0,SIEGE_SHOP.length-1);call(siegeBuy);break;
- case 'pickUp':{const drop=R.ground.find(d=>d.it.uid===args[0]);if(!drop)throw new Error('Món đồ không còn trên đất');pickUp(drop);break;}
+ case 'pickUp':{const drop=R.ground.find(d=>d.it.uid===args[0]);if(!drop)throw new Error('Món đồ không còn trên đất');R.pickTarget=drop;pickUp(drop);break;}
  case 'petAdopt':if(!petChoices().includes(args[0])||S.lvl<PET_LV)throw new Error('Đồng hành chưa mở');call(petAdopt);break;
  case 'tpPick':call(tpPick);break;
  case 'jhAddAdvanced':call(jhAddAdvanced);break;

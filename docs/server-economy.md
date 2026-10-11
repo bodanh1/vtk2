@@ -42,3 +42,10 @@ Công thức hiện tại trong `rdata.js` là công thức cộng đồng: hai 
 - Xếp hạng tự gửi mỗi 5 phút; nếu thông tin không đổi, tối đa 15 phút. Mở bảng vẫn đồng bộ ngay khi có thay đổi.
 - D1 và Durable Objects có hạn mức riêng. Không đổi gói trả phí tự động, không hứa đủ cho lượng người chơi không giới hạn. Hai cập nhật mỗi 30 giây tương đương tối thiểu 5.760 cập nhật/người/ngày nếu online đủ 24 giờ, chưa tính giao dịch/index/đăng nhập; cần theo dõi dashboard khi tăng người chơi.
 - Rollback code không được xóa migration/binding SocialRoom đã tạo, vì chat mới lưu tại đó. Giữ class và binding, có thể tắt nhánh định tuyến để dùng D1 cũ nếu có yêu cầu; không xóa namespace để tránh mất lịch sử chat.
+
+### v104: loot safety and account loading
+- Explicit ground pickup marks the item `manualKeep`, so automatic sale/room-making cannot remove it on later checkpoints. Explicit Sell, Discard and Clear Inventory still work unless locked.
+- Current auto-sale/filter/lock controls are applied to the same active character before farming settlement, including market requests; elapsed activity/speed stay on the previous checkpoint. Character switches do not change the previous character's filter.
+- Browser automatic junk sweeps are disabled for authoritative accounts. In-flight lock changes survive responses for items still owned.
+- Account selection no longer parses local slots when a cloud save exists. Raw local archives preserve malformed bytes without allowing them to replace trusted server data. Storage write failure still blocks installation and keeps the old data.
+- No schema changes, polling, extra database writes, or added asset downloads.

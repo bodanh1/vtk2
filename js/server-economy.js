@@ -4,12 +4,14 @@ const ECON={version:0,chain:Promise.resolve(),applying:false,picking:new Map()};
 function serverEconomy(){if(CLOUD.economyVersion===1||CLOUD.meta?.economyVersion===1)ECON.version=1;return ECON.version===1&&!!CLOUD.user&&CLOUD.ready&&!CLOUD.detachedBundle;}
 const ECON_SETTINGS=['speed','diff','push','stage','autoEquip','autoJunk','autoBuy','autoPts','autoSk','autoForge','lootF','lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt','autoMovePaused'];
 function economyControls(){const c={};if(!S?.fac)return c;for(const k of ECON_SETTINGS)if(S[k]!==undefined)c[k]=JSON.parse(JSON.stringify(S[k]));c.attr=S.attr;c.sk=S.sk;c.locks=[...S.inv,...Object.values(S.eq)].filter(Boolean).map(it=>[it.uid,!!it.locked]);c.running=!R.town&&!S.autoMovePaused;return c;}
+function economyPreserveLocks(current,sent,preserve){const prior=new Map(sent.locks||[]);const changed=(current.locks||[]).filter(([id,locked])=>prior.has(id)&&prior.get(id)!==locked);return changed.length?{...preserve,locks:changed}:preserve;}
 function economyApply(r,preserve=null){
  if(!r.patch)return;ECON.version=r.patch.version;ECON.applying=true;
  try{
   const oldRuntime=JSON.stringify([R.tower&&[R.tower.kind,R.tower.floor],R.tk?.wave,S?.siege?.layer]);
   for(const {slot,state}of r.patch.slots){if(!state){localStorage.removeItem(slotKey(slot));continue;}const copy=state;if(slot===SLOT&&S?.fac){const sound=S.snd;S=copy;if(sound)S.snd=sound;
     if(preserve)for(const k of ECON_SETTINGS)if(preserve[k]!==undefined)S[k]=preserve[k];
+    if(preserve?.locks)for(const [id,locked]of preserve.locks){const it=S.inv.find(it=>it.uid===id)||Object.values(S.eq).find(it=>it?.uid===id);if(it)it.locked=locked;}
    }const key=slotKey(slot),raw=pack(slot===SLOT&&S?.fac?S:copy);if(localStorage.getItem(key)!==raw){localStorage.setItem(key,raw);sealWrite(slot,state.mode);}}
   for(const [key,state]of Object.entries(r.patch.shared||{}))if(CLOUD_SHARED.includes(key)){const raw=pack(state);if(localStorage.getItem(key)!==raw)localStorage.setItem(key,raw);}
   if(r.patch.activeSlot===SLOT){R.tower=r.patch.runtime?.tower||null;R.tk=r.patch.runtime?.tk||null;}
@@ -34,7 +36,7 @@ cloudSync=async function(force=false){
   const r=await cloudApi('save',payload),current=economyControls();
   // Preserve cosmetic/filter changes made while waiting. Allocations are confirmed by the next save.
   const preserve=JSON.stringify(current)===sentControls?null:Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));
-  economyApply(r,preserve);if(preserve&&S?.fac)economyPendingPoints(current,payload.controls);cloudStatus('Đã lưu · tiền và đồ do server quản lý');return true;
+  economyApply(r,economyPreserveLocks(current,payload.controls,preserve));if(preserve&&S?.fac)economyPendingPoints(current,payload.controls);cloudStatus('Đã lưu · tiền và đồ do server quản lý');return true;
  }catch(e){cloudFail(e);return false;}finally{CLOUD.busy=false;}
 };
 function economyAction(action,args=[],after){
@@ -49,7 +51,7 @@ function economyAction(action,args=[],after){
   try{
    if(!CLOUD.lease||Date.now()-CLOUD.lastLeaseAt>90000){const claimed=await cloudClaim();if(claimed.revision!==CLOUD.revision){const e=new Error('Có bản mới trên server');e.code='save_conflict';throw e;}}
    const payload=economyPayload();payload.action=action;payload.args=args;sent=true;
-   const r=await cloudApi('economy/action',payload),current=economyControls();const preserve=Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));economyApply(r,preserve);economyPendingPoints(current,payload.controls);
+   const r=await cloudApi('economy/action',payload),current=economyControls();const preserve=Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));economyApply(r,economyPreserveLocks(current,payload.controls,preserve));economyPendingPoints(current,payload.controls);
    const msg=r.result?.msg||r.notices?.at(-1);if(msg)toast(msg);else economyNotice('Đã cập nhật');
    if(after)after(r);else refresh();
   }catch(e){if(sent&&e.code==='offline'){e.code='save_conflict';e.message+=' · Tải bản tài khoản để kiểm tra kết quả';}cloudFail(e);toast(e.message);}
@@ -73,7 +75,7 @@ economyWrap('unequip',null,()=>refresh());economyWrap('sellUnmatched',null,()=>r
 for(const n of ['towerStart','tkStart','siegeStart','jhDungeonStart','jhTowerStart','jhFerryStart'])economyWrap(n,null,()=>{closeModal(true);R.town=false;});
 const economyOriginalReborn=doReborn;doReborn=function(){if(!serverEconomy())return economyOriginalReborn();if(S.lvl<MAX_LEVEL||RW().stat.reborn>=10)return;if(confirm('Chuyển sinh: về cấp 1, giữ trang bị và võ công. Tiếp tục?'))economyAction('doReborn',[],()=>{closeModal(true);refresh();tamPhapModal();});};
 // Server computes gains. Browser combat continues solely for animation and input feedback.
-for(const n of ['payKill','rwOnKill','gainXp','grant','offlineGains','autoForge','autoBuyWeapon','achCheck','kyNgoTick','fireCheck'])economyWrap(n,false);
+for(const n of ['sweepJunk','payKill','rwOnKill','gainXp','grant','offlineGains','autoForge','autoBuyWeapon','achCheck','kyNgoTick','fireCheck'])economyWrap(n,false);
 const economyOriginalPickUp=pickUp;pickUp=function(drop){if(!serverEconomy())return economyOriginalPickUp(drop);if(Date.now()<(CLOUD.retryAt||0)||CLOUD.busy||window.JXADMINBUSY||S.inv.length>=INV_MAX)return false;if(R.pickTarget!==drop&&S.ctrl!=='manual'&&lootFilter().auto)return false;const id=drop.it.uid,now=performance.now();if(now-(ECON.picking.get(id)||-Infinity)<10000)return false;ECON.picking.set(id,now);if(ECON.picking.size>200)ECON.picking.delete(ECON.picking.keys().next().value);economyAction('pickUp',[id]);return false;};
 for(const name of ['stashImport','importSave','modeTransferDo']){const original=window[name];if(typeof original==='function')window[name]=function(...a){if(!serverEconomy())return original.apply(this,a);toast('Tài khoản dùng dữ liệu server; file xuất chỉ dùng làm backup');return {ok:false,msg:'Không thể thay tiền hoặc đồ bằng file tại máy'};};}
 const economyOriginalUseLocal=cloudUseLocal;cloudUseLocal=async function(...args){if(ECON.version===1){toast('Tài khoản dùng tiến trình server. Chọn nhân vật trên tài khoản để chơi.');return;}return economyOriginalUseLocal(...args);};

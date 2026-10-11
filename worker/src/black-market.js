@@ -1,4 +1,4 @@
-import {economyMeta,settleEconomy,economyPatch} from './economy.js';
+import {economyMeta,settleEconomy,economyPatch,prepareInventory} from './economy.js';
 import {HttpError,randomToken} from './http.js';
 import {rateLimit} from './db.js';
 import {GAME as G} from '../gen/game.js';
@@ -32,7 +32,7 @@ export async function marketRoute(env,acc,body,url,method,cleanBundle){
  const row=await stmt(db,'SELECT * FROM cloud_saves WHERE account_id=?1',acc.id).first();
  if(row.write_owner!==body.clientId||row.write_until<=now)fail('device_changed','Máy này chưa có quyền đồng bộ',409);
  if(row.revision!==body.revision)fail('save_conflict','Tiến trình đã thay đổi; tải bản tài khoản',409);
- const bundle=!secure&&body.bundle?cleanBundle(body.bundle):JSON.parse(row.snapshot||'null');if(!secure&&body.bundle)await marketSaveCheck(db,acc.id,bundle);if(secure)settleEconomy(bundle,meta,now);const s=Number.isInteger(body.slot)&&bundle?.slots[body.slot];
+ const bundle=!secure&&body.bundle?cleanBundle(body.bundle):JSON.parse(row.snapshot||'null');if(!secure&&body.bundle)await marketSaveCheck(db,acc.id,bundle);if(secure){prepareInventory(bundle,meta,body);settleEconomy(bundle,meta,now);}const s=Number.isInteger(body.slot)&&bundle?.slots[body.slot];
  if(!s?.fac||typeof s.cid!=='string'||!Array.isArray(s.inv))fail('no_character','Chọn nhân vật đã lưu lên tài khoản');
  const operations=[];let guard='1=1',args=[],message='';
  if(path==='post'){
