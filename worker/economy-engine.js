@@ -147,7 +147,7 @@ function econExecute(name,args,meta){
  case 'tkBuy':integer(0,0,TK_SHOP.length-1);call(tkBuy);break;
  case 'siegeBuy':integer(0,0,SIEGE_SHOP.length-1);call(siegeBuy);break;
  case 'idleSetGoal':meta.running=true;return idleSetGoal(String(args[0]));
- case 'idleStore':case 'idleTake':if(!['forge','stable'].includes(args[0]))throw new Error('Kho không hợp lệ');return (name==='idleStore'?idleStore:idleTake)(args[0],integer(1,1));
+ case 'idleStore':case 'idleTake':{if(!['forge','stable'].includes(args[0]))throw new Error('Kho không hợp lệ');const uid=typeof args[1]==='string'&&args[1].length>0&&args[1].length<=80?args[1]:integer(1,1);return (name==='idleStore'?idleStore:idleTake)(args[0],uid);}
  case 'idleFeedHorse':return idleFeedHorse();
  case 'idleWeeklyStart':meta.activityAt=gameNow();meta.running=true;return idleWeeklyStart();
  case 'idleWeeklyClaim':return idleWeeklyClaim();
