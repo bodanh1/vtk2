@@ -1,5 +1,5 @@
 // Compiled inside the native game closure. No browser/render loop runs on the server.
-const ECON_CONTROL_KEYS=['speed','diff','push','stage','autoEquip','autoJunk','autoBuy','autoPts','autoSk','autoForge','autoEnh','autoFuse','autoHt','autoOre','autoKham','autoPlat','autoPlatUp','autoShard','lootF','filter','lootPolicy','lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt','autoMovePaused'];
+const ECON_CONTROL_KEYS=['speed','diff','push','stage','autoEquip','autoJunk','autoBuy','autoPts','autoSk','autoForge','autoEnh','autoFuse','autoHt','autoOre','autoKham','autoPlat','autoPlatUp','autoShard','lootF','filter','lootPolicy','lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt','autoMovePaused','idleGoal','forgeLoot'];
 const ECON_USER_KEYS=['lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt'];
 let econStorage=new Map(),econNotices=[];
 const econLocalStorage={getItem:k=>econStorage.get(k)||null,setItem:(k,v)=>econStorage.set(k,String(v)),removeItem:k=>econStorage.delete(k)};
@@ -31,6 +31,8 @@ function econControl(state,c){
   const v=c[k];if(k==='speed'){if(![1,1.5,2].includes(v))throw new Error('Tốc độ tối đa x2');}
   else if(k==='diff'){if(!Number.isInteger(v)||v<0||v>=DIFFS.length||MC().diff!=null&&v!==MC().diff)continue;}
   else if(k==='stage'){if(!Number.isInteger(v)||v<1||v>Math.max(1,state.maxStage)||stageLevel(v)>state.lvl+STAGE_GATE)continue;}
+  else if(k==='idleGoal'){if(!Object.hasOwn(IDLE_GOALS,v))continue;}
+  else if(k==='forgeLoot'){if(!v||typeof v!=='object'||Array.isArray(v))continue;state.forgeLoot={enabled:v.enabled===true,white:v.white!==false,blue:v.blue!==false,minLine:Math.max(1,Math.min(10,Number(v.minLine)||5))};continue;}
   else if(k==='lootF'||k==='filter'||k==='lootPolicy'){if(!v||typeof v!=='object'||JSON.stringify(v).length>5000)continue;}
   else if(k==='slots'){if(!Array.isArray(v))continue;state.slots=v.slice(0,4).map(id=>(c.sk?.[id]??state.sk[id])>0?id:0);continue;}
   else if(k==='main'){if(v!==0&&!((c.sk?.[v]??state.sk[v])>0))continue;}
@@ -66,6 +68,7 @@ function econFarm(seconds,meta,offline){
  const phase=meta.killPhase||0,bosses=bossStage?Math.floor((phase+kills)/24)-Math.floor(phase/24):0,elites=Math.max(0,Math.floor((phase+kills)/6)-Math.floor(phase/6)-bosses),normals=kills-elites-bosses;meta.killPhase=(phase+kills)%24;
  gainXp(expFor(L)*(normals+elites*CLS.elite.xp+bosses*CLS.boss.xp*ctcBossXp({cls:'boss'}))*mult*diffOf().rew*(typeof tienThaoMul==='function'?tienThaoMul():S.tienThaoUntil>gameNow()?2:1));
  const gold=Math.round(moneyDrop({L,cls:'normal'})*(normals+elites*2+bosses*8)*diffOf().rew*modeGoldMul());S.gold+=gold;
+ idleHorseXp(normals+elites*3+bosses*10);petGainXp(normals+elites*3+bosses*10);
  const r=RW();r.stat.kills+=kills;S.totalKills=(S.totalKills||0)+kills;questTick('kills',kills);r.stat.bosses+=bosses;questTick('bosses',bosses);ytTick('elites',elites);
  S.knb=(S.knb||0)+Math.min(kills,econPoisson(kills*KNB_DROP_RATE));r.stat.tokens+=Math.min(kills,econPoisson(kills*.05));
  // Sparse drops are sampled in bounded batches, just as the previous offline reward path.
@@ -83,6 +86,7 @@ function econFarm(seconds,meta,offline){
  achCheck();let xp=S.xp-xpBefore;for(let level=levelBefore;level<S.lvl;level++)xp+=expNeed(level);return {kills,gold,xp};
 }
 function econActivity(seconds,meta){
+ if(R.tower?.kind==='weekly')return idleWeeklySim(seconds,meta);
  if(!(R.tower||R.tk||S.siege))return;
  const speed=[1,1.5,2].includes(S.speed)?S.speed:1;
  let budget=(meta.damage||0)+seconds*speed*Math.max(1,R.P.main?.dps||R.P.basic.dps);const initialFloor=R.tower?.floor;
@@ -142,6 +146,11 @@ function econExecute(name,args,meta){
  case 'ytClaim':ytClaim();break;
  case 'tkBuy':integer(0,0,TK_SHOP.length-1);call(tkBuy);break;
  case 'siegeBuy':integer(0,0,SIEGE_SHOP.length-1);call(siegeBuy);break;
+ case 'idleSetGoal':meta.running=true;return idleSetGoal(String(args[0]));
+ case 'idleStore':case 'idleTake':if(!['forge','stable'].includes(args[0]))throw new Error('Kho không hợp lệ');return (name==='idleStore'?idleStore:idleTake)(args[0],integer(1,1));
+ case 'idleFeedHorse':return idleFeedHorse();
+ case 'idleWeeklyStart':meta.activityAt=gameNow();meta.running=true;return idleWeeklyStart();
+ case 'idleWeeklyClaim':return idleWeeklyClaim();
  case 'pickUp':{const drop=R.ground.find(d=>d.it.uid===args[0]);if(!drop)throw new Error('Món đồ không còn trên đất');R.pickTarget=drop;pickUp(drop);break;}
  case 'petAdopt':if(!petChoices().includes(args[0])||S.lvl<PET_LV)throw new Error('Đồng hành chưa mở');call(petAdopt);break;
  case 'tpPick':call(tpPick);break;
@@ -154,7 +163,7 @@ function econExecute(name,args,meta){
   if(name==='towerStart'&&S.lvl<TOWER_LV&&!RW().stat.reborn)throw new Error('Chưa mở Tháp I');
   ({towerStart,tkStart,siegeStart,jhDungeonStart,jhTowerStart,jhFerryStart}[name])(...args);meta.activityAt=gameNow();meta.damage=0;meta.running=true;break;
  }
- case 'activityExit':if(R.tower)towerExit(false);if(R.tk)tkExit(false);if(S.siege)siegeExit(false);meta.damage=0;break;
+ case 'activityExit':S.idleGoal='farm';if(R.tower)towerExit(false);if(R.tk)tkExit(false);if(S.siege)siegeExit(false);meta.damage=0;break;
  default:throw new Error('Thao tác kinh tế chưa được hỗ trợ');
  }
  return {ok:true};
@@ -167,6 +176,6 @@ function econStashGold(dir,n){const {key,st}=econStash();if(dir==='in'){if(S.gol
 function econStashMat(dir,group,key,n){if(!['ht','ore','shard','misc'].includes(group)||typeof key!=='string'&&typeof key!=='number')throw new Error('Nguyên liệu không hợp lệ');const box=econStash(),st=box.st;st.mats[group]=st.mats[group]||{};const have=dir==='in'?matHave(group,key):st.mats[group][key]||0;const count=n==null?have:n;if(!Number.isSafeInteger(have)||!Number.isSafeInteger(count)||count<1||count>have)throw new Error('Không đủ nguyên liệu');if(dir==='in'){matAdd(group,key,-count);st.mats[group][key]=(st.mats[group][key]||0)+count;}else if(dir==='out'){st.mats[group][key]-=count;matAdd(group,key,count);}else throw new Error('Thao tác kho không hợp lệ');return econStashWrite(box.key,st);}
 const economyEngine={
  collect(){if(S.ctrl==='manual'||!lootFilter().auto)return;for(const drop of [...R.ground])if(lootWanted(drop.it))pickUp(drop,true);},
- context:econContext,control:econControl,farm:econFarm,activity:econActivity,execute:econExecute,
+ plan:idlePlan,context:econContext,control:econControl,farm:econFarm,activity:econActivity,execute:econExecute,
  create(spec){const old=S;try{S=newSave();S.fac=spec.fac;S.mode=spec.mode;S.sex=spec.sex===1?1:0;S.sexSet=1;if(typeof spec.cid==='string'&&/^[A-Za-z0-9_-]{8,80}$/.test(spec.cid))S.cid=spec.cid;S.name=String(spec.name||FAC[spec.fac].n).trim().slice(0,16);S.speed=MC().defSpeed;S.diff=MC().diff??0;const f=FAC[S.fac];if(f.starter){S.sk[f.starter]=1;S.skPts=Math.max(0,S.skPts-1);S.main=f.starter;}starterGear();return structuredClone(S);}finally{S=old;}}
 };

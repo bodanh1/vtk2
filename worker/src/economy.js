@@ -8,7 +8,7 @@ const stmt=(db,q,...args)=>db.prepare(q).bind(...args);
 export const economyEnabled=env=>env.SERVER_ECONOMY_ENABLED==='1';
 export async function economyMeta(db,id){const row=await stmt(db,'SELECT meta_json FROM economy_states WHERE account_id=?1',id).first();return row?JSON.parse(row.meta_json):null;}
 export function economyPatch(bundle,meta){return {slots:bundle.slots.map((state,slot)=>({slot,state})),shared:bundle.shared,activeSlot:meta.activeSlot,runtime:meta.runtime||null,version:1};}
-function identify(bundle){for(const s of bundle.slots)if(s){checkStateSecurity(s);const items=[...(s.inv||[]),...Object.values(s.eq||{}),...(s.ground||[]).map(r=>r.it)].filter(Boolean);for(const it of items)if(!it.eid)it.eid=crypto.randomUUID();}for(const [key,st]of Object.entries(bundle.shared||{}))if(key.startsWith('jxidle_stash')){checkStateSecurity(st);for(const it of st.items||[])if(!it.eid)it.eid=crypto.randomUUID();}}
+function identify(bundle){for(const s of bundle.slots)if(s){checkStateSecurity(s);const items=[...(s.inv||[]),...(s.forgeVault||[]),...(s.stable||[]),...Object.values(s.eq||{}),...(s.ground||[]).map(r=>r.it)].filter(Boolean);for(const it of items)if(!it.eid)it.eid=crypto.randomUUID();}for(const [key,st]of Object.entries(bundle.shared||{}))if(key.startsWith('jxidle_stash')){checkStateSecurity(st);for(const it of st.items||[])if(!it.eid)it.eid=crypto.randomUUID();}}
 export async function ensureEconomy(env,acc){
  let meta=await economyMeta(env.DB,acc.id);if(meta||!economyEnabled(env))return meta;
  const row=await stmt(env.DB,'SELECT * FROM cloud_saves WHERE account_id=?1',acc.id).first(),now=Date.now();
@@ -30,6 +30,7 @@ export function prepareInventory(bundle,meta,body){
  if(!state||!c||typeof c!=='object')return;
  if(typeof c.autoJunk==='boolean')state.autoJunk=c.autoJunk;
  for(const key of ['lootF','filter','lootPolicy'])if(c[key]&&typeof c[key]==='object'&&!Array.isArray(c[key])&&JSON.stringify(c[key]).length<=5000)state[key]=structuredClone(c[key]);
+ if(c.forgeLoot&&typeof c.forgeLoot==='object')state.forgeLoot={enabled:c.forgeLoot.enabled===true,white:c.forgeLoot.white!==false,blue:c.forgeLoot.blue!==false,minLine:Math.max(1,Math.min(10,Number(c.forgeLoot.minLine)||5))};
  if(Array.isArray(c.locks))for(const pair of c.locks.slice(0,120)){if(!Array.isArray(pair)||!Number.isSafeInteger(pair[0])||typeof pair[1]!=='boolean')continue;const it=state.inv.find(it=>it.uid===pair[0])||Object.values(state.eq).find(it=>it?.uid===pair[0]);if(it)it.locked=pair[1];}
 }
 export function settleEconomy(bundle,meta,now){
@@ -73,7 +74,7 @@ export async function economyCommit(env,acc,body,type='sync'){
    if(!Number.isInteger(meta.activeSlot))throw new Error('Chọn nhân vật để chơi');
    const outcome=engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>engine.execute(body.action,body.args||[],meta));result=outcome.result;meta.runtime=outcome.runtime;notices=outcome.notices;
   }
-  if(type==='sync'&&Number.isInteger(meta.activeSlot))engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>engine.collect());
+  if(Number.isInteger(meta.activeSlot)&&(type==='sync'||(bundle.slots[meta.activeSlot]?.idleGoal||'farm')!=='farm')){const next=engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>{if(type==='sync')engine.collect();engine.plan(meta);});meta.runtime=next.runtime;}
   identify(bundle);
  }catch(e){if(e instanceof HttpError)throw e;fail('economy_action',e.message||'Thao tác không hợp lệ');}
  const response={ok:true,revision:row.revision+1,updatedAt:now,patch:economyPatch(bundle,meta),result,reward,notices};

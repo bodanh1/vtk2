@@ -7,21 +7,41 @@ const fail=(code,msg,status=400)=>{throw new HttpError(status,code,msg)};
 const stmt=(db,q,...v)=>db.prepare(q).bind(...v);
 export async function marketSaveCheck(db,id,bundle){
  for(const state of bundle.slots)if(state?.cid){
-  const uids=[...(state.inv||[]),...Object.values(state.eq||{}),...(state.ground||[]).map(r=>r.it)].filter(Boolean).map(it=>it.uid).filter(Number.isSafeInteger);
+  const uids=[...(state.inv||[]),...(state.forgeVault||[]),...(state.stable||[]),...Object.values(state.eq||{}),...(state.ground||[]).map(r=>r.it)].filter(Boolean).map(it=>it.uid).filter(Number.isSafeInteger);
   for(let i=0;i<uids.length;i+=80){const part=uids.slice(i,i+80),found=await stmt(db,'SELECT 1 FROM market_removed WHERE account_id=?1 AND cid=?2 AND uid IN ('+part.map((_,n)=>'?'+(n+3)).join(',')+') LIMIT 1',id,state.cid,...part).first();if(found)fail('market_restore','Bản lưu có đồ đã gửi lên Chợ đen; tải bản trên tài khoản để tiếp tục',409);}
  }
 }
-function receive(s,item){if(s.inv.length>=G.INV_MAX)fail('inventory_full','Hành trang đầy; dọn một ô trước');const ids=[...s.inv,...Object.values(s.eq||{}),...(s.ground||[]).map(r=>r.it)].filter(Boolean).map(it=>Number(it.uid)||0);s.uid=Math.max(Number(s.uid)||1,...ids.map(n=>n+1));const copy=structuredClone(item);copy.uid=s.uid++;copy.locked=true;s.inv.push(copy);}
+function receive(s,item){if(s.inv.length>=G.INV_MAX)fail('inventory_full','Hành trang đầy; dọn một ô trước');const ids=[...s.inv,...(s.forgeVault||[]),...(s.stable||[]),...Object.values(s.eq||{}),...(s.ground||[]).map(r=>r.it)].filter(Boolean).map(it=>Number(it.uid)||0);s.uid=Math.max(Number(s.uid)||1,...ids.map(n=>n+1));const copy=structuredClone(item);copy.uid=s.uid++;copy.locked=true;s.inv.push(copy);}
 export async function marketRoute(env,acc,body,url,method,cleanBundle){
  const db=env.DB,path=url.pathname.slice('/api/cloud/market/'.length),now=Date.now(),meta=await economyMeta(db,acc.id),secure=!!meta;
  if(method==='GET'&&path==='list'){
   const mode=url.searchParams.get('mode');if(!Object.hasOwn(G.MODES,mode))fail('market_mode','Chế độ không hợp lệ');
   const page=Math.min(10000,Math.max(0,Number(url.searchParams.get('page'))|0)),mine=url.searchParams.get('mine')==='1',q=(url.searchParams.get('q')||'').slice(0,60);
   const where=mine?'seller=?1 AND mode=?2 AND (status=\'active\' OR status=\'sold\' AND claimed=0)':'mode=?2 AND status=\'active\' AND expires_at>?3';
-  // Keep placeholders identical on both queries, including own expired listings.
-  const predicate=where+' AND (?3>=0) AND (?1 IS NOT NULL) AND name LIKE ?4 AND EXISTS(SELECT 1 FROM economy_states es WHERE es.account_id=market_listings.seller)='+Number(secure);
-  const count=await stmt(db,'SELECT COUNT(*) n FROM market_listings WHERE '+predicate,acc.id,mode,now,'%'+q+'%').first();
-  const rows=(await stmt(db,'SELECT id,seller,seller_name,name,item_json,currency,price,expires_at,status,claimed,cid FROM market_listings WHERE '+predicate+' ORDER BY created_at DESC LIMIT 20 OFFSET ?5',acc.id,mode,now,'%'+q+'%',page*20).all()).results.map(r=>({...r,item:JSON.parse(r.item_json),item_json:undefined,mine:r.seller===acc.id}));
+  const params=[acc.id,mode,now,'%'+q+'%'],bind=v=>'?'+params.push(v);
+  let predicate=where+' AND (?3>=0) AND (?1 IS NOT NULL) AND (name LIKE ?4 OR seller_name LIKE ?4) AND EXISTS(SELECT 1 FROM economy_states es WHERE es.account_id=market_listings.seller)='+Number(secure);
+  const currency=url.searchParams.get('currency'),kind=url.searchParams.get('kind'),rar=url.searchParams.get('rar'),sort=url.searchParams.get('sort');
+  if(['knb','gold'].includes(currency))predicate+=' AND currency='+bind(currency);
+  if(kind!==null&&/^([0-9]|10)$/.test(kind))predicate+=" AND json_extract(item_json,'$.d')="+bind(+kind);
+  if(rar==='set')predicate+=" AND json_extract(item_json,'$.set') IS NOT NULL AND COALESCE(json_extract(item_json,'$.set.kind'),'')<>'platina'";
+  else if(rar==='platina')predicate+=" AND json_extract(item_json,'$.set.kind')='platina'";
+  else if(rar==='vio')predicate+=" AND json_extract(item_json,'$.vio')=1";
+  else if(/^[0-5]$/.test(rar||''))predicate+=" AND json_extract(item_json,'$.r')="+bind(+rar);
+  if(url.searchParams.get('fit')==='1'||url.searchParams.get('funds')==='1'){
+   const save=await stmt(db,'SELECT snapshot FROM cloud_saves WHERE account_id=?1',acc.id).first(),state=JSON.parse(save?.snapshot||'null')?.slots?.[Number(url.searchParams.get('slot'))];
+   if(!state?.fac)fail('no_character','Chọn nhân vật đã lưu để lọc chợ');
+   if(url.searchParams.get('funds')==='1')predicate+=' AND price<=CASE currency WHEN \'knb\' THEN '+bind(state.knb||0)+' ELSE '+bind(Math.floor((state.gold||0)/10000))+' END';
+   if(url.searchParams.get('fit')==='1'){
+    const f=G.FAC[state.fac],base=G.J.start[f.series*2+(state.sex||0)]||G.J.start[0],values={32:base.str+(state.attr?.str||0),33:base.dex+(state.attr?.dex||0),34:base.vit+(state.attr?.vit||0),35:base.eng+(state.attr?.eng||0),36:state.lvl,37:f.series,38:state.sex||0,39:f.id};
+    const tests=Object.entries(values).map(([id,value])=>"(json_extract(req.value,'$[0]')="+id+" AND json_extract(req.value,'$[1]')>=0 AND json_extract(req.value,'$[1]')"+(+id>=37?'<>':'>')+bind(value)+')');
+    predicate+=" AND NOT EXISTS(SELECT 1 FROM json_each(COALESCE(json_extract(item_json,'$.req'),'[]')) req WHERE "+tests.join(' OR ')+')';
+    if(f.wcode>=0)predicate+=" AND (json_extract(item_json,'$.d')>1 OR "+(f.wcode===7?"json_extract(item_json,'$.d')=1":"(json_extract(item_json,'$.d')=0 AND json_extract(item_json,'$.k')="+bind(f.wcode===9?6:f.wcode)+')')+')';
+    if(state.chal==='white')predicate+=" AND COALESCE(json_extract(item_json,'$.r'),0)<2 AND json_extract(item_json,'$.set') IS NULL AND COALESCE(json_extract(item_json,'$.vio'),0)=0";
+   }
+  }
+  const order=sort==='low'?'currency ASC,price ASC,created_at DESC':sort==='high'?'currency ASC,price DESC,created_at DESC':'created_at DESC';
+  const count=await stmt(db,'SELECT COUNT(*) n FROM market_listings WHERE '+predicate,...params).first();
+  const offset=bind(page*20),rows=(await stmt(db,'SELECT id,seller,seller_name,name,item_json,currency,price,expires_at,status,claimed,cid FROM market_listings WHERE '+predicate+' ORDER BY '+order+' LIMIT 20 OFFSET '+offset,...params).all()).results.map(r=>({...r,item:JSON.parse(r.item_json),item_json:undefined,mine:r.seller===acc.id}));
   return {rows,total:count.n,page,pages:Math.ceil(count.n/20),now};
  }
  if(method!=='POST'||!['post','buy','cancel','collect'].includes(path))fail('not_found','Không có thao tác này',404);
