@@ -31,14 +31,16 @@ async function economyRecoverCheckpoint(){
  const claimed=await cloudClaim(),remote=await cloudApi('load');
  if(remote.checkpoint&&remote.bundle)remote.patch={...remote.checkpoint,slots:remote.bundle.slots.map((state,slot)=>({slot,state})),shared:remote.bundle.shared};
  if(CLOUD.user?.id!==owner||SLOT!==slot||S?.cid!==cid||remote.revision!==claimed.revision||remote.patch?.slots.find(x=>x.slot===slot)?.state?.cid!==cid)throw Object.assign(new Error('Tiến trình đã đổi; chọn lại nhân vật trên tài khoản'),{code:'save_conflict'});
- economyApply(remote);CLOUD.paused=false;cloudStatus('Đã nối lại đồng bộ · EXP do server xác nhận');return true;
+ economyApply(remote);CLOUD.paused=false;CLOUD.pauseReason=null;closeModal();refresh();cloudStatus('Đã nối lại đồng bộ · EXP do server xác nhận');return true;
 }
 const economyOriginalSync=cloudSync;
 cloudSync=async function(force=false){
  if(!serverEconomy())return economyOriginalSync(force);
- if(Date.now()<(CLOUD.retryAt||0)||SAVE_LOCK||CLOUD.paused||CLOUD.busy||document.hidden&&!force)return false;
+ if(Date.now()<(CLOUD.retryAt||0)||SAVE_LOCK||CLOUD.busy||document.hidden&&!force)return false;
+ if(CLOUD.paused&&CLOUD.pauseReason&&!['save_conflict','economy_refresh'].includes(CLOUD.pauseReason))return false;
  CLOUD.busy=true;
  try{
+  if(CLOUD.paused)return await economyRecoverCheckpoint();
   if(!CLOUD.lease||Date.now()-CLOUD.lastLeaseAt>90000){const claimed=await cloudClaim();if(claimed.revision!==CLOUD.revision){const e=new Error('Có tiến trình mới trên server; tải bản tài khoản');e.code='save_conflict';throw e;}}
   const payload=economyPayload(),sentControls=JSON.stringify(payload.controls);
   const r=await cloudApi('save',payload),current=economyControls();
@@ -50,7 +52,8 @@ cloudSync=async function(force=false){
 function economyAction(action,args=[],after){
  if(!serverEconomy())return false;
  if(Date.now()<(CLOUD.retryAt||0)){toast(CLOUD.status);return true;}
- if(CLOUD.paused||SAVE_LOCK){toast('Tải tiến trình tài khoản để tiếp tục');return true;}
+ if(SAVE_LOCK){toast('Tải tiến trình tài khoản để tiếp tục');return true;}
+ if(CLOUD.paused){cloudSync(true).then(ok=>toast(ok?'Đã nối lại tiến trình; kiểm tra hành trang rồi thao tác lại':CLOUD.status));return true;}
  const owner=CLOUD.user.id,slot=SLOT,cid=S?.cid;ECON.chain=ECON.chain.then(async()=>{
   if(!serverEconomy()||CLOUD.paused||CLOUD.user.id!==owner||SLOT!==slot||S?.cid!==cid)return;
   // Reuse the existing lease/revision flow; no timer per monster or skill is added.
@@ -62,12 +65,12 @@ function economyAction(action,args=[],after){
    const r=await cloudApi('economy/action',payload),current=economyControls();const preserve=Object.fromEntries(ECON_SETTINGS.filter(k=>JSON.stringify(current[k])!==JSON.stringify(payload.controls[k])).map(k=>[k,current[k]]));economyApply(r,economyPreserveLocks(current,payload.controls,preserve));economyPendingPoints(current,payload.controls);
    const msg=r.result?.msg||r.notices?.at(-1);if(msg)toast(msg);else economyNotice('Đã cập nhật');
    if(after)after(r);else refresh();
-  }catch(e){if(sent&&e.code==='offline'){e.code='save_conflict';e.message+=' · Tải bản tài khoản để kiểm tra kết quả';}cloudFail(e);toast(e.message);}
+  }catch(e){if(sent&&e.code==='offline'){e.code='save_conflict';e.message+=' · Đang kiểm tra kết quả trên tài khoản';}if(e.code==='save_conflict'){CLOUD.paused=true;CLOUD.pauseReason='save_conflict';try{await economyRecoverCheckpoint();toast('Đã nối lại tiến trình; kiểm tra hành trang rồi thao tác lại');return;}catch(recovery){e=recovery;}}cloudFail(e);toast(e.message);}
   finally{CLOUD.busy=false;}
  }).catch(e=>{CLOUD.busy=false;toast(e.message);});
  return true;
 }
-function economyWrap(name,encode,argsAfter){const original=window[name];if(typeof original!=='function')return;window[name]=function(...args){if(!serverEconomy()||ECON.applying)return original.apply(this,args);if(encode===false)return;const encoded=encode?encode(args):args;economyAction(name,encoded,argsAfter?()=>argsAfter(args):null);return {ok:false,n:0,gold:0,msg:'Đang xử lý trên server…'};};}
+function economyWrap(name,encode,argsAfter){const original=window[name];if(typeof original!=='function')return;window[name]=function(...args){if(!serverEconomy()||ECON.applying)return original.apply(this,args);if(encode===false)return;const encoded=encode?encode(args):args;economyAction(name,encoded,argsAfter?r=>argsAfter(args,r):null);return {ok:false,pending:true,n:0,gold:0,msg:'Đang xử lý trên server…'};};}
 for(const n of ['sell','discardItem','equip','enhance','reroll','upgradePlatina','stashDeposit'])economyWrap(n,args=>[args[0]?.uid],args=>{if(n==='sell'||n==='discardItem'){closeModal();refresh();}else if(n==='stashDeposit')stashModal();else if(n==='enhance'||n==='reroll'||n==='upgradePlatina'){const item=findItem(args[0]?.uid);if(item)forgeModal(item);}else refresh();});
 economyWrap('enchase',a=>[a[0]?.uid,a[1],a[2]],a=>{const it=findItem(a[0]?.uid);if(it)forgeModal(it);});
 economyWrap('fuse',a=>[a[0].map(it=>it.uid)],()=>htModal());
@@ -79,7 +82,7 @@ for(const n of ['claimLogin','claimLvMs','claimQuest','eventBuy','openChest','ta
 economyWrap('buyMask',null,()=>maskShopModal());
 economyWrap('wearMask',null,()=>{renderChar();if(document.getElementById('maskShopList'))maskShopModal();});
 economyWrap('buyTienThaoLo',null,()=>treasureShopModal());
-economyWrap('unequip',null,()=>refresh());economyWrap('sellUnmatched',null,()=>refresh());economyWrap('clearInventory',null,()=>renderInv());economyWrap('autoEquipAll',null,()=>refresh());
+economyWrap('unequip',null,()=>refresh());economyWrap('sellUnmatched',null,(_,r)=>{const result=r.result||{};toast(`Đã bán ${result.n||0} món · +${fmtMoney(result.gold||0)}${result.kept?' · giữ '+result.kept+' món bảo vệ / nâng cấp':''}`);refresh();});economyWrap('clearInventory',null,()=>renderInv());economyWrap('autoEquipAll',null,()=>refresh());
 for(const n of ['towerStart','tkStart','siegeStart','jhDungeonStart','jhTowerStart','jhFerryStart'])economyWrap(n,null,()=>{closeModal(true);R.town=false;});
 const economyOriginalReborn=doReborn;doReborn=function(){if(!serverEconomy())return economyOriginalReborn();if(S.lvl<MAX_LEVEL||RW().stat.reborn>=10)return;if(confirm('Chuyển sinh: về cấp 1, giữ trang bị và võ công. Tiếp tục?'))economyAction('doReborn',[],()=>{closeModal(true);refresh();tamPhapModal();});};
 // Server computes gains. Browser combat continues solely for animation and input feedback.

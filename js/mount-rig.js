@@ -4,7 +4,7 @@ function setClientRideAttack(state,attack){if(state)CLIENT_RIDE_ATTACKS.set(stat
 const CLIENT_RIDE_PARTS=[0,1,4,5,6,7,8,9];
 function clientRideAction(state,act){
  if(act==='run')return 'RideRun';if(act==='walk')return 'RideWalk';if(act==='hurt')return 'RideWound';
- if(act==='mag')return 'RideMagic';if(act==='at2')return 'RidePuncture';if(act==='at')return CLIENT_RIDE_ATTACKS.get(state)===10?'RidePuncture':'RideCut';
+ if(act==='mag')return 'RideMagic';if(act==='at2')return 'RidePuncture';if(act==='at'){const an=CLIENT_RIDE_ATTACKS.get(state);return an===11?'RideMagic':an===10?'RidePuncture':'RideCut';}
  return 'RideStand';
 }
 function clientRidePlan(state,act){

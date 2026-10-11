@@ -108,7 +108,7 @@ function econExecute(name,args,meta){
  const call=(fn)=>fn(...args);
  switch(name){
  case 'buyGoods':{const key=String(args[0]),index=integer(1,0,1000),g=shopEntries(key)[index];if(!SHOP_TABS.some(x=>x[0]===key)||!g)throw new Error('Món hàng không tồn tại');buyGoods(g,true);break;}
- case 'sell':sell(it(0,true));break;
+ case 'sell':{const item=it(0,true);if(item.locked)throw new Error('Mở khóa món đồ trước khi bán');return sell(item);}
  case 'discardItem':{const item=it(0,true);if(item.locked)throw new Error('Mở khóa món đồ trước khi vứt');return discardItem(item);}
  case 'sellUnmatched':return sellUnmatched();
  case 'clearInventory':return clearInventory();

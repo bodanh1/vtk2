@@ -65,12 +65,17 @@ export async function economyCommit(env,acc,body,type='sync'){
  let result,reward,notices=[];
  try{
   prepareInventory(bundle,meta,body);
+  // A selected owned item must not be consumed by elapsed automation first.
+  let selectedAction=false;
+  if(type==='action'&&['sell','discardItem'].includes(body.action)&&Number.isInteger(meta.activeSlot)&&body.slot===meta.activeSlot){
+   const outcome=engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>engine.execute(body.action,body.args||[],meta));result=outcome.result;meta.runtime=outcome.runtime;notices=outcome.notices;selectedAction=true;
+  }
   reward=settleEconomy(bundle,meta,now);
   // Only fac/name/sex/mode are used for a new character. Uploaded money/items/levels are discarded.
   hydrateEmpty(bundle,body.characters||body.bundle?.slots);
   control(bundle,body.slot??body.activeSlot,body.controls,now,meta);
   if(type==='action'&&body.action==='deleteCharacter'){const [target,cid]=body.args||[];if(!Number.isInteger(target)||target<0||target>2||bundle.slots[target]?.cid!==cid)fail('bad_character','Nhân vật đã thay đổi');const pending=await stmt(db,"SELECT 1 FROM market_listings WHERE seller=?1 AND cid=?2 AND (status='active' OR (status='sold' AND claimed=0)) LIMIT 1",acc.id,cid).first();if(pending)fail('market_pending','Nhận hết đồ và tiền ở chợ trước khi xóa nhân vật');bundle.slots[target]=null;if(meta.activeSlot===target){meta.activeSlot=null;meta.runtime=null;meta.running=false;}result={ok:true};}
-  else if(type==='action'){
+  else if(type==='action'&&!selectedAction){
    if(!Number.isInteger(meta.activeSlot))throw new Error('Chọn nhân vật để chơi');
    const outcome=engine.context(bundle,meta.activeSlot,now,meta.runtime,()=>engine.execute(body.action,body.args||[],meta));result=outcome.result;meta.runtime=outcome.runtime;notices=outcome.notices;
   }
