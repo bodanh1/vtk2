@@ -872,4 +872,4 @@ body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jx
 .auto-settings h4{margin:0 0 8px;color:#f2d66d}
 .auto-settings small{display:block;color:#a7b6a6;line-height:1.5;margin-top:6px}
 body.sv #autoControls{display:none}
-@media(pointer:coarse){#autoControls button{min-height:44px}#jxAutoSettings{width:44px;padding:11px}#autoControls #jxMini{min-width:44px;min-height:44px}#jxAutoSwitch{gap:5px;padding:4px 7px;font-size:14px}#autoControls{gap:4px}}
+@media(pointer:coarse),(max-width:600px){#autoControls button{min-height:44px}#jxAutoSettings{width:44px;padding:11px}#autoControls #jxMini{min-width:44px;min-height:44px}#jxAutoSwitch{gap:5px;padding:4px 7px;font-size:14px}#autoControls{gap:4px}}
