@@ -9,7 +9,7 @@ const TOGGLES=[
  {id:"push",n:"Vượt ải",get:()=>!!S.push,run:()=>$("#jxPush").click()},
  {id:"rot",n:"Xoay chiêu",get:()=>S.rot!==false,run:()=>$("#jxRot").click()},
  {id:"pot",n:"Tự dùng thuốc",get:()=>!S.potOff&&S.chal!=="nopot",run:()=>window.togglePotAuto&&window.togglePotAuto()},
- {id:"ctrl",n:"Thủ công",get:()=>typeof manual==="function"&&manual(),run:()=>setCtrl(manual()?"auto":"manual")}
+ {id:"ctrl",n:"Thủ công",get:()=>typeof manual==="function"&&manual(),run:()=>typeof toggleGameAuto==="function"?toggleGameAuto():setCtrl(manual()?"auto":"manual")}
 ];
 const GROUPS=[
  ["Chơi & tự động",true,["Thao tác nhanh","Tốc độ game","Tự động","Độ khó và trợ giúp"]],
@@ -88,7 +88,7 @@ function statText(){
  else if(S.siege)p.push("Công thành "+S.siege.layer+"/3");
  else if(R.tk)p.push("Tống Kim "+R.tk.wave+"/"+TK_WAVES);
  else if(R.town)p.push("Trong thành");
- else if(S.autoMovePaused)p.push("Tự tìm quái: tắt");
+ else if(S.autoMovePaused)p.push("Auto: tắt");
  else if(typeof manual==="function"&&manual()){const left=window.JXM?Math.ceil(window.JXM()/1e3):0;p.push(left>0?"Thủ công · tự đánh lại sau "+left+"s":"Thủ công")}
  else p.push(S.push?"Tự cày · vượt ải":"Tự cày · tại chỗ");
  const v=typeof gameSpeed==="function"?gameSpeed():1;if(v>1)p.push("×"+v);

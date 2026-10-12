@@ -852,3 +852,24 @@ body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jx
 #guideResults{font-size:12px;line-height:1.65}.guideCard{padding:9px 0;border-bottom:1px solid #6f8a5266}.guideCard h4{margin:3px 0;color:#ffd94e}.guideCard p{margin:6px 0}.guideCard small{color:#a9d3be}.guideCard li{margin:4px 0}.guideTable{overflow-x:auto;-webkit-overflow-scrolling:touch}.guideTable table{width:100%;border-collapse:collapse}.guideTable td,.guideTable th{padding:5px 6px;border-bottom:1px solid #6f8a5244;text-align:left;vertical-align:top}.guideTable th{color:#ffd94e}#guideSearch{box-sizing:border-box;width:100%;font-size:16px}#jxPlayerGuide i{background:none;font:20px/24px Arial,sans-serif}
 
 #guideSearch{background:#07140e;color:#e8f2ea;border:1px solid #72856a;border-radius:3px;padding:6px}.guideCard ol{padding-left:20px;list-style:decimal}
+/* Compact Auto controls beside the minimap toggle; CSS/SVG only. */
+#autoControls{position:absolute;z-index:35;display:flex;align-items:center;gap:5px;pointer-events:auto}
+#autoControls button{height:36px;border:1px solid #b79a4e;background:linear-gradient(#3e3113,#1d190c);color:#f6dfa0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#jxAutoSettings{width:36px;border-radius:50%;padding:8px}
+#jxAutoSettings svg{width:100%;height:100%;fill:currentColor}
+#jxAutoSwitch{display:flex;align-items:center;gap:8px;border-radius:24px;padding:4px 8px;font:14px Arial,sans-serif}
+#jxAutoSwitch i{position:relative;width:36px;height:23px;border:1px solid #b79a4e;border-radius:18px;background:#292616}
+#jxAutoSwitch i:after{content:"";position:absolute;left:2px;top:2px;width:17px;height:17px;border-radius:50%;background:#b4a887}
+#jxAutoSwitch.on i{background:#9b803c}
+#jxAutoSwitch.on i:after{left:15px;background:#fff0bd}
+#autoControls #jxMini{position:relative!important;inset:auto!important;flex-shrink:0;margin:0}
+#autoControls #jxMini{background:none!important;display:grid;place-items:center}
+#autoControls #jxMini:before{content:"";width:28px;height:28px;background:url(v2/b_map.png) 0 0/84px 28px no-repeat;image-rendering:pixelated}
+#autoControls #jxMini.off:before{background-position:-28px 0}
+.auto-settings .auto-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;font-size:14px}
+.auto-settings .auto-row input{width:22px;height:22px;flex-shrink:0;touch-action:manipulation}
+.auto-settings select{font-size:16px;min-height:40px;max-width:100px;touch-action:manipulation}
+.auto-settings h4{margin:0 0 8px;color:#f2d66d}
+.auto-settings small{display:block;color:#a7b6a6;line-height:1.5;margin-top:6px}
+body.sv #autoControls{display:none}
+@media(pointer:coarse){#autoControls button{min-height:44px}#jxAutoSettings{width:44px;padding:11px}#autoControls #jxMini{min-width:44px;min-height:44px}#jxAutoSwitch{gap:5px;padding:4px 7px;font-size:14px}#autoControls{gap:4px}}

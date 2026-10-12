@@ -1,0 +1,58 @@
+[
+  {
+    "id": 195,
+    "name": "Nhạn Đãng sơn",
+    "source": "\\maps\\江南区\\雁荡山\\雁荡山24.jpg",
+    "pak": "maps.pak",
+    "file": "img/z/195.webp",
+    "bytes": 128382
+  },
+  {
+    "id": 43,
+    "name": "Kiếm Các Trung Nguyên",
+    "source": "\\maps\\中原北区\\剑阁中原24.jpg",
+    "pak": "maps.pak",
+    "file": "img/z/43.webp",
+    "bytes": 129266
+  },
+  {
+    "id": 179,
+    "name": "La Tiêu sơn",
+    "source": "\\maps\\江南区\\罗霄山\\罗霄山24.jpg",
+    "pak": "maps.pak",
+    "file": "img/z/179.webp",
+    "bytes": 117098
+  },
+  {
+    "id": 193,
+    "name": "Vũ Di sơn",
+    "source": "\\maps\\江南区\\武夷山\\武夷山24.jpg",
+    "pak": "update01.pak",
+    "file": "img/z/193.webp",
+    "bytes": 100328
+  },
+  {
+    "id": 74,
+    "name": "Miêu Lĩnh",
+    "source": "\\maps\\两湖区\\神农架\\神农架24.jpg",
+    "pak": "maps.pak",
+    "file": "img/z/74.webp",
+    "bytes": 128874
+  },
+  {
+    "id": 167,
+    "name": "Điểm Thương sơn",
+    "source": "\\maps\\西南南区\\点苍山\\点苍山24.jpg",
+    "pak": "maps.pak",
+    "file": "img/z/167.webp",
+    "bytes": 114374
+  },
+  {
+    "id": 321,
+    "name": "Trường Bạch sơn Nam",
+    "source": "\\maps\\东北区\\长白山\\长白山南24.jpg",
+    "pak": "updatejx03.pak",
+    "file": "img/z/321.webp",
+    "bytes": 75276
+  }
+]

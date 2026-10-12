@@ -15,13 +15,13 @@
 <link rel="stylesheet" href="ui/black-market.css?v=93">
 <link rel="stylesheet" href="ui/account-admin.css?v=73">
 <link rel="stylesheet" href="ui/masks.css?v=83">
-<link rel="stylesheet" href="ui/jx2.css?v=137">
+<link rel="stylesheet" href="ui/jx2.css?v=138">
 <link rel="stylesheet" href="ui/jx/jx_layout.css">
 <link rel="stylesheet" href="ui/jx/jx_win.css?v=79">
 </head>
 <body>
 <div id="app">
-  <section id="battle">
+  <section id="battle"><div id="autoControls" aria-label="Điều khiển Auto"><button id="jxAutoSettings" aria-label="Cài đặt Auto" title="Cài đặt Auto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.6 6.4a5 5 0 0 0-6.1 6.1L2 19l3 3 6.5-6.5a5 5 0 0 0 6.1-6.1L14 13l-3-3z"/></svg></button><button id="jxAutoSwitch" role="switch" aria-label="Auto" aria-checked="true" title="Bật / tắt Auto (F)"><span>Auto</span><i aria-hidden="true"></i></button></div>
     <div id="bg"></div>
     <canvas id="arena"></canvas>
     <header id="top">
@@ -42,7 +42,6 @@
       <button class="rnd" id="jxPotionShop" data-r="med" title="Mua bình máu và mana ngay tại bãi train" aria-label="Shop thuốc: mua bình máu và mana"><i aria-hidden="true"></i><span class="sk">Shop thuốc</span></button>
       </div>
       <div id="jxExtraActs">
-      <button class="rnd tg" id="jxHunt" data-r="hunt" title="Bật / tắt tự di chuyển tìm và đánh quái" aria-label="Tự di chuyển tìm và đánh quái" aria-pressed="false"><i aria-hidden="true"></i><span class="sk">Tự tìm quái</span></button>
       <button class="rnd" id="jxBots" data-r="train" title="Menu mật độ nhân vật luyện cấp" aria-label="Menu nhân vật luyện cấp"><i></i><span class="sk">Menu bot</span></button>
       <button class="rnd" id="jxParty" data-r="party" title="Mời nhân vật xung quanh vào tổ đội" aria-label="Menu tổ đội"><i></i><span class="sk">Tổ đội</span></button>
       <button class="rnd" id="jxRanking" data-r="ranking" title="Xếp hạng người chơi theo chế độ" aria-label="Bảng xếp hạng"><i></i><span class="sk">Xếp hạng</span></button>
@@ -52,7 +51,6 @@
     <div class="rcol" id="jxR">
       <button class="rbtn" data-jt="log" data-ic="rec"><i></i><span class="sk">Nhật ký</span></button>
       <button class="rbtn big" id="giftBtn" title="Phần thưởng" data-ic="gift"><i></i><span class="sk">Quà</span></button>
-      <button class="rbtn" id="jxAuto" data-ic="char" title="Cày thông minh: bật Vượt ải + Tự nhặt + Xoay chiêu cùng lúc"><i></i><span class="sk">Tự cày</span></button>
       <button class="rbtn" id="jxToday" data-ic="pk" title="Việc hôm nay: điểm danh, nhiệm vụ, hoạt động còn lượt"><i></i><span class="sk">Hôm nay</span></button>
       <button class="rbtn" id="jxPick" data-ic="pick" title="Bật / tắt tự nhặt đồ theo bộ lọc Hành trang (phím G)"><i></i><span class="sk">Nhặt</span></button>
       <button class="rbtn" id="jxMount" data-ic="horse" title="Lên hoặc xuống ngựa" aria-pressed="false"><i></i><span class="sk">Lên ngựa</span></button>
@@ -133,6 +131,7 @@
 <script defer src="js/cloud-storage.js?v=1"></script>
 <script defer src="data.js"></script>
 <script defer src="world.js"></script>
+<script defer src="js/training-map-data.js?v=138"></script>
 <script defer src="sound.js"></script>
 <script defer src="fx.js?v=90"></script>
 <script defer src="jmo.js"></script>
@@ -151,7 +150,7 @@
 <script defer src="js/sets.js"></script>
 <script defer src="ref.js"></script>
 <script defer src="js/recipes.js?v=98"></script>
-<script defer src="js/combat.js?v=136"></script>
+<script defer src="js/combat.js?v=138"></script>
 <script defer src="js/local-guard.js?v=116"></script>
 <script defer src="js/save.js?v=116"></script>
 <script defer src="js/doll-data.js"></script>
@@ -167,9 +166,9 @@
 <script defer src="js/mask-data.js?v=112"></script>
 <script defer src="js/masks.js?v=129"></script>
 <script defer src="js/audio.js"></script>
-<script defer src="js/ui.js?v=126"></script>
+<script defer src="js/ui.js?v=138"></script>
 <script defer src="js/inventory-menu.js?v=119"></script>
-<script defer src="js/control.js?v=69"></script>
+<script defer src="js/control.js?v=138"></script>
 <script defer src="js/horse-shop-data.js?v=65"></script>
 <script defer src="js/shop.js?v=65"></script>
 <script defer src="js/rewards.js?v=128"></script>
@@ -194,9 +193,9 @@
 <script defer src="js/idle-systems.js?v=125"></script>
 <script defer src="js/loot-modes.js?v=117"></script>
 <script defer src="js/main.js?v=132"></script>
-<script defer src="js/jxshell.js?v=134"></script>
+<script defer src="js/jxshell.js?v=138"></script>
 <script defer src="js/quick.js?v=46"></script>
-<script defer src="js/uihub.js?v=128"></script>
+<script defer src="js/uihub.js?v=138"></script>
 <script defer src="js/feedback.js"></script>
 <script defer src="js/jxorig.js?v=83"></script>
 <script defer src="js/skill-scroll.js?v=74"></script>
@@ -208,6 +207,8 @@
 <script defer src="js/account-admin.js?v=121"></script>
 <script defer src="js/black-market.js?v=110"></script>
 <script defer src="js/idle-ui.js?v=128"></script>
-<script defer src="js/player-guide.js?v=137"></script>
+<script defer src="js/player-guide.js?v=138"></script>
+<script defer src="js/auto-settings.js?v=138"></script>
+<script defer src="js/training-maps.js?v=138"></script>
 </body>
 </html>

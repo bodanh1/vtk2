@@ -1,0 +1,8 @@
+// The native map overview path is defined by ScenePlaceMapC.cpp as <map root>24.jpg.
+// Import only a small training-ground tile; do not ship PAK files or entire maps.
+import fs from 'node:fs';import vm from 'node:vm';import {spawnSync} from 'node:child_process';import {read,close} from './client-sprite.mjs';
+const python=process.env.JX_PYTHON||'python';
+const c={window:{}};vm.runInNewContext(fs.readFileSync('data.js','utf8'),c);vm.runInNewContext(fs.readFileSync('js/training-map-data.js','utf8'),c);
+const destination='tools/map-preview';fs.mkdirSync(destination,{recursive:true});const audit=[];
+try{for(const q of c.window.JTRAIN_MAPS){const m=c.window.JX.maps.find(m=>m.id===q.id),native='\\maps\\'+m.path+'24.jpg';const encoded=spawnSync(python,['-c',"import sys; sys.stdout.buffer.write(sys.argv[1].encode('gbk'))",native]);if(encoded.status!==0)throw Error('GBK conversion failed');const r=read(encoded.stdout.toString('latin1'),'latin1');if(!r)throw Error('Missing native map '+q.id);const input=destination+'/'+q.id+'.jpg',output='img/z/'+q.id+'.webp';fs.writeFileSync(input,r.data);const converted=spawnSync(python,['-c',"from PIL import Image; import sys; im=Image.open(sys.argv[1]).convert('RGB'); x=(im.width-512)//2; y=(im.height-512)//2; im.crop((x,y,x+512,y+512)).save(sys.argv[2],'WEBP',quality=85,method=6)",input,output]);if(converted.status!==0)throw Error('Image conversion failed');audit.push({id:q.id,name:q.n,source:native,pak:r.pak,file:output,bytes:fs.statSync(output).size});}}finally{close();}
+fs.writeFileSync('docs/client-training-maps.json',JSON.stringify(audit,null,2));console.log('Imported',audit.length,'maps;',audit.reduce((n,m)=>n+m.bytes,0),'bytes.');
