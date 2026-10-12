@@ -91,6 +91,7 @@ function statText(){
  else if(S.autoMovePaused)p.push("Auto: tắt");
  else if(typeof manual==="function"&&manual()){const left=window.JXM?Math.ceil(window.JXM()/1e3):0;p.push(left>0?"Thủ công · tự đánh lại sau "+left+"s":"Thủ công")}
  else p.push(S.push?"Tự cày · vượt ải":"Tự cày · tại chỗ");
+ if(!R.tower&&!R.tk&&!R.town&&!S.siege&&S.push&&typeof stageAdvanceBlock==='function'){const note=stageAdvanceBlock();if(note)p.push(note);}
  const v=typeof gameSpeed==="function"?gameSpeed():1;if(v>1)p.push("×"+v);
  const b=typeof xpBuffLeft==="function"?xpBuffLeft():0;if(b>0)p.push("EXP +25% · "+Math.ceil(b/6e4)+"p");
  return p.join(" · ")}
