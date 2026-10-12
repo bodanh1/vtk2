@@ -3,6 +3,8 @@
  const topics=[['start','Bắt đầu'],['maps','Bản đồ'],['skills','Võ công'],['gear','Lên đồ'],['forge','Rèn đồ'],['loot','Nhặt / bán'],['activities','Hoạt động'],['mounts','Ngựa / mặt nạ'],['party','Tổ đội'],['account','Tài khoản']];
  const weapons={'-2':'Không hạn chế vũ khí','-1':'Tay không',0:'Kiếm',1:'Đao',2:'Côn',3:'Thương',4:'Chùy',5:'Song đao',100:'Phi Tiêu',101:'Phi Đao',102:'Tụ Tiễn'};
  const fold=t=>String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
+ const references=[['zone','Vùng và quái'],['set','Bộ Hoàng Kim'],['mat','Nguyên liệu rèn']];
+ const reference=typeof codexModal==='function'?codexModal:null;
  const table=(heads,rows)=>`<div class="guideTable"><table><thead><tr>${heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${esc(String(v))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
  let topic='start',query='',faction='',articles=[];
  function build(){
@@ -33,10 +35,12 @@
  }
  function results(){const q=fold(query),rows=articles.filter(a=>q?a.search.includes(q):a.key===topic);if(q)rows.sort((a,b)=>Number(fold(b.title).includes(q))-Number(fold(a.title).includes(q))); return rows.length?rows.map(a=>`<article class="guideCard"><small>${esc(topics.find(t=>t[0]===a.key)?.[1]||'')}</small><h4>${esc(a.title)}</h4>${a.body}</article>`).join(''):'<p>Không tìm thấy. Thử tên map, vũ khí, Bạch Kim, bộ lọc hoặc lưu tài khoản.</p>';}
  window.playerGuide=function(selected=topic){if(!S?.fac)return;topic=topics.some(t=>t[0]===selected)?selected:'start';faction=faction||S.fac;build();document.getElementById('jxOverflow')?.classList.add('hidden');document.getElementById('jxMenu')?.setAttribute('aria-expanded','false');
-  modal(`<h3>Bách khoa · server H5</h3><p class="desc">Hướng dẫn cho ${esc(MC().n)} · nhân vật cấp ${S.lvl}. Nội dung viết theo cơ chế server này.</p><label>Tìm hướng dẫn<input id="guideSearch" type="search" placeholder="Map, Tụ Tiễn, Bạch Kim, lọc đồ…" value="${esc(query)}"></label><div class="dtabs">${topics.map(([k,n])=>`<button data-guide-topic="${k}" class="${k===topic?'on':''}">${n}</button>`).join('')}</div>${topic==='skills'?`<label>Môn phái<select id="guideFaction">${Object.entries(FAC).map(([k,f])=>`<option value="${k}" ${k===faction?'selected':''}>${esc(f.n)}</option>`).join('')}</select></label>`:''}<div id="guideResults">${results()}</div><div class="btnrow"><button class="btn" id="guideClose">Đóng</button></div>`,()=>{
+  modal(`<h3>Bách khoa · server H5</h3><p class="desc">Hướng dẫn cho ${esc(MC().n)} · nhân vật cấp ${S.lvl}. Nội dung viết theo cơ chế server này.</p><label>Tìm hướng dẫn<input id="guideSearch" type="search" placeholder="Map, Tụ Tiễn, Bạch Kim, lọc đồ…" value="${esc(query)}"></label><div class="dtabs">${topics.map(([k,n])=>`<button data-guide-topic="${k}" class="${k===topic?'on':''}">${n}</button>`).join('')}${reference?references.map(([k,n])=>`<button data-guide-ref="${k}">${n}</button>`).join(''):''}</div>${topic==='skills'?`<label>Môn phái<select id="guideFaction">${Object.entries(FAC).map(([k,f])=>`<option value="${k}" ${k===faction?'selected':''}>${esc(f.n)}</option>`).join('')}</select></label>`:''}<div id="guideResults">${results()}</div><div class="btnrow"><button class="btn" id="guideClose">Đóng</button></div>`,()=>{
    document.getElementById('guideClose').onclick=()=>closeModal();document.querySelectorAll('[data-guide-topic]').forEach(b=>b.onclick=()=>{query='';playerGuide(b.dataset.guideTopic);});
+   document.querySelectorAll('[data-guide-ref]').forEach(b=>b.onclick=()=>codexModal(b.dataset.guideRef));
    document.getElementById('guideSearch').oninput=e=>{query=e.target.value;document.getElementById('guideResults').innerHTML=results();};const f=document.getElementById('guideFaction');if(f)f.onchange=()=>{faction=f.value;build();document.getElementById('guideResults').innerHTML=results();};
   });
  };
- const menu=document.getElementById('jxOverflow');if(menu){const b=document.createElement('button');b.id='jxPlayerGuide';b.className='rbtn';b.title='Bách khoa · hướng dẫn chơi';b.setAttribute('aria-label','Bách khoa');b.innerHTML='<i aria-hidden="true">📖</i><span class="sk">Bách khoa</span>';b.onclick=()=>playerGuide('start');menu.appendChild(b);}
+ // The Journal's existing Bách khoa button now opens the combined guide.
+ if(reference)codexModal=function(tab){if(!references.some(([key])=>key===tab)){playerGuide('start');return;}reference(tab);const back=document.createElement('button');back.className='btn sm';back.id='guideReferenceBack';back.textContent='Hướng dẫn chơi';back.onclick=()=>playerGuide('start');document.getElementById('mBody').appendChild(back);};
 })();
