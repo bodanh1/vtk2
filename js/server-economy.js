@@ -2,7 +2,7 @@
 // Only semantic controls/actions cross the network; rendering stays local.
 const ECON={version:0,chain:Promise.resolve(),applying:false,picking:new Map()};
 function serverEconomy(){if(CLOUD.economyVersion===1||CLOUD.meta?.economyVersion===1)ECON.version=1;return ECON.version===1&&!!CLOUD.user&&CLOUD.ready&&!CLOUD.detachedBundle;}
-const ECON_SETTINGS=['speed','diff','push','stage','autoEquip','autoJunk','autoBuy','autoPts','autoSk','autoForge','lootF','lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt','autoMovePaused','autoCfg','idleGoal','forgeLoot'];
+const ECON_SETTINGS=['speed','diff','push','pushHold','stage','autoEquip','autoJunk','autoBuy','autoPts','autoSk','autoForge','lootF','lowFx','ctrl','inputMode','rot','main','mainLock','slots','branch','potOff','autoPot','potAt','manaAt','autoMovePaused','autoCfg','idleGoal','forgeLoot'];
 function economyControls(){const c={};if(!S?.fac)return c;for(const k of ECON_SETTINGS)if(S[k]!==undefined)c[k]=JSON.parse(JSON.stringify(S[k]));c.attr=S.attr;c.sk=S.sk;c.locks=[...S.inv,...Object.values(S.eq)].filter(Boolean).map(it=>[it.uid,!!it.locked]);c.running=!R.town&&!S.autoMovePaused;return c;}
 function economyPreserveLocks(current,sent,preserve){const prior=new Map(sent.locks||[]);const changed=(current.locks||[]).filter(([id,locked])=>prior.has(id)&&prior.get(id)!==locked);return changed.length?{...preserve,locks:changed}:preserve;}
 function economyCache(fn){try{fn();}catch(e){if(!['QuotaExceededError','SecurityError','NS_ERROR_DOM_QUOTA_REACHED'].includes(e.name))throw e;CLOUD.cacheError=true;}}

@@ -29,7 +29,7 @@
       defineProperty(target,key,d){if(!allowed())return false;return Reflect.defineProperty(target,key,d);}
     });seen.set(value,proxy);seen.set(proxy,proxy);return proxy;
   }
-  const numbers=['gold','xp','knb','lvl','speed','attrPts','skPts','stage','maxStage','totalKills'];
+  const numbers=['gold','xp','knb','lvl','speed','attrPts','skPts','stage','maxStage','totalKills','tienThaoUntil','queHoaUntil','thienSonUntil'];
   function protect(state){
     if(!state||typeof state!=='object'||roots.has(state))return state;
     roots.add(state);

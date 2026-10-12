@@ -29,3 +29,4 @@ test('Safari stack format supports known script calls without requiring V8 forma
  // Constructor is captured at startup; test Safari by starting a fresh context.
  const s={...c,Error:c.Error};s.window=s;s.document=c.document;s.localStorage=new c.Storage();vm.createContext(s);vm.runInContext(source,s,{filename:base+'js/local-guard.js?v=116'});s.S={gold:7,xp:0,inv:[],eq:{},attr:{},sk:{}};s.S.gold=8;assert.equal(s.S.gold,8);c.Error=real;
 });
+test('native timed consumables save normally while console cannot extend their expiry',()=>{const{c,run}=setup();run('S.tienThaoUntil=1000;S.queHoaUntil=2000;S.thienSonUntil=3000;localStorage.setItem("jxidle",JSON.stringify(S));');run('S.tienThaoUntil=999999;S.queHoaUntil=999999;S.thienSonUntil=999999;','console');assert.equal(c.S.tienThaoUntil,1000);assert.equal(c.S.queHoaUntil,2000);assert.equal(c.S.thienSonUntil,3000);assert.equal(JSON.parse(c.localStorage.getItem('jxidle')).queHoaUntil,2000);});

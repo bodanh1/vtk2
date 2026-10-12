@@ -880,3 +880,11 @@ body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jx
 .auto-settings .auto-toggle input:focus-visible+i{outline:2px solid #fff0bd;outline-offset:3px}
 body.sv #autoControls{display:none}
 @media(pointer:coarse),(max-width:600px){#autoControls button{min-height:44px}#jxAutoSettings{width:44px;padding:11px}#autoControls #jxMini{min-width:44px;min-height:44px}#jxAutoSwitch{gap:5px;padding:4px 7px;font-size:14px}#autoControls{gap:4px}}
+.treasureHorse{display:grid;grid-template-columns:32px minmax(0,1fr) 85px;gap:9px;align-items:start;font-size:12px}
+.treasureHorse>img{width:32px;height:36px;object-fit:contain}
+.treasureHorse small{display:block;color:#aebda8;margin:3px 0}
+.treasureHorse>div:last-child{display:grid;gap:5px;text-align:right}
+.treasureHorse summary{cursor:pointer;color:#d5c388;min-height:28px;touch-action:manipulation}
+.treasureProduct small{display:block;color:#b7c1a7;margin-top:5px}
+.treasureTabs button,.treasureHorse button{touch-action:manipulation}
+@media(pointer:coarse),(max-width:600px){.treasureTabs button,.treasureHorse button,.treasureProduct button{min-height:40px}}

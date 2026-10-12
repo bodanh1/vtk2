@@ -1,0 +1,44 @@
+[
+  {
+    "name": "que-hoa-tuu",
+    "source": "\\spr\\item\\medecine\\zq_icon_004.spr",
+    "pak": "ui.pak",
+    "f": "img/i/que-hoa-tuu.png",
+    "w": 20,
+    "h": 23,
+    "ax": 157,
+    "ay": 219,
+    "d": 1,
+    "n": 1,
+    "per": 1,
+    "frames": [
+      0
+    ],
+    "interval": 1,
+    "sourceW": 24,
+    "sourceH": 24,
+    "compact": true,
+    "bytes": 1193
+  },
+  {
+    "name": "thien-son-bao-lo",
+    "source": "\\spr\\item\\medecine\\tianshanyulu.spr",
+    "pak": "ui.pak",
+    "f": "img/i/thien-son-bao-lo.png",
+    "w": 20,
+    "h": 24,
+    "ax": 157,
+    "ay": 220,
+    "d": 1,
+    "n": 1,
+    "per": 1,
+    "frames": [
+      0
+    ],
+    "interval": 1,
+    "sourceW": 24,
+    "sourceH": 24,
+    "compact": true,
+    "bytes": 1416
+  }
+]

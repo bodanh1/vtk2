@@ -17,7 +17,7 @@ export const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS market_requests(account_id TEXT NOT NULL,request_id TEXT NOT NULL,client_id TEXT NOT NULL,response_json TEXT NOT NULL,created_at INTEGER NOT NULL,ok INTEGER NOT NULL CHECK(ok=1),PRIMARY KEY(account_id,request_id))`,
   `CREATE TABLE IF NOT EXISTS market_removed(account_id TEXT NOT NULL,cid TEXT NOT NULL,uid INTEGER NOT NULL,PRIMARY KEY(account_id,cid,uid))`,
   `CREATE TABLE IF NOT EXISTS admin_grants(account_id TEXT NOT NULL,request_id TEXT NOT NULL,client_id TEXT NOT NULL,slot INTEGER NOT NULL,entry_id TEXT NOT NULL,quantity INTEGER NOT NULL,created_at INTEGER NOT NULL,response_json TEXT NOT NULL,PRIMARY KEY(account_id,request_id))`,
-  `CREATE TABLE IF NOT EXISTS player_rankings(actor_key TEXT NOT NULL,mode TEXT NOT NULL,char_id TEXT NOT NULL,name TEXT NOT NULL,fac TEXT NOT NULL,lvl INTEGER NOT NULL,xp REAL NOT NULL,power INTEGER NOT NULL,at INTEGER NOT NULL,PRIMARY KEY(actor_key,mode,char_id))`,
+  `CREATE TABLE IF NOT EXISTS player_rankings(actor_key TEXT NOT NULL,mode TEXT NOT NULL,char_id TEXT NOT NULL,name TEXT NOT NULL,fac TEXT NOT NULL,lvl INTEGER NOT NULL,xp REAL NOT NULL,power INTEGER NOT NULL,at INTEGER NOT NULL,reborn INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(actor_key,mode,char_id))`,
   `CREATE INDEX IF NOT EXISTS player_rankings_mode ON player_rankings(mode,lvl DESC,power DESC)`,
   `CREATE TABLE IF NOT EXISTS player_presence(tab_key TEXT PRIMARY KEY,actor_key TEXT NOT NULL,seen_at INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS player_presence_seen ON player_presence(seen_at)`,
@@ -82,10 +82,12 @@ const COLUMNS = [
   "ALTER TABLE chars ADD COLUMN power INTEGER NOT NULL DEFAULT 0",
   "ALTER TABLE chars ADD COLUMN bracket TEXT",
   "ALTER TABLE chars ADD COLUMN flagged INTEGER NOT NULL DEFAULT 0",
+  "ALTER TABLE player_rankings ADD COLUMN reborn INTEGER NOT NULL DEFAULT 0",
 ];
 
+export const RANKING_REBORN_BACKFILL=`UPDATE player_rankings SET reborn=COALESCE((SELECT MIN(10,MAX(0,CAST(COALESCE(json_extract(CASE WHEN slot.type='object' THEN slot.value ELSE '{}' END,'$.rw.stat.reborn'),0) AS INTEGER))) FROM cloud_saves AS save,json_each(CASE WHEN json_valid(save.snapshot) THEN save.snapshot ELSE '{"slots":[]}' END,'$.slots') AS slot WHERE save.account_id=substr(player_rankings.actor_key,9) AND json_valid(save.snapshot) AND json_extract(CASE WHEN slot.type='object' THEN slot.value ELSE '{}' END,'$.cid')=player_rankings.char_id AND json_extract(CASE WHEN slot.type='object' THEN slot.value ELSE '{}' END,'$.mode')=player_rankings.mode LIMIT 1),0) WHERE actor_key LIKE 'account:%' AND reborn=0`;
 let ready = null;
-async function schemaInstalled(db){const names=SCHEMA.map(q=>/^CREATE (?:TABLE|INDEX) IF NOT EXISTS (\w+)/.exec(q)?.[1]).filter(Boolean).concat(['chars_mode_ladder','chars_ladder']);const row=await db.prepare('SELECT COUNT(*) n FROM sqlite_master WHERE name IN ('+names.map((_,i)=>'?'+(i+1)).join(',')+')').bind(...names).first();if(row.n!==names.length)return false;const mark=await db.prepare("SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97'").first();if(!mark)return false;const columns=(await db.prepare('PRAGMA table_info(chars)').all()).results.map(r=>r.name);return ['mode','power','bracket','flagged'].every(k=>columns.includes(k));}
+async function schemaInstalled(db){const names=SCHEMA.map(q=>/^CREATE (?:TABLE|INDEX) IF NOT EXISTS (\w+)/.exec(q)?.[1]).filter(Boolean).concat(['chars_mode_ladder','chars_ladder','player_rankings_power']);const row=await db.prepare('SELECT COUNT(*) n FROM sqlite_master WHERE name IN ('+names.map((_,i)=>'?'+(i+1)).join(',')+')').bind(...names).first();if(row.n!==names.length)return false;const mark=await db.prepare("SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97'").first();if(!mark)return false;const columns=(await db.prepare('PRAGMA table_info(chars)').all()).results.map(r=>r.name);return ['mode','power','bracket','flagged'].every(k=>columns.includes(k));}
 
 
 
@@ -100,8 +102,10 @@ export function ensureSchema(db) {
           db.prepare("INSERT OR IGNORE INTO economy_market_backup(id,row_json) SELECT id,json_object('id',id,'seller',seller,'seller_name',seller_name,'cid',cid,'slot',slot,'mode',mode,'name',name,'item_json',item_json,'currency',currency,'price',price,'created_at',created_at,'expires_at',expires_at,'status',status,'claimed',claimed,'buyer',buyer,'sold_at',sold_at) FROM market_listings WHERE NOT EXISTS(SELECT 1 FROM economy_backup_marks WHERE id='pre-server-economy-v97')"),
           db.prepare("INSERT OR IGNORE INTO economy_backup_marks(id,created_at) VALUES('pre-server-economy-v97',CAST(strftime('%s','now') AS INTEGER)*1000)")
         ]);
-        let addedMode=false;
-        for(const sql of COLUMNS){try{await db.prepare(sql).run();if(sql===COLUMNS[0])addedMode=true;}catch(e){if(!/duplicate column/i.test(String(e&&e.message)))throw e;}}
+        let addedMode=false,addedReborn=false;
+        for(const sql of COLUMNS){try{await db.prepare(sql).run();if(sql===COLUMNS[0])addedMode=true;if(sql===COLUMNS[4])addedReborn=true;}catch(e){if(!/duplicate column/i.test(String(e&&e.message)))throw e;}}
+        if(addedReborn)await db.prepare(RANKING_REBORN_BACKFILL).run();
+        await db.prepare("CREATE INDEX IF NOT EXISTS player_rankings_power ON player_rankings(mode,power DESC,lvl DESC,xp DESC,name ASC)").run();
         if(addedMode)await db.prepare("UPDATE chars SET mode=json_extract(snapshot,'$.mode') WHERE snapshot IS NOT NULL AND json_valid(snapshot) AND json_extract(snapshot,'$.mode') IN ('ctc','phlt','g2') AND mode<>json_extract(snapshot,'$.mode')").run();
         await db.prepare("CREATE INDEX IF NOT EXISTS chars_mode_ladder ON chars(mode,bracket,flagged,power)").run();
         await db.prepare("CREATE INDEX IF NOT EXISTS chars_ladder ON chars(bracket, flagged, power)").run();

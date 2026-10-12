@@ -94,6 +94,7 @@ function statText(){
  if(!R.tower&&!R.tk&&!R.town&&!S.siege&&S.push&&typeof stageAdvanceBlock==='function'){const note=stageAdvanceBlock();if(note)p.push(note);}
  const v=typeof gameSpeed==="function"?gameSpeed():1;if(v>1)p.push("×"+v);
  const b=typeof xpBuffLeft==="function"?xpBuffLeft():0;if(b>0)p.push("EXP +25% · "+Math.ceil(b/6e4)+"p");
+ const luck=typeof farmLuckBonus==='function'?farmLuckBonus():0;if(luck>0)p.push('May mắn +'+luck);
  return p.join(" · ")}
 setInterval(()=>{const t=statText();if(st.textContent!==t)st.textContent=t;st.style.display=t?"":"none"},500);
 })();
