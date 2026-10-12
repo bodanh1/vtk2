@@ -68,7 +68,7 @@ body.compact #tabs{display:contents!important}
 .row .btn,.stagectl .btn{flex:none}
 
 /* hàng điều khiển: 3 nút tròn của client (按钮条按钮: pk / 跑步 / 打坐), phóng đúng 2x, không kéo giãn */
-.acts{position:absolute;left:4px;top:calc(52px + var(--safe-t));display:flex;gap:2px;z-index:7}
+.acts{position:absolute;left:4px;top:calc(67px + var(--safe-t));display:flex;gap:2px;z-index:7}
 .rnd{position:relative;width:56px;display:grid;justify-items:center;gap:1px;padding:0;border:0;background:none;color:inherit;cursor:pointer}
 .rnd i{width:40px;height:40px;background:var(--ri) 0 0/auto 100% no-repeat;image-rendering:pixelated;filter:drop-shadow(0 1px 1px #000)}
 .rnd span{font:700 10.5px/12px var(--font);color:var(--jx-label);white-space:nowrap}
@@ -259,7 +259,7 @@ body.sv #top{display:none}
 .invbar #bSellAll{grid-column:1/-1}
 /* KN len chung hang HUD voi HP / MP */
 .hslot.xp span::before{content:"KN ";color:var(--jx-label)}
-.acts{top:calc(52px + var(--safe-t))}
+.acts{top:calc(67px + var(--safe-t))}
 .stg{top:calc(21px + var(--safe-t));transform-origin:100% 0}
 
 /* nút ẩn / hiện bản đồ nhỏ (小地图－世界大地图按钮.spr, 2x) — nằm sát trái ô ải */
@@ -637,8 +637,8 @@ body.jxleft.jxland #jxOverflow{left:0;right:auto}
   body.jxthumb .acts .rnd{width:42px}
   body.jxthumb .acts .rnd span{width:42px;font-size:10px}
 }
-#jxStat{position:absolute;left:var(--edge-l,2px);top:calc(50px + var(--safe-t,0px));z-index:6;max-width:calc(100% - 140px);padding:1px 7px;border:1px solid var(--jx-line2,#3b6a50);background:rgba(6,19,13,.72);color:var(--jx-gold,#e6c67a);font:600 10.5px/16px var(--font);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.jxland #jxStat{top:calc(100px + var(--safe-t,0px))}
+#jxStat{position:absolute;left:var(--edge-l,2px);top:calc(65px + var(--safe-t,0px));z-index:6;max-width:calc(100% - 140px);padding:1px 7px;border:1px solid var(--jx-line2,#3b6a50);background:rgba(6,19,13,.72);color:var(--jx-gold,#e6c67a);font:600 10.5px/16px var(--font);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.jxland #jxStat{top:calc(115px + var(--safe-t,0px))}
 body.sv #jxStat{display:none!important}
 .mgrp{margin:6px 0;border:1px solid var(--jx-line2,#3b6a50);background:rgba(6,19,13,.35)}
 .mgrp>summary{cursor:pointer;padding:10px 12px;min-height:24px;font-weight:650;color:var(--jx-gold,#e6c67a);list-style:none}
@@ -699,7 +699,7 @@ body.jxland .acts{max-width:232px;flex-wrap:wrap}
 /* Màn dọc nhỏ (rộng < 360px hoặc cao < 640px): bỏ dải trạng thái và dòng thông báo trên chiến trường cho đỡ chật; nhật ký vẫn xem ở nút Nhật ký */
 body.jxsmall #jxStat,body.jxsmall #jxChat{display:none!important}
 /* Máy tính / màn không phải cảm ứng dọc: dải trạng thái nằm dưới hàng nút hoạt động */
-body:not(.jxthumb) #jxStat{top:calc(100px + var(--safe-t,0px));max-width:232px}
+body:not(.jxthumb) #jxStat{top:calc(115px + var(--safe-t,0px));max-width:232px}
 
 /* Chấm xanh: có quà / nhiệm vụ nhận được (nút Quà, Hôm nay, thẻ trong hộp Quà, dòng nhận được) */
 #giftBtn.on::after,#jxToday.on::after{content:"";position:absolute;right:8px;top:2px;width:8px;height:8px;background:#3fd16b;border:1px solid #062;border-radius:50%;box-shadow:0 0 6px #3fd16baa;animation:none}
@@ -744,8 +744,8 @@ body.jxthumb #jxActs{flex-wrap:wrap}body.jxland #jxActs{max-width:min(408px,calc
 #jxActsToggle{position:relative;z-index:1;width:36px;height:44px;padding:0;border:1px solid #bfa45d88;border-radius:4px;background:#102117d9;color:#e6d094;font-size:22px;line-height:40px;cursor:pointer;touch-action:manipulation;pointer-events:auto;-webkit-appearance:none;appearance:none}
 #jxActs.actionsCollapsed #jxExtraActs{grid-template-columns:36px;width:36px}
 #jxActs.actionsCollapsed,body.jxland #jxActs.actionsCollapsed,body.jxthumb #jxActs.actionsCollapsed{width:36px}
-body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(145px + var(--safe-t,0px))}
-body:not(.jxthumb).actionsCollapsed #jxStat{top:calc(100px + var(--safe-t,0px))}
+body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(160px + var(--safe-t,0px))}
+body:not(.jxthumb).actionsCollapsed #jxStat{top:calc(115px + var(--safe-t,0px))}
 
 .partyHudToggle{position:absolute;right:-25px;top:0;width:24px;height:30px;padding:0;border:1px solid #849c6277;border-radius:0 4px 4px 0;background:#102117dc;color:#e6d094;font-size:24px;line-height:26px;cursor:pointer;touch-action:manipulation}
 #partyHud.partyHudCollapsed{width:0;height:30px;border:0;background:none}
@@ -837,9 +837,9 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #jxActs,body.jxland #jxActs,body.jxthumb #jxActs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));min-height:44px}
 #jxMainActs,#jxExtraActs,#jxActs.actionsCollapsed #jxExtraActs{display:contents}
 #jxActsToggle{position:absolute;right:-23px;top:9px;margin:0;grid-column:auto}
-body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(100px + var(--safe-t,0px))}
+body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(115px + var(--safe-t,0px))}
 body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(124px + var(--safe-t,0px))!important}
-body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxStat{top:calc(145px + var(--safe-t,0px))}
+body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxStat{top:calc(160px + var(--safe-t,0px))}
 body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxChat{top:calc(169px + var(--safe-t,0px))!important}
 
 #jxParty.partyPending::after{content:"!";position:absolute;right:2px;top:0;z-index:2;width:12px;height:12px;box-sizing:border-box;border:1px solid #ffe295;border-radius:50%;background:#b82219;color:#fff5b5;font:700 10px/10px Arial,sans-serif;text-align:center;pointer-events:none}
@@ -911,3 +911,6 @@ body.sv #autoControls{display:none}
 .loot-set-chosen span{min-width:0;overflow-wrap:anywhere}
 .loot-set-chosen button{flex:0 0 30px;padding:2px;min-height:30px;touch-action:manipulation}
 @media(pointer:coarse),(max-width:600px){.treasureTabs button,.treasureHorse button,.treasureProduct button{min-height:40px}}
+
+.hname .hpower{font-size:11px;line-height:15px;gap:4px}
+.hname #hudPower{color:#ffe091;font-weight:700;font-variant-numeric:tabular-nums}
