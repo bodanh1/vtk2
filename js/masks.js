@@ -3,6 +3,7 @@ const MASK_ITEMS=new Map((window.JMASK?.items||[]).map(m=>[m.id,m]));
 let maskPage=0,maskQuery='';
 function ownedMasks(state=S){return Array.isArray(state?.maskOwned)?state.maskOwned:[];}
 function equippedMask(state=S){return ownedMasks(state).includes(state?.maskId)?MASK_ITEMS.get(state.maskId)||null:null;}
+function maskMountBadge(state){return !!(state?.mounted&&state.eq?.horse&&equippedMask(state));}
 function buyMask(id){const item=MASK_ITEMS.get(id);if(!S?.fac||!item)return false;if(ownedMasks().includes(id)){toast('Đã sở hữu mặt nạ này');return false;}if(!Number.isSafeInteger(S.knb)||S.knb<item.price){toast('Không đủ Kim Nguyên Bảo');return false;}S.knb-=item.price;S.maskOwned=[...ownedMasks(),id];save();updateTop();maskShopModal();toast('Đã mua '+item.n);return true;}
 function wearMask(id){if(id!==null&&(!MASK_ITEMS.has(id)||!ownedMasks().includes(id)))return false;const old=equippedMask();S.maskId=id;const next=equippedMask();if(old&&old.id!==next?.id)for(const sheet of Object.values(old.anim)){const image=IMG[sheet.f];if(image){image.src="";delete IMG[sheet.f];}}if(next)for(const act of ["st","run","at","at2","mag"])img(next.anim[act].f);save();renderChar();if(document.getElementById('maskShopList'))maskShopModal();toast(id===null?'Đã tháo mặt nạ':'Đã đeo '+MASK_ITEMS.get(id).n);return true;}
 function maskShopModal(){if(!S?.fac)return;const all=[...MASK_ITEMS.values()].filter(m=>!maskQuery||noMark(m.n).includes(noMark(maskQuery))),pages=Math.max(1,Math.ceil(all.length/16));maskPage=Math.min(maskPage,pages-1);const current=equippedMask();
