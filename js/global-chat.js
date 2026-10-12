@@ -7,7 +7,7 @@
   let retryAt=0,retryMsg='';
   const seen = new Set();
   const ready = () => typeof S !== 'undefined' && S && S.fac;
-  const key = () => saveKey() + '_global_chat_social_v2_' + (typeof CLOUD!=='undefined'&&CLOUD.user?.id||'guest');
+  const key = () => saveKey() + '_global_chat_social_v3_' + (typeof CLOUD!=='undefined'&&CLOUD.user?.id||'guest');
   const identity = () => { try { const value = JSON.parse(localStorage.getItem(key()) || 'null'); return value && value.name === S.name ? value : null } catch { return null } };
   const api = async (path, body, token, signal) => {
     if(Date.now()<retryAt)throw {msg:retryMsg,retryAfter:Math.ceil((retryAt-Date.now())/1000)};
@@ -26,7 +26,7 @@
       seen.add(message.id); cursor = Math.max(cursor, message.id);
       const row = document.createElement('p'), time = document.createElement('time'), name = document.createElement('b');
       time.textContent = new Date(message.at).toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
-      if(message.isAdmin===true)name.classList.add('chatAdmin');
+      if(message.isAdmin===true){row.classList.add('chatAdmin');name.classList.add('chatAdmin');}
       name.textContent = message.name + ' #' + message.sender.slice(-4) + ': ';
       row.append(time, name, document.createTextNode(message.text));
       row.dataset.id = message.id; list.appendChild(row);

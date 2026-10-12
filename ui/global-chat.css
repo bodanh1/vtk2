@@ -12,3 +12,5 @@
 #globalChatInput{flex:1;min-width:0;background:#07140b;color:#fff;border:1px solid #8b8058;padding:6px;font-size:16px}
 
 #globalChatMessages b.chatAdmin{color:#ff4545;font-weight:700}
+
+#globalChatMessages p.chatAdmin{color:#ff4545}#globalChatMessages p.chatAdmin b{color:inherit}

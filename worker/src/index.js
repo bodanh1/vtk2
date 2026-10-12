@@ -45,7 +45,7 @@ export default {
     const fn = url.pathname.startsWith("/api/cloud/") ? cloudRoute : ROUTES[req.method + " " + url.pathname];
     if (!fn) return json({ error: "not_found" }, 404);
     try {
-      if(env.SOCIAL&&(url.pathname==='/api/social'||url.pathname==='/api/presence'||url.pathname==='/api/chat'||url.pathname==='/api/chat/session'))return await env.SOCIAL.get(env.SOCIAL.idFromName('global-v1')).fetch(req);
+      if(env.SOCIAL&&(url.pathname==='/api/social'||url.pathname==='/api/presence'||url.pathname==='/api/chat'||url.pathname==='/api/chat/session'))return await env.SOCIAL.get(env.SOCIAL.idFromName('global-v2')).fetch(req);
       if (!env.DB) throw new HttpError(503, "no_db", "Chưa gắn cơ sở dữ liệu D1");
       await ensureSchema(env.DB);
       const body = req.method === "POST" ? await readJson(req) : null;

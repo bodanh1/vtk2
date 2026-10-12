@@ -40,6 +40,7 @@ export class SocialRoom {
   if(this.historyReady)return this.historyReady;
   this.historyReady=(async()=>{if(this.sql.exec('SELECT v FROM social_version WHERE v=2').toArray().length)return;
    // Import only into an empty room. Never overwrite newer messages after a restart.
+   if(!this.sql.exec('SELECT id FROM chat_messages LIMIT 1').toArray().length&&this.env.SOCIAL){try{const response=await this.env.SOCIAL.get(this.env.SOCIAL.idFromName('global-v1')).fetch(new Request('https://social.internal/api/chat'));if(!response.ok)throw Error('history unavailable');const {messages}=await response.json();for(const row of messages||[])this.sql.exec('INSERT OR IGNORE INTO chat_messages(id,name,sender,text,at) VALUES(?,?,?,?,?)',row.id,row.name,row.sender,row.text,row.at);}catch(e){console.warn('Previous room history remains archived');}}
    if(!this.sql.exec('SELECT id FROM chat_messages LIMIT 1').toArray().length&&this.env.DB){try{const rows=(await this.env.DB.prepare('SELECT id,name,sender,text,at FROM chat_messages WHERE at>?1 ORDER BY id DESC LIMIT 50').bind(Date.now()-7*86400000).all()).results;for(const row of rows.reverse())this.sql.exec('INSERT OR IGNORE INTO chat_messages(id,name,sender,text,at) VALUES(?,?,?,?,?)',row.id,row.name,row.sender,row.text,row.at);}catch(e){console.warn('Previous chat remains archived in D1');}}
    this.sql.exec('INSERT INTO social_version VALUES(2)');
   })();return this.historyReady;
