@@ -2,10 +2,22 @@
 const CLIENT_ACTIVITY=window.JCLIENT_ACTIVITY||{buffs:{},bosses:[]};
 // Visual skins keep the original encounter's stats, drops and NPC template.
 for(const boss of CLIENT_ACTIVITY.bosses)W.anim[boss.key]=boss.anim;
+const CLIENT_BOSS_BAGS=new WeakMap(),CLIENT_BOSS_FIRST=new Map();
+function clientBossSkin(run){
+ let bag=CLIENT_BOSS_BAGS.get(run);
+ if(!bag||!bag.length){
+  bag=CLIENT_ACTIVITY.bosses.slice();
+  for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}
+  const key=run.kind==='dungeon'?'dungeon:'+run.d?.id:run.kind||'tower';
+  if(bag.length>1&&bag[0].key===CLIENT_BOSS_FIRST.get(key))[bag[0],bag[1]]=[bag[1],bag[0]];
+  if(!CLIENT_BOSS_BAGS.has(run))CLIENT_BOSS_FIRST.set(key,bag[0].key);
+  CLIENT_BOSS_BAGS.set(run,bag);
+ }
+ return bag.shift();
+}
 function clientActivityBoss(enemy,run){
  if(!run||enemy.cls!=="boss"||run.kind&&!["tower2","dungeon"].includes(run.kind)||!CLIENT_ACTIVITY.bosses.length)return enemy;
- const offset=run.kind==="dungeon"?JH_DUNGEONS.findIndex(d=>d.id===run.d?.id):Math.floor((run.floor||1)/5)-1+(run.kind==="tower2"?3:0);
- const boss=CLIENT_ACTIVITY.bosses[(Math.max(0,offset))%CLIENT_ACTIVITY.bosses.length];
+ const boss=clientBossSkin(run);
  enemy.clientAnimKey=boss.key;enemy.animKey=boss.key;return enemy;
 }
 function clientBuffList(){
