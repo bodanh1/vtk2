@@ -20,10 +20,11 @@
   }
   function blocked(){const now=performance.now();if(now-lastNotice>5000){lastNotice=now;try{if(typeof toast==='function')toast('Không thể chỉnh dữ liệu trực tiếp ngoài thao tác game.');}catch{}}}
   function allowed(){if(trusted())return true;blocked();return false;}
-  function collection(value){
+  function collection(value,deep=false){
     if(!value||typeof value!=='object')return value;
     if(seen.has(value))return seen.get(value);
     const proxy=new Proxy(value,{
+      ...(deep?{get(target,key,receiver){return collection(Reflect.get(target,key,receiver),true);}}:{}),
       set(target,key,v){if(!allowed())return true;return Reflect.set(target,key,v,target);},
       deleteProperty(target,key){if(!allowed())return true;return Reflect.deleteProperty(target,key);},
       defineProperty(target,key,d){if(!allowed())return false;return Reflect.defineProperty(target,key,d);}
@@ -33,8 +34,8 @@
   function protect(state){
     if(!state||typeof state!=='object'||roots.has(state))return state;
     roots.add(state);
-    for(const key of [...numbers,'inv','eq','attr','sk']){
-      let value=numbers.includes(key)?state[key]:collection(state[key]);
+    for(const key of [...numbers,'inv','eq','attr','sk','rps']){
+      let value=numbers.includes(key)?state[key]:collection(state[key],key==='rps');
       Object.defineProperty(state,key,{enumerable:true,configurable:false,get(){return value;},set(next){
         if(!allowed())return;
         if(numbers.includes(key)){
@@ -42,7 +43,7 @@
           if(key==='speed'&&![1,1.5,2].includes(next))return;
           if(['gold','xp','knb'].includes(key)&&next<0)return;
           value=next;
-        }else value=collection(next);
+        }else value=collection(next,key==='rps');
       }});
     }
     return state;

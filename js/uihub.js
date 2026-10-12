@@ -45,7 +45,7 @@ function groupMore(){
 if(typeof renderMore==="function"){const _rm=renderMore;renderMore=function(){_rm();const t=$("#t-more");if(!t)return;addToggles(t);groupMore()}}
 
 /* ---------- 2. Hộp Quà: nhóm thẻ + gập phần mô tả dài ---------- */
-const GIFT_GROUPS=[["Hôm nay",["login","quest","lvms"]],["Hoạt động",["yt","tk","siege","tower","tower2","dungeons","ferry","weekly","training"]],["Thưởng",["ach","chest","event","tx","stable"]],["Nhân vật",["pet","reborn","mode"]],["Cộng đồng",["guild","clan"]]];
+const GIFT_GROUPS=[["Hôm nay",["login","quest","lvms"]],["Hoạt động",["yt","tk","siege","tower","tower2","dungeons","ferry","weekly","training"]],["Thưởng",["ach","chest","event","tx","rps","stable"]],["Nhân vật",["pet","reborn","mode"]],["Cộng đồng",["guild","clan"]]];
 const descOpen=new Set();
 if(typeof giftModal==="function"){const _gm=giftModal;giftModal=function(){_gm();
  const bar=$("#giftTabs");if(!bar)return;
@@ -96,5 +96,5 @@ function statText(){
  const b=typeof xpBuffLeft==="function"?xpBuffLeft():0;if(b>0)p.push("EXP +25% · "+Math.ceil(b/6e4)+"p");
  const luck=typeof farmLuckBonus==='function'?farmLuckBonus():0;if(luck>0)p.push('May mắn +'+luck);
  return p.join(" · ")}
-setInterval(()=>{const t=statText();if(st.textContent!==t)st.textContent=t;st.style.display=t?"":"none"},500);
+setInterval(()=>{if(typeof rpsPulse==="function")rpsPulse();const t=statText();if(st.textContent!==t)st.textContent=t;st.style.display=t?"":"none"},500);
 })();

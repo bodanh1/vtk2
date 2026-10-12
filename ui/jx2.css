@@ -887,4 +887,20 @@ body.sv #autoControls{display:none}
 .treasureHorse summary{cursor:pointer;color:#d5c388;min-height:28px;touch-action:manipulation}
 .treasureProduct small{display:block;color:#b7c1a7;margin-top:5px}
 .treasureTabs button,.treasureHorse button{touch-action:manipulation}
+.rps-game{font-size:13px;line-height:1.5}
+.rps-game h4{margin:8px 0;color:#f3d876}
+.rps-game p{margin:6px 0}
+.rps-wallet{color:#f3d876;margin:10px 0}
+.rps-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.rps-form label{display:grid;gap:4px;min-width:0}
+.rps-form input,.rps-form select{width:100%;min-width:0;box-sizing:border-box;font-size:16px;min-height:40px;touch-action:manipulation}
+.rps-hands{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.rps-hands button{display:grid;justify-items:center;gap:4px;min-height:62px;touch-action:manipulation}
+.rps-hands span{font-size:26px}
+.rps-hands button.on{border-color:#ffe091;box-shadow:inset 0 0 0 1px #ffe091;background:#645326}
+#rpsPlay{width:100%;min-height:44px;touch-action:manipulation}
+#rpsRound{color:#f3d876;min-height:20px;font-variant-numeric:tabular-nums}
+.rps-history>div{display:grid;grid-template-columns:1fr 48px 1fr;gap:6px;border-bottom:1px solid #375134;padding:6px 0;font-size:12px}
+.rps-history>div>span:last-child{text-align:right}
+.rps-game summary{cursor:pointer;min-height:36px;touch-action:manipulation}
 @media(pointer:coarse),(max-width:600px){.treasureTabs button,.treasureHorse button,.treasureProduct button{min-height:40px}}
