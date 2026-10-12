@@ -848,3 +848,5 @@ body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jx
 #bb{position:absolute;left:0;bottom:var(--safe-b,0px);background:transparent}
 #bbunder{position:absolute;left:0;right:0;bottom:0;background:transparent;pointer-events:none}
 #bbunder canvas{visibility:hidden}
+
+#guideResults{font-size:12px;line-height:1.65}.guideCard{padding:9px 0;border-bottom:1px solid #6f8a5266}.guideCard h4{margin:3px 0;color:#ffd94e}.guideCard p{margin:6px 0}.guideCard small{color:#a9d3be}.guideCard li{margin:4px 0}.guideTable{overflow-x:auto;-webkit-overflow-scrolling:touch}.guideTable table{width:100%;border-collapse:collapse}.guideTable td,.guideTable th{padding:5px 6px;border-bottom:1px solid #6f8a5244;text-align:left;vertical-align:top}.guideTable th{color:#ffd94e}#guideSearch{box-sizing:border-box;width:100%;font-size:16px}#jxPlayerGuide i{background:none;font:20px/24px Arial,sans-serif}
