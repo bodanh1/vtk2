@@ -1,6 +1,8 @@
 "use strict";
 const TRAIN_BOT_MAX = 30;
 const TRAIN_BOTS = { actors: new Map(), map: '', nextSpawnAt:0 };
+const BOT_PROFILE_CACHE=new WeakMap();
+function cachedBotProfile(data,lvl){const key=[S.mode,lvl,data.fac,data.sex].join(':');const old=BOT_PROFILE_CACHE.get(data);if(old?.key===key)return old.profile;const profile=botProfile(data,lvl);BOT_PROFILE_CACHE.set(data,{key,profile});return profile;}
 const BOT_NAMES = ['Lệnh Hồ Xung','Đông Phương Bại','Độc Cô Cầu Bại','Dương Quá','Tiểu Long Nữ','Quách Tĩnh','Hoàng Dung','Trương Vô Kỵ','Triệu Mẫn','Chu Chỉ Nhược','Kiều Phong','Đoàn Dự','Hư Trúc','Vương Ngữ Yên','Nhậm Doanh Doanh','Vi Tiểu Bảo','Lục Tiểu Phụng','Hoa Mãn Lâu','Sở Lưu Hương','Lý Tầm Hoan','A Phi','Tây Môn Xuy Tuyết','Ăn Mì Đánh Quái','Đại Hiệp Hết Tiền','Kiếm Sĩ Mất Dép','Bún Bò Đại Hiệp','Lão Hạc Cầm Kiếm','Cày Thuê Trả Nợ','Bang Chủ Ngủ Gật','Thánh Né Deadline','Độc Cô Ăn Vạ','Hết Mana Rồi','Một Đấm Ăn Cơm','Đang Đợi Lương','Sư Phụ Mất Wifi','Kiếm Khách Ăn Hành','Tiểu Nhị Bán Bún','Chưởng Môn Sợ Vợ','Đại Ca Bán Cá','Cô Nương Ăn Lẩu'];
 const BOT_FIRST = ['Thiên','Phong','Long','Hàn','Ngọc','Bạch','Vân','Lâm','Kiếm','Tiểu','Mộc','Tử'];
 const BOT_LAST = ['Vũ','Ảnh','Phong','Tâm','Sơn','Hổ','Nguyệt','Long','Minh','Hà','Trúc','Yến'];
@@ -27,15 +29,21 @@ function botConfig() {
       const hadParty=S.botParty&&S.botParty.members&&S.botParty.members.length;
       if(S.botParty){S.botParty.members=[];S.botParty.leader='player';S.botParty.lootTurn=0;S.botParty.history=[]}
       if(typeof BOT_PARTY!=='undefined'){BOT_PARTY.invite=null;BOT_PARTY.nextInvite=Date.now()+30000}
-      for(let i=0;i<count;i++)addTrainBot();
+      for(let i=0;i<count;i++)addTrainBot(cfg);
       const hud=document.getElementById('partyHud');if(hud)hud.classList.add('hidden');
       if(hadParty)toast('Đã sang map mới: tổ đội cũ giải tán. Hãy tìm đội mới.');
     }
   }
+  if(cfg.defaultPopulationVersion!==1){
+    cfg.defaultPopulationVersion=1;cfg.on=true;
+    const count=cfg.list.length>=5&&cfg.list.length<=10?cfg.list.length:irnd(5,10);
+    cfg.list=cfg.list.slice(0,count);
+    while(cfg.list.length<count)addTrainBot(cfg);
+  }
   return cfg;
 }
-function addTrainBot() {
-  const cfg = botConfig();
+function addTrainBot(config) {
+  const cfg = config||botConfig();
   if (cfg.list.length >= TRAIN_BOT_MAX) return false;
   const name=botRandomName(cfg.list);
   const fac = Object.keys(FAC)[irnd(0,Object.keys(FAC).length-1)];
@@ -64,7 +72,7 @@ function botsTick(dt) {
     }
     const zone=zoneOf(Math.min(S.stage,STAGES)),effectiveLevel=clamp(data.lvl,Math.max(1,zone.lo),Math.min(MAX_LEVEL,zone.hi));
     const profileKey=S.mode+':'+effectiveLevel;
-    if(b.profileKey!==profileKey){b.profile=botProfile(data,effectiveLevel);b.profileKey=profileKey;b.maxhp=b.profile.P.life;b.hp=b.maxhp;b.mana=b.profile.P.mana}
+    if(b.profileKey!==profileKey){b.profile=cachedBotProfile(data,effectiveLevel);b.profileKey=profileKey;b.maxhp=b.profile.P.life;b.hp=b.maxhp;b.mana=b.profile.P.mana}
     const oldX=b.x,oldY=b.y;
     b.cd=Math.max(0,b.cd-dt);
     b.mana=Math.min(b.profile.P.mana,b.mana+b.profile.P.manaRegen*dt);
