@@ -832,3 +832,12 @@ html.jxo #bb:not(.touchbar) #jxTreasure>*{visibility:hidden}
 #jxPX,#mClose{right:0;top:-34px;width:36px;height:32px;padding:0;border:1px solid #827653;border-radius:3px;background:linear-gradient(#3e4332,#1c2519);color:#f7df9d;font:700 24px/28px Arial,sans-serif;text-shadow:0 1px 1px #000;z-index:6;touch-action:manipulation;cursor:pointer}
 #jxPX:hover,#mClose:hover{background:#49543a}
 #jxPX:active,#mClose:active{background:#1b2617}
+
+/* Pack remaining actions into the top row; the collapse control occupies no grid cell. */
+#jxActs,body.jxland #jxActs,body.jxthumb #jxActs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));min-height:44px}
+#jxMainActs,#jxExtraActs,#jxActs.actionsCollapsed #jxExtraActs{display:contents}
+#jxActsToggle{position:absolute;right:-23px;top:9px;margin:0;grid-column:auto}
+body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(100px + var(--safe-t,0px))}
+body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(124px + var(--safe-t,0px))!important}
+body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxStat{top:calc(145px + var(--safe-t,0px))}
+body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxChat{top:calc(169px + var(--safe-t,0px))!important}
