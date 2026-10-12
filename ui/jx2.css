@@ -871,5 +871,12 @@ body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jx
 .auto-settings select{font-size:16px;min-height:40px;max-width:100px;touch-action:manipulation}
 .auto-settings h4{margin:0 0 8px;color:#f2d66d}
 .auto-settings small{display:block;color:#a7b6a6;line-height:1.5;margin-top:6px}
+.auto-settings .auto-toggle{position:relative;display:inline-block;width:38px;height:23px;flex:0 0 38px}
+.auto-settings .auto-toggle input{position:absolute;inset:0;width:38px;height:23px;margin:0;opacity:0!important;z-index:1;cursor:pointer}
+.auto-settings .auto-toggle i{display:block;width:100%;height:100%;box-sizing:border-box;border:1px solid #b79a4e;border-radius:18px;background:#292616;pointer-events:none}
+.auto-settings .auto-toggle i:after{content:"";position:absolute;left:3px;top:3px;width:17px;height:17px;border-radius:50%;background:#b4a887;transition:transform .12s}
+.auto-settings .auto-toggle input:checked+i{background:#9b803c}
+.auto-settings .auto-toggle input:checked+i:after{transform:translateX(15px);background:#fff0bd}
+.auto-settings .auto-toggle input:focus-visible+i{outline:2px solid #fff0bd;outline-offset:3px}
 body.sv #autoControls{display:none}
 @media(pointer:coarse),(max-width:600px){#autoControls button{min-height:44px}#jxAutoSettings{width:44px;padding:11px}#autoControls #jxMini{min-width:44px;min-height:44px}#jxAutoSwitch{gap:5px;padding:4px 7px;font-size:14px}#autoControls{gap:4px}}
