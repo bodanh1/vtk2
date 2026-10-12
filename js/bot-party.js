@@ -1,6 +1,7 @@
 "use strict";
 const BOT_PARTY_MAX=6,BOT_PARTY_RANGE=800;
 const BOT_PARTY={invite:null,nextInvite:0,slot:null};
+function refreshPartyInviteBadge(){const button=document.getElementById("jxParty");if(!button)return;const pending=!!(S?.fac&&BOT_PARTY.invite&&BOT_PARTY.invite.until>Date.now());if(button.dataset.partyPending===String(pending))return;button.dataset.partyPending=String(pending);button.classList.toggle("partyPending",pending);button.classList.toggle("on",pending);button.setAttribute("aria-label",pending?"Tổ đội · có lời mời hoặc yêu cầu đang chờ":"Menu tổ đội");button.title=pending?"Có lời mời hoặc yêu cầu vào đội · bấm để trả lời":"Mời nhân vật xung quanh vào tổ đội";}
 function botPartyConfig(){
   if(!S.botParty||typeof S.botParty!=='object')S.botParty={members:[],lootTurn:0,invites:true,history:[]};
   const p=S.botParty,cfg=botConfig(),active=new Set(cfg.on?cfg.list.map(b=>b.id):[]);
@@ -9,7 +10,7 @@ function botPartyConfig(){
   p.history=Array.isArray(p.history)?p.history.slice(-8):[];
   if(p.invites===undefined)p.invites=true;
   if(BOT_PARTY.invite&&!active.has(BOT_PARTY.invite.id))BOT_PARTY.invite=null;
-  return p;
+  refreshPartyInviteBadge();return p;
 }
 const botInParty=id=>botPartyConfig().members.includes(id);
 function partyAddBot(id,invited=false){
@@ -27,13 +28,13 @@ function partyInviteCheck(){
   if(BOT_PARTY.slot!==slot){BOT_PARTY.slot=slot;BOT_PARTY.invite=null;BOT_PARTY.nextInvite=now+30000}
   const p=botPartyConfig();
   if(BOT_PARTY.invite&&BOT_PARTY.invite.until<now)BOT_PARTY.invite=null;
-  const button=$('#jxParty');if(button)button.classList.toggle('on',!!BOT_PARTY.invite);
+  refreshPartyInviteBadge();
   if(!p.invites||!botsAvailable()||p.members.length>=BOT_PARTY_MAX-1||BOT_PARTY.invite||now<BOT_PARTY.nextInvite||document.hidden)return;
   BOT_PARTY.nextInvite=now+60000;
   const nearby=botActors().filter(b=>b.deadT<=0&&b.hp>0&&!p.members.includes(b.data.id)&&Math.hypot(b.x-H.x,b.y-H.y)<=BOT_PARTY_RANGE);
   if(!nearby.length)return;
-  const b=pick(nearby);BOT_PARTY.invite={id:b.data.id,name:b.data.name,until:now+60000};
-  toast(b.data.name+' mời bạn vào tổ đội. Mở Tổ đội để trả lời.');if(button)button.classList.add('on');
+  const b=pick(nearby);BOT_PARTY.invite={id:b.data.id,name:b.data.name,until:now+60000,kind:p.members.length&&p.leader==='player'?'join':'invite'};
+  toast(b.data.name+(BOT_PARTY.invite.kind==='join'?' xin vào tổ đội của bạn.':' mời bạn vào tổ đội.')+' Mở Tổ đội để trả lời.');refreshPartyInviteBadge();
 }
 setInterval(partyInviteCheck,1000);
 function partyRecipients(e){
@@ -88,13 +89,13 @@ function botPartyModal(){
   modal(`<h3>Tổ đội <small>${p.members.length?1+p.members.length:0}/${BOT_PARTY_MAX}</small></h3>
     <p class="desc">Mời nhân vật gần bạn cùng cày. Thành viên còn sống trong tầm ${BOT_PARTY_RANGE} nhận EXP và ngân lượng chia đều; đồ rơi chia luân phiên. Đồng đội sẽ chạy tới hỗ trợ bạn.</p>
     <div class="btnrow"><button class="btn" id="partyRefresh">Làm mới</button><button class="btn red" id="partyDismiss" ${p.members.length?'':'disabled'}>Rời tổ đội</button><button class="btn ${p.invites?'on':''}" id="partyInvites">Bot mời: ${p.invites?'Bật':'Tắt'}</button></div>
-    ${invite?`<div class="card"><b>${esc(invite.name)} mời bạn vào tổ đội</b><div class="btnrow"><button class="btn" id="partyAccept">Chấp nhận</button><button class="btn red" id="partyDecline">Từ chối</button></div></div>`:''}
+    ${invite?`<div class="card"><b>${esc(invite.name)} ${invite.kind==='join'?'xin vào tổ đội của bạn':'mời bạn vào tổ đội'}</b><div class="btnrow"><button class="btn" id="partyAccept">Chấp nhận</button><button class="btn red" id="partyDecline">Từ chối</button></div></div>`:''}
     ${p.members.length?`<h4>Thành viên · Đội trưởng: ${esc(leader?leader.name:S.name||'Bạn')}</h4><div class="partyrow"><b>${esc(S.name||'Bạn')}</b><small>Cấp ${S.lvl}</small></div>${p.members.map(id=>{const b=cfg.list.find(b=>b.id===id),a=TRAIN_BOTS.actors.get(id);return `<div class="partyrow"><span><b>${esc(b.name)}</b><small>${a&&a.deadT>0?'Đang hồi sinh':a&&Math.hypot(a.x-H.x,a.y-H.y)<=BOT_PARTY_RANGE?'Ở gần':'Đang tới'} · Cấp ${b.lvl} · Nhận ${Array.isArray(b.bag)?b.bag.length:0} món</small></span><button class="btn sm" data-party-remove="${esc(id)}">Rời nhóm</button></div>`}).join('')}`:'<p class="desc">Bạn chưa có tổ đội.</p>'}
     <h4>Nhân vật xung quanh</h4>${nearby.map(b=>`<div class="partyrow"><span><b>${esc(b.data.name)}</b><small>Cấp ${b.data.lvl}</small></span><button class="btn sm" data-party-add="${esc(b.data.id)}" ${p.members.length>=BOT_PARTY_MAX-1?'disabled':''}>Mời</button></div>`).join('')||'<p class="desc">Chưa có nhân vật ở gần. Bật hoặc thêm bot tại Menu bot.</p>'}
     ${p.history.length?`<h4>Chia đồ gần đây</h4>${p.history.map(t=>`<p class="desc">${esc(t)}</p>`).join('')}`:''}`,()=>{
       $('#partyRefresh').onclick=botPartyModal;$('#partyDismiss').onclick=partyDismiss;
       $('#partyInvites').onclick=()=>{p.invites=!p.invites;if(!p.invites)BOT_PARTY.invite=null;save();botPartyModal()};
-      if(invite){$('#partyAccept').onclick=()=>partyAddBot(invite.id,true);$('#partyDecline').onclick=()=>{BOT_PARTY.invite=null;BOT_PARTY.nextInvite=Date.now()+60000;botPartyModal()}}
+      if(invite){$('#partyAccept').onclick=()=>partyAddBot(invite.id,invite.kind!=='join');$('#partyDecline').onclick=()=>{BOT_PARTY.invite=null;BOT_PARTY.nextInvite=Date.now()+60000;botPartyModal()}}
       document.querySelectorAll('[data-party-add]').forEach(b=>b.onclick=()=>partyAddBot(b.dataset.partyAdd));
       document.querySelectorAll('[data-party-remove]').forEach(b=>b.onclick=()=>partyLeaveBot(b.dataset.partyRemove));
     });

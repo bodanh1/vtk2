@@ -841,3 +841,5 @@ body:not(.jxthumb):not(.actionsCollapsed) #jxStat{top:calc(100px + var(--safe-t,
 body:not(.jxthumb):not(.actionsCollapsed) #jxChat{top:calc(124px + var(--safe-t,0px))!important}
 body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxStat{top:calc(145px + var(--safe-t,0px))}
 body:not(.jxthumb):not(.actionsCollapsed):has(#jxAccountAdmin:not([hidden])) #jxChat{top:calc(169px + var(--safe-t,0px))!important}
+
+#jxParty.partyPending::after{content:"!";position:absolute;right:2px;top:0;z-index:2;width:12px;height:12px;box-sizing:border-box;border:1px solid #ffe295;border-radius:50%;background:#b82219;color:#fff5b5;font:700 10px/10px Arial,sans-serif;text-align:center;pointer-events:none}
