@@ -904,4 +904,10 @@ body.sv #autoControls{display:none}
 .rps-history>div{display:grid;grid-template-columns:1fr 48px 1fr;gap:6px;border-bottom:1px solid #375134;padding:6px 0;font-size:12px}
 .rps-history>div>span:last-child{text-align:right}
 .rps-game summary{cursor:pointer;min-height:36px;touch-action:manipulation}
+.loot-set-filter{margin:10px 0;border:1px solid #496047;padding:7px;font-size:12px}
+.loot-set-filter summary{cursor:pointer;color:#f2d66d;min-height:32px;touch-action:manipulation}
+.loot-set-filter .policy-grid{margin:6px 0}
+.loot-set-chosen>div{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px solid #344531}
+.loot-set-chosen span{min-width:0;overflow-wrap:anywhere}
+.loot-set-chosen button{flex:0 0 30px;padding:2px;min-height:30px;touch-action:manipulation}
 @media(pointer:coarse),(max-width:600px){.treasureTabs button,.treasureHorse button,.treasureProduct button{min-height:40px}}
