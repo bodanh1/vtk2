@@ -47,7 +47,7 @@ export class SocialRoom {
  async fetch(req){try{
   const url=new URL(req.url);if(url.pathname==='/api/social'&&req.method==='GET')return await this.connect(req,url);const body=req.method==='POST'?await readJson(req,16384):null,now=Date.now();
   if(url.pathname==='/api/presence'&&req.method==='POST')return json(await this.presence(req,body));
-  await this.history();const env={...this.env,DB:this.db,SKIP_CHAT_CLEANUP:true};
+  await this.history();const env={...this.env,ACCOUNT_DB:this.env.DB,DB:this.db,SKIP_CHAT_CLEANUP:true};
   if(url.pathname==='/api/chat/session'&&req.method==='POST')return json(await chatSession(req,env,body));
   if(url.pathname==='/api/chat'&&req.method==='GET'){const key=url.search;const hit=this.listCache.get(key);if(hit&&now-hit.at<4000)return json(hit.data);const data=await chatList(req,env,body,url);if(this.listCache.size>=100)this.listCache.clear();this.listCache.set(key,{at:now,data});return json(data);}
   if(url.pathname==='/api/chat'&&req.method==='POST'){const data=await chatSend(req,env,body);this.listCache.clear();this.broadcast(data.message);if(now-this.cleanedAt>=3600000){this.sql.exec('DELETE FROM chat_messages WHERE at<?',now-7*86400000);this.sql.exec('DELETE FROM rate WHERE t<?',Math.floor(now/1000)-3600);this.sql.exec('DELETE FROM chat_sessions WHERE at<?',now-7*86400000);this.cleanedAt=now;}return json(data);}

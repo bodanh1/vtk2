@@ -1,6 +1,10 @@
 import { HttpError, bearer, sha256Hex, randomToken, ipHash } from './http.js';
 import { rateLimit } from './db.js';
 import { cleanName } from './account.js';
+import {cloudAuth} from './cloud-account.js';
+import {requireCharacterName} from './character-name.js';
+const ADMIN_SENDER='verified-danh:';
+const messageRole=m=>({...m,isAdmin:m.sender.startsWith(ADMIN_SENDER)});
 
 export function cleanChat(text) {
   if (typeof text !== 'string') throw new HttpError(400, 'bad_text', 'Tin nhắn không hợp lệ');
@@ -12,10 +16,12 @@ export function cleanChat(text) {
 // Phiên chat riêng giúp mọi chế độ/cấp độ tham gia, không thay đổi tài khoản PvP.
 export async function chatSession(req, env, body) {
   const name = cleanName(body.name);
+  let account=null;if(req.headers.get('cookie'))try{account=await cloudAuth(req,{...env,DB:env.ACCOUNT_DB||env.DB});}catch(e){if(e.status!==401)throw e;}
+  requireCharacterName(name,account);
   const ip = await ipHash(req, env);
   if (!await rateLimit(env.DB, 'chat-session:' + ip, 20, 3600))
     throw new HttpError(429, 'rate', 'Tạo phiên chat quá nhiều, thử lại sau');
-  const token = randomToken(), id = randomToken(9), at = Date.now();
+  const token = randomToken(), id = (account?.username==='danh'?ADMIN_SENDER:'')+randomToken(9), at = Date.now();
   await env.DB.prepare('INSERT INTO chat_sessions(id,token_hash,name,at) VALUES(?1,?2,?3,?4)')
     .bind(id, await sha256Hex(token), name, at).run();
   return { token };
@@ -29,7 +35,7 @@ export async function chatList(req, env, body, url) {
     ? 'SELECT id,name,sender,text,at FROM chat_messages WHERE id>?1 AND at>?2 ORDER BY id LIMIT 50'
     : 'SELECT id,name,sender,text,at FROM chat_messages WHERE at>?1 ORDER BY id DESC LIMIT 50')
     .bind(...(after ? [after, oldest] : [oldest])).all();
-  return { messages: after ? rows.results : rows.results.reverse() };
+  return { messages: (after ? rows.results : rows.results.reverse()).map(messageRole) };
 }
 
 export async function chatSend(req, env, body) {
@@ -38,6 +44,7 @@ export async function chatSend(req, env, body) {
   const sender = await env.DB.prepare('SELECT id,name FROM chat_sessions WHERE token_hash=?1')
     .bind(await sha256Hex(token)).first();
   if (!sender) throw new HttpError(401, 'bad_token', 'Cần kết nối lại chat');
+  requireCharacterName(sender.name,sender.id.startsWith(ADMIN_SENDER)?{username:'danh'}:null);
   const ip = await ipHash(req, env);
   if (!await rateLimit(env.DB, 'chat-ip:' + ip, 30, 60) ||
       !await rateLimit(env.DB, 'chat-send:' + sender.id, 1, 3))
@@ -46,5 +53,5 @@ export async function chatSend(req, env, body) {
   const message = await env.DB.prepare('INSERT INTO chat_messages(name,sender,text,at) VALUES(?1,?2,?3,?4) RETURNING id,name,sender,text,at')
     .bind(sender.name, sender.id, text, at).first();
   if(!env.SKIP_CHAT_CLEANUP)await env.DB.prepare('DELETE FROM chat_messages WHERE at<?1').bind(at - 7 * 864e5).run();
-  return { message };
+  return { message:messageRole(message) };
 }

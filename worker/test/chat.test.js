@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { SCHEMA } from '../src/db.js';
 import { cleanChat, chatSession, chatSend, chatList } from '../src/chat.js';
+import {sha256Hex} from '../src/http.js';
+import {requireCharacterName} from '../src/character-name.js';
 
 function setup() {
   const sql = new DatabaseSync(':memory:');
@@ -17,6 +19,22 @@ function setup() {
   return { env: { DB }, sql };
 }
 const req = token => new Request('https://game.example/api/chat', { headers: token ? { authorization: 'Bearer ' + token } : {} });
+
+test('only authenticated danh can reserve admin names and receive red chat role, never client role claims',async()=>{
+ const {env,sql}=setup(),cookie='a'.repeat(30);
+ sql.prepare('INSERT INTO cloud_accounts VALUES(?,?,?,?,?,?)').run('danh-id','danh','hash','salt',1,Date.now());
+ sql.prepare('INSERT INTO cloud_sessions VALUES(?,?,?,?)').run(await sha256Hex(cookie),'danh-id',Date.now(),Date.now()+60000);
+ const authenticated=new Request('https://game.example/api/chat/session',{headers:{cookie:'vltk_cloud='+cookie}});
+ for(const name of ['admin','admin1','admin2','admin3','XAdminX','ADMIN','Ádmin']){
+  await assert.rejects(chatSession(req(),env,{name,isAdmin:true,username:'danh'}),e=>e.code==='reserved_character_name');
+  requireCharacterName(name,{username:'danh'});
+ }
+ for(const name of ['admin','admin1','admin2','admin3','Nhân vật thường']){
+  const session=await chatSession(authenticated,env,{name});const sent=await chatSend(req(session.token),env,{text:'Xin chào',isAdmin:false});assert.equal(sent.message.isAdmin,true);
+ }
+ const ordinary=await chatSession(req(),env,{name:'Người chơi',isAdmin:true});assert.equal((await chatSend(req(ordinary.token),env,{text:'Giả màu',isAdmin:true})).message.isAdmin,false);
+ const history=await chatList(req(),env,null,new URL('https://game.example/api/chat'));assert.equal(history.messages.filter(m=>m.isAdmin).length,5);sql.close();
+});
 
 test('chat chuẩn hóa tiếng Việt, giới hạn độ dài, chặn dữ liệu rỗng', () => {
   assert.equal(cleanChat('  Xin chào\nmap mới  '), 'Xin chào map mới');

@@ -1,3 +1,4 @@
+import {requireCharacterName} from './character-name.js';
 import {economyEnabled,economyMeta} from './economy.js';
 import {checkStateSecurity} from './state-security.js';
 // Tài khoản online: đăng ký, heartbeat (đo giờ chơi phía server), đồng bộ save.
@@ -82,6 +83,7 @@ export async function register(req, env, body) {
   if (!(await verifyTurnstile(env, body.turnstile, req.headers.get("cf-connecting-ip"))))
     throw new HttpError(403, "captcha", "Xác minh chống bot không thành công");
   const name = cleanName(body.name);
+  let nameOwner=null;if(req.headers.get('cookie'))try{nameOwner=await cloudAuth(req,env);}catch(e){if(e.status!==401)throw e;}requireCharacterName(name,nameOwner);
   let state = parseSave(body.save);if(req.headers.get('cookie')){let owner;try{owner=await cloudAuth(req,env);}catch(e){if(e.status!==401)throw e;}if(owner&&await economyMeta(env.DB,owner.id,env)){const row=await env.DB.prepare('SELECT snapshot FROM cloud_saves WHERE account_id=?1').bind(owner.id).first();const trusted=JSON.parse(row?.snapshot||'null')?.slots.find(x=>x?.cid===state.cid);if(!trusted)throw new HttpError(409,'online_character','Lưu nhân vật lên tài khoản trước khi đăng ký online');state=trusted;}}
   if (state.lvl > REGISTER_MAX_LVL)
     throw new HttpError(400, "too_late", `Chỉ đăng ký được khi nhân vật dưới cấp ${REGISTER_MAX_LVL + 1}`);
@@ -141,6 +143,7 @@ export async function sync(req, env, body) {
   if (!(await rateLimit(env.DB, "sync:" + acc.id, 20, 3600)))
     throw new HttpError(429, "rate_limited", "Đồng bộ quá nhiều, thử lại sau");
   const state = await serverState(env,acc.id)||parseSave(body.save);
+  let nameOwner=null;if(req.headers.get('cookie'))try{nameOwner=await cloudAuth(req,env);}catch(e){if(e.status!==401)throw e;}requireCharacterName(state.name,nameOwner);
   const previous=await env.DB.prepare('SELECT snapshot FROM chars WHERE account_id=?1').bind(acc.id).first();
   if(!previous||JSON.parse(previous.snapshot||'null')?.mode!==state.mode)throw new HttpError(409,'online_mode','Nhân vật online không thể đổi chế độ');
   const now = Date.now();

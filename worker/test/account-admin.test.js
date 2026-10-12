@@ -21,3 +21,5 @@ test('Tang Mon weapon filter includes every native Tu Tien tier and the ranged-o
  const crossbows=G.J.items[1].list.map((r,i)=>({r,i})).filter(({r})=>r.k===2);
  assert.ok(crossbows.length);for(const {r,i}of crossbows){assert.ok(all.some(e=>e.id==='e:1:'+i),r.n);assert.ok(ranged.some(e=>e.id==='e:1:'+i),r.n);}
 });
+
+test('cloud saving reserves admin character names for authenticated danh only',async()=>{for(const isAdmin of [false,true]){const {env,sql}=setup(),a=isAdmin?await admin(env,sql):await register(env),b=await ready(env,a.cookie);b.slots[0].name='ADMIN3';const body={clientId,revision:1,bundle:b};if(isAdmin){const r=await route(env,'save',body,a.cookie);assert.equal(r.data.revision,2);assert.equal((await route(env,'load',{},a.cookie,'GET')).data.bundle.slots[0].name,'ADMIN3');}else{await assert.rejects(route(env,'save',body,a.cookie),e=>e.code==='reserved_character_name');assert.equal(sql.prepare('SELECT revision FROM cloud_saves').get().revision,1);}sql.close();}});
